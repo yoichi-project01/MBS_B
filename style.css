@@ -1,0 +1,107 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+    font-family: 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.container {
+    text-align: center;
+    padding: 40px 20px;
+    max-width: 100%;
+}
+
+h1 {
+    font-size: 36px;
+    color: #2f5d3f;
+    margin-bottom: 10px;
+}
+
+h2 {
+    font-size: 22px;
+    color: #4b7a5c;
+    margin-bottom: 40px;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.menu button {
+    width: 240px;
+    max-width: 90%;
+    padding: 16px 0;
+    font-size: 18px;
+    background-color: #ffffff;
+    color: #2f5d3f;
+    border: 2px solid #b5cbbb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.menu button:hover {
+    background-color: #f0f5f1;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* モバイル向け調整 */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 28px;
+    }
+
+    h2 {
+        font-size: 18px;
+        margin-bottom: 30px;
+    }
+
+    .menu button {
+        font-size: 16px;
+        padding: 14px 0;
+    }
+}
+
+.site-header {
+    width: 100%;
+    background-color: #2f5d3f;
+    padding: 16px 20px;
+    color: #ffffff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000; 
+}
+
+.header-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 24px;
+    margin: 0;
+}
+
+.nav a {
+    margin-left: 16px;
+    text-decoration: none;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.nav a:hover {
+    text-decoration: underline;
+}
