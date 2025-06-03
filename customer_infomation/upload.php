@@ -1,21 +1,5 @@
 <?php
-$host = 'localhost';
-$db   = 'mbs';      // ← あなたのDB名に変更
-$user = 'root';          // ← あなたのユーザー名に変更
-$pass = '';      // ← あなたのパスワードに変更
-$charset = 'utf8mb4';
-
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-$options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-];
-
-try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
-} catch (PDOException $e) {
-    die("DB接続失敗: " . $e->getMessage());
-}
+require_once(__DIR__ . '/../component/db.php');
 
 if (isset($_FILES['csv_file']) && $_FILES['csv_file']['error'] === UPLOAD_ERR_OK) {
     $tmpName = $_FILES['csv_file']['tmp_name'];
