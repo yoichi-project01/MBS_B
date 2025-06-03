@@ -10,11 +10,13 @@
 
 <body>
     <div id="header"></div>
-    <h1>CSVファイルをアップロード</h1>
-    <form action="upload.php" method="post" enctype="multipart/form-data">
-        <input type="file" name="csv_file" accept=".csv" required>
-        <button type="submit">アップロード</button>
-    </form>
+    <div class="container upload-container">
+        <h1>顧客情報</h1>
+        <form action="upload.php" method="post" enctype="multipart/form-data">
+            <input type="file" name="csv_file" accept=".csv" required>
+            <button type="submit">アップロード</button>
+        </form>
+    </div>
     <script src="../component/scipt.js"></script>
 </body>
 

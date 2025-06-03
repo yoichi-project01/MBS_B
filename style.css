@@ -1,13 +1,40 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: #ffffff;
+    background-color: #fff; /* 背景を白に */
     font-family: 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
     box-sizing: border-box;
+}
+
+/* コンテナを上部に配置 */
+.container.upload-container {
+    margin-top: 120px;
+    margin-bottom: 0;
+    background: #fff; /* 背景を白に統一 */
+    /* 線（枠線）を消すためborderを削除またはnoneに */
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(47, 93, 63, 0.08);
+    padding: 48px 32px 32px 32px;
+    min-width: 320px;
+    max-width: 400px;
+    position: relative;
+    top: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* モバイル対応 */
+@media (max-width: 480px) {
+    .container.upload-container {
+        padding: 24px 8px 16px 8px;
+        margin-top: 80px;
+        min-width: unset;
+        max-width: 100%;
+    }
 }
 
 .container {
@@ -70,38 +97,114 @@ h2 {
     }
 }
 
+/* ヘッダー全体 */
 .site-header {
     width: 100%;
     background-color: #2f5d3f;
-    padding: 16px 20px;
+    padding: 16px 0;
+    /* 左右のpaddingを0にする */
     color: #ffffff;
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 1000; 
+    z-index: 1000;
 }
 
+/* ヘッダーの中身 */
 .header-inner {
-    max-width: 1000px;
+    width: 100%;
+    max-width: none;
+    /* 制限を外す */
     margin: 0 auto;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: center;
+    /* 横方向の中央寄せ */
     align-items: center;
 }
 
-.logo {
-    font-size: 24px;
-    margin: 0;
+/* ナビゲーション */
+.nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    text-align: center;
+    width: 100%;
+    /* スマホ画面全体を使う */
+    padding: 0 16px;
+    /* 余白を調整 */
+    box-sizing: border-box;
 }
 
+/* リンク */
 .nav a {
-    margin-left: 16px;
     text-decoration: none;
     color: #ffffff;
     font-weight: bold;
+    font-size: 16px;
 }
 
 .nav a:hover {
     text-decoration: underline;
+}
+
+/* メインの余白 */
+.container {
+    margin-top: 80px;
+    text-align: center;
+    padding: 40px 16px;
+}
+
+/* CSVアップロード用の追加デザイン */
+.upload-container {
+    background: #f8fbf7;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(47, 93, 63, 0.08);
+    padding: 48px 32px 32px 32px;
+    margin-top: 100px;
+    min-width: 320px;
+    max-width: 400px;
+}
+
+.upload-container form {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.upload-container input[type="file"] {
+    border: 1px solid #b5cbbb;
+    border-radius: 6px;
+    padding: 10px;
+    background: #fff;
+    font-size: 16px;
+}
+
+.upload-container button[type="submit"] {
+    background: linear-gradient(90deg, #4b7a5c 0%, #2f5d3f 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 0;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(47, 93, 63, 0.08);
+}
+
+.upload-container button[type="submit"]:hover {
+    background: linear-gradient(90deg, #2f5d3f 0%, #4b7a5c 100%);
+    box-shadow: 0 4px 16px rgba(47, 93, 63, 0.12);
+}
+
+@media (max-width: 480px) {
+    .upload-container {
+        padding: 24px 8px 16px 8px;
+        margin-top: 70px;
+        min-width: unset;
+        max-width: 100%;
+    }
 }
