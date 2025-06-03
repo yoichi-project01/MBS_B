@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>注文書作成</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <div id="header"></div>
+    <div class="container upload-container">
+        <h1>注文書作成</h1>
+        <form action="create.php" method="post">
+            <input type="text" name="customer_name" placeholder="顧客名" required><br>
+            <input type="text" name="item" placeholder="商品名" required><br>
+            <input type="number" name="quantity" placeholder="数量" required><br>
+            <input type="text" name="remarks" placeholder="備考"><br>
+            <button type="submit">注文書を作成</button>
+        </form>
+    </div>
+    <script src="../component/scipt.js"></script>
+</body>
+</html>
