@@ -12,11 +12,26 @@
     <div id="header"></div>
     <div class="container upload-container">
         <h1>顧客情報</h1>
+        <div id="upload-message"></div> <!-- メッセージ表示用 -->
         <form action="upload.php" method="post" enctype="multipart/form-data">
             <input type="file" name="csv_file" accept=".csv" required>
             <button type="submit">アップロード</button>
         </form>
     </div>
+    <script>
+        // クエリパラメータからresultを取得してメッセージ表示
+        const params = new URLSearchParams(window.location.search);
+        const result = params.get('result');
+        if (result === 'success') {
+            document.getElementById('upload-message').textContent = '✅ CSVの取り込みが完了しました。';
+        } else if (result === 'fail') {
+            document.getElementById('upload-message').textContent = '❌ CSVファイルのアップロードに失敗しました。';
+        }
+        // クエリパラメータを履歴から消す（リロード時はメッセージ非表示）
+        if (result) {
+            history.replaceState(null, '', location.pathname);
+        }
+    </script>
     <script src="../component/scipt.js"></script>
 </body>
 

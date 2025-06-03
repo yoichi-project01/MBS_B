@@ -70,7 +70,9 @@ if (isset($_FILES['csv_file']) && $_FILES['csv_file']['error'] === UPLOAD_ERR_OK
     }
 
     fclose($handle);
-    echo "✅ CSVの取り込みが完了しました。";
+    header("Location: index.html?result=success");
+    exit;
 } else {
-    echo "❌ CSVファイルのアップロードに失敗しました。";
+    header("Location: index.html?result=fail");
+    exit;
 }
