@@ -18,9 +18,11 @@ if (isset($_FILES['csv_file']) && $_FILES['csv_file']['error'] === UPLOAD_ERR_OK
             return mb_convert_encoding($value, 'UTF-8', 'SJIS-win');
         }, $data);
 
-        if (count($data) < 7) continue; // データ不完全行をスキップ
+        if (count($data) < 9) continue; // 必須列が不足している場合はスキップ
 
         list(
+            $customer_no,
+            $store_name,
             $customer_name,
             $manager_name,
             $address,
@@ -31,14 +33,23 @@ if (isset($_FILES['csv_file']) && $_FILES['csv_file']['error'] === UPLOAD_ERR_OK
         ) = $data;
 
         $stmt = $pdo->prepare("
-      INSERT INTO customers (
-        customer_name, manager_name, address,
-        telephone_number, delivery_conditions, registration_date, remarks
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)
-    ");
+            INSERT INTO customers (
+                customer_no,
+                store_name,
+                customer_name,
+                manager_name,
+                address,
+                telephone_number,
+                delivery_conditions,
+                registration_date,
+                remarks
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
 
         try {
             $stmt->execute([
+                $customer_no,
+                $store_name,
                 $customer_name,
                 $manager_name ?: null,
                 $address,
