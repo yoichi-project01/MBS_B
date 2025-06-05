@@ -208,3 +208,10 @@ h2 {
         max-width: 100%;
     }
 }
+
+#store-title {
+    font-size: 20px;
+    color: #2f5d3f;
+    font-weight: bold;
+    margin: 0;
+}
