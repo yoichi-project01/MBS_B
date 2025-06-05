@@ -1,24 +1,25 @@
 <!DOCTYPE html>
-    <html lang="ja">
+<html lang="ja">
 
 <head>
-    <meta charset="UTF-8">
-    <title>緑橋書店 受注管理システム</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>緑橋書店</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-    <div class="container">
-        <h1>緑橋書店<br>受注管理システム</h1>
-
+    <main class="container">
+        <h2>店舗を選択してください</h2>
         <div class="menu">
-            <button class="menu-button" onclick="location.href='./customer_infomation/index.html'">顧客情報</button>
-            <button class="menu-button" onclick="location.href=''">統計情報</button>
-            <button class="menu-button" onclick="location.href='./orderlist/index.php'">注文書</button>
-            <button class="menu-button" onclick="location.href=''">納品書</button>
+            <button onclick="handleClick('緑橋本店')">緑橋本店</button>
+            <button onclick="handleClick('今里店')">今里店</button>
+            <button onclick="handleClick('深江橋店')">深江橋店</button>
         </div>
-    </div>
+    </main>
+
+    <!-- 外部JS読み込み -->
+    <script src="script.js"></script>
 </body>
 
 </html>
