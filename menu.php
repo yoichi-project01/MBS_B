@@ -1,6 +1,8 @@
 <?php
-// GETパラメータとローカルストレージ連携用に store を取得
-$storeName = $_GET['store'] ?? '緑橋書店';
+$storeName = $_GET['store'] ?? $_COOKIE['selectedStore'] ?? '';
+if ($storeName) {
+    setcookie('selectedStore', $storeName, time() + 3600, '/');
+}
 ?>
 
 <!DOCTYPE html>
@@ -11,7 +13,6 @@ $storeName = $_GET['store'] ?? '緑橋書店';
     <title><?php echo htmlspecialchars($storeName); ?> 受注管理システム</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
 </head>
 
 <body>
@@ -19,12 +20,14 @@ $storeName = $_GET['store'] ?? '緑橋書店';
         <h1 id="store-title"><?php echo htmlspecialchars($storeName); ?><br>受注管理システム</h1>
 
         <div class="menu">
-            <button class="menu-button" onclick="location.href='./customer_infomation/index.php'">顧客情報</button>
-            <button class="menu-button" onclick="location.href=''">統計情報</button>
-            <button class="menu-button" onclick="location.href='./orderlist/index.php'">注文書</button>
-            <button class="menu-button" onclick="location.href=''">納品書</button>
+            <button class="menu-button" data-path="customer_infomation/index.php">顧客情報</button>
+            <button class="menu-button" data-path="statistics/index.php">統計情報</button>
+            <button class="menu-button" data-path="orderlist/index.php">注文書</button>
+            <button class="menu-button" data-path="delivery/index.php">納品書</button>
         </div>
     </div>
+
+    <script src="script.js"></script>
 </body>
 
 </html>

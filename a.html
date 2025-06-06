@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>受注管理システム</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+            font-family: 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+        }
+
+        /* ===================
+       ヘッダー
+    =================== */
+        .site-header {
+            width: 100%;
+            background-color: #2f5d3f;
+            color: #ffffff;
+            padding: 16px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .header-inner {
+            max-width: 100%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            position: relative;
+        }
+
+        /* ☰ハンバーガー用 */
+        .menu-toggle-checkbox {
+            display: none;
+        }
+
+        .menu-toggle-label {
+            display: none;
+            font-size: 28px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        #store-title {
+            font-weight: bold;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .nav {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===================
+       モバイル対応
+    =================== */
+        @media (max-width: 768px) {
+            .header-inner {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 0 16px;
+            }
+
+            .menu-toggle-label {
+                display: block;
+                position: absolute;
+                top: 16px;
+                right: 16px;
+                z-index: 1001;
+            }
+
+            #store-title {
+                margin: 0;
+                padding: 16px 0 8px;
+                text-align: left;
+            }
+
+            .nav {
+                display: none;
+                flex-direction: column;
+                background-color: #2f5d3f;
+                width: 100%;
+                padding: 8px 0;
+                margin-top: 48px;
+            }
+
+            .nav a {
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            .menu-toggle-checkbox:checked+header .nav {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ☰ のトグル用 hidden チェックボックス -->
+    <input type="checkbox" id="menu-toggle" class="menu-toggle-checkbox">
+
+    <header class="site-header">
+        <div class="header-inner">
+            <!-- ☰ハンバーガーアイコン -->
+            <label for="menu-toggle" class="menu-toggle-label">☰</label>
+
+            <!-- 左側のタイトル -->
+            <b id="store-title">〇〇書店 受注管理</b>
+
+            <!-- ナビゲーションメニュー -->
+            <nav class="nav">
+                <a href="#">顧客情報</a>
+                <a href="#">統計情報</a>
+                <a href="#">注文書</a>
+                <a href="#">納品書</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- コンテンツのスペース確保 -->
+    <div style="height: 200px;"></div>
+    <main style="padding: 20px;">
+        <p>ここにコンテンツが入ります。</p>
+    </main>
+
+</body>
+
+</html>
