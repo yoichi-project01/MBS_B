@@ -65,9 +65,9 @@ if (isset($_FILES['csv_file']) && $_FILES['csv_file']['error'] === UPLOAD_ERR_OK
     }
 
     fclose($handle);
-    header("Location: index.html?result=success");
+    header("Location: index.php?result=success");
     exit;
 } else {
-    header("Location: index.html?result=fail");
+    header("Location: index.php?result=fail");
     exit;
 }
