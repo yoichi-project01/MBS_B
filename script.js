@@ -1,7 +1,7 @@
 // 書店名をローカルストレージに保存し、GETで次のページへ遷移
 function selectedStore(storeName) {
   localStorage.setItem('selectedStore', storeName);
-  window.location.href = `/menu.php?store=${encodeURIComponent(storeName)}`;
+  window.location.href = `/MBS_B/menu.php?store=${encodeURIComponent(storeName)}`;
 }
 
 // DOM読み込み後の処理

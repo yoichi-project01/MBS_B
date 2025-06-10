@@ -30,20 +30,16 @@ body {
     max-width: 100%;
     margin: 0 auto;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+    padding: 0 16px;
+    position: relative;
 }
 
 .nav {
     display: flex;
-    justify-content: center;
-    /* nav全体を中央に */
-    align-items: center;
-    width: 100%;
     gap: 16px;
-    padding: 0 16px;
-    flex-wrap: wrap;
-    text-align: center;
+    align-items: center;
 }
 
 .nav-left {
@@ -53,8 +49,6 @@ body {
 
 #store-title {
     font-weight: bold;
-    font-size: 16px;
-    color: #ffffff;
 }
 
 .nav a {
@@ -113,8 +107,15 @@ h1 {
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
-@media (max-width: 480px) {
+.menu-toggle-checkbox {
+    display: none;
+}
 
+.menu-toggle-label {
+    display: none;
+    font-size: 28px;
+    color: #fff;
+    cursor: pointer;
 }
 
 /* ===================
@@ -169,26 +170,25 @@ h1 {
     box-shadow: 0 4px 16px rgba(47, 93, 63, 0.12);
 }
 
-@media (max-width: 480px) {
-    .container.upload-container {
-        padding: 24px 8px 16px 8px;
-        margin-top: 80px;
-        min-width: unset;
-        max-width: 100%;
+@media (max-width: 768px) {
+    .header-inner {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0 16px;
     }
 
-    .menu button {
-        font-size: 16px;
-        padding: 14px 0;
-    }
-    
-    h1 {
-        font-size: 24px;
-        margin-top: 100px;
-    }
-
-    .menu-toggle {
+    .menu-toggle-label {
         display: block;
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        z-index: 1001;
+    }
+
+    #store-title {
+        margin: 0;
+        padding: 16px 0 8px;
+        text-align: left;
     }
 
     .nav {
@@ -197,58 +197,15 @@ h1 {
         background-color: #2f5d3f;
         width: 100%;
         padding: 8px 0;
-        text-align: center;
+        margin-top: 48px;
     }
 
-    .nav.open {
+    .nav a {
+        padding: 12px;
+        font-size: 16px;
+    }
+
+    .menu-toggle-checkbox:checked+header .nav {
         display: flex;
     }
-
-    #store-title {
-        position: static;
-        transform: none;
-        text-align: center;
-        margin-bottom: 8px;
-    }
-
-    .header-inner {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 0 16px;
-    }
-
-    #store-title {
-        position: static;
-        transform: none;
-        margin-bottom: 8px;
-        text-align: center;
-        width: 100%;
-    }
-
-    .menu-toggle-label {
-        display: block;   }
-
-    /* チェックされたらメニュー表示 */
-    .menu-toggle-checkbox:checked+.menu-toggle-label+.nav {
-        display: flex;   }
-}
-
-b {
-    text-align: left;
-}
-
-.menu-toggle-checkbox {
-    display: none;
-}
-
-.menu-toggle-label {
-    display: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #fff;
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1001;
 }
