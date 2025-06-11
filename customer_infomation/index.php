@@ -10,15 +10,14 @@
 </head>
 
 <body>
-    <main class="upload-area">
+    <div class="container upload-container">
         <h1>顧客情報<br>CSVアップロード</h1>
         <form action="upload.php" method="post" enctype="multipart/form-data" id="csvForm">
-            <label for="csvfile">📁 CSVファイルを選択</label>
-            <input type="file" name="csvfile" id="csvfile" accept=".csv" required />
+            <input type="file" name="csvfile" accept=".csv" required />
             <button type="submit">アップロード</button>
         </form>
         <div id="result"></div>
-    </main>
+    </div>
 </body>
 
 </html>
