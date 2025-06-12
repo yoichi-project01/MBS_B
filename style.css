@@ -30,27 +30,17 @@ body {
     max-width: 100%;
     margin: 0 auto;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+    padding: 0 16px;
+    position: relative;
 }
 
 .nav {
     display: flex;
-    justify-content: center;
-    /* nav全体を中央に */
-    align-items: center;
-    width: 100%;
     gap: 16px;
-    padding: 0 16px;
-    flex-wrap: wrap;
-    text-align: center;
+    align-items: center;
 }
-
-.nav-left {
-    margin-right: auto;
-    /* 左端に寄せる */
-}
-
 
 .nav a {
     text-decoration: none;
@@ -122,6 +112,24 @@ h1 {
     outline-offset: 2px;
 }
 
+.menu-toggle-checkbox {
+    display: none;
+}
+
+.menu-toggle-label {
+    display: none;
+    font-size: 28px;
+    color: #fff;
+    cursor: pointer;
+}
+
+a#store-title {
+    font: 100 16px/1.5 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+    font-weight: bold;
+    font-size: 20px;
+    color: #fff;
+}
+
 /* ===================
      アップロードコンテナ
   =================== */
@@ -187,6 +195,14 @@ h1 {
         padding: 14px 0;
     }
 
+    .menu-toggle-label {
+        display: block;
+        position: absolute;
+        top: 8px;
+        right: 16px;
+        z-index: 1001;
+    }
+
     h1 {
         font-size: 24px;
         margin-top: 80px;
@@ -196,23 +212,19 @@ h1 {
         display: block;
     }
 
+    h2#store-title {
+        margin: 0;
+        padding: 16px 0 8px;
+        text-align: left;
+    }
+
     .nav {
         display: none;
         flex-direction: column;
         background-color: #2f5d3f;
         width: 100%;
         padding: 8px 0;
-        text-align: center;
-        transition: max-height 0.3s ease, opacity 0.3s ease;
-        overflow: hidden;
-        max-height: 0;
-        opacity: 0;
-    }
-
-    .nav.open {
-        display: flex;
-        max-height: 500px;
-        opacity: 1;
+        margin-top: 48px;
     }
 
     .header-inner {
@@ -222,6 +234,11 @@ h1 {
         padding: 0 16px;
     }
 
+    .nav a {
+        padding: 12px;
+        font-size: 16px;
+    }
+
     .menu-toggle-label {
         display: block;
     }
@@ -229,20 +246,4 @@ h1 {
     .menu-toggle-checkbox:checked+.menu-toggle-label+.nav {
         display: flex;
     }
-}
-
-.menu-toggle-checkbox {
-    display: none;
-}
-
-.menu-toggle-label {
-    display: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #fff;
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1001;
 }
