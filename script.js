@@ -1,3 +1,5 @@
+document.body.style.overflow = 'hidden';
+
 // 書店名をローカルストレージに保存し、GETで次のページへ遷移
 function selectedStore(storeName) {
   localStorage.setItem('selectedStore', storeName);

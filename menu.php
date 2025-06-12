@@ -16,7 +16,7 @@ if ($storeName) {
 </head>
 
 <body>
-    <div class="container">
+    <main class="container">
         <h1 id="store-title"><?php echo htmlspecialchars($storeName); ?><br>受注管理システム</h1>
 
         <div class="menu">
@@ -25,7 +25,7 @@ if ($storeName) {
             <button class="menu-button" data-path="orderlist/index.php">注文書</button>
             <button class="menu-button" data-path="delivery/index.php">納品書</button>
         </div>
-    </div>
+    </main>
 
     <script src="script.js"></script>
 </body>

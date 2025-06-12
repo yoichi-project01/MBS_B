@@ -10,7 +10,7 @@ $storeName = $_GET['store'] ?? '';
         <label for="menu-toggle" class="menu-toggle-label">☰</label>
 
         <!-- 左側のタイトル -->
-        <b id="store-title"><?php echo htmlspecialchars($storeName); ?> 受注管理</b>
+        <a id="store-title"><?php echo nl2br(htmlspecialchars($storeName . "\n受注管理")); ?></a>
 
         <!-- ナビゲーションメニュー -->
         <nav class="nav">

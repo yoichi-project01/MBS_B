@@ -30,16 +30,20 @@ body {
     max-width: 100%;
     margin: 0 auto;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 0 16px;
-    position: relative;
 }
 
 .nav {
     display: flex;
-    gap: 16px;
+    justify-content: center;
+    /* nav全体を中央に */
     align-items: center;
+    width: 100%;
+    gap: 16px;
+    padding: 0 16px;
+    flex-wrap: wrap;
+    text-align: center;
 }
 
 .nav-left {
@@ -47,9 +51,6 @@ body {
     /* 左端に寄せる */
 }
 
-#store-title {
-    font-weight: bold;
-}
 
 .nav a {
     text-decoration: none;
@@ -75,7 +76,6 @@ h1 {
     /* <br>対応 */
 }
 
-
 /* ===================
      メニュー
   =================== */
@@ -87,32 +87,39 @@ h1 {
 }
 
 .menu button {
-    width: 240px;
+    width: 260px;
     max-width: 90%;
-    padding: 16px 0;
+    padding: 16px 24px;
     font-size: 18px;
-    background-color: #ffffff;
+    background-color: #f8faf9;
     color: #2f5d3f;
-    border: 2px solid #b5cbbb;
-    border-radius: 8px;
+    border: 2px solid #4b7a5c;
+    border-radius: 12px;
     cursor: pointer;
-    transition: background-color 0.2s, box-shadow 0.2s;
+    font-weight: 600;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    box-shadow: 0 2px 6px rgba(47, 93, 63, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.menu button:active {
+    transform: scale(0.98);
+    box-shadow: none;
 }
 
 .menu button:hover {
-    background-color: #f0f5f1;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    background-color: #e3efe6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(47, 93, 63, 0.2);
 }
 
-.menu-toggle-checkbox {
-    display: none;
-}
-
-.menu-toggle-label {
-    display: none;
-    font-size: 28px;
-    color: #fff;
-    cursor: pointer;
+.menu button:focus,
+.upload-container button[type="submit"]:focus {
+    outline: 2px solid #4b7a5c;
+    outline-offset: 2px;
 }
 
 /* ===================
@@ -167,25 +174,26 @@ h1 {
     box-shadow: 0 4px 16px rgba(47, 93, 63, 0.12);
 }
 
-@media (max-width: 768px) {
-    .header-inner {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 0 16px;
+@media (max-width: 480px) {
+    .container.upload-container {
+        padding: 24px 8px 16px 8px;
+        margin-top: 80px;
+        min-width: unset;
+        max-width: 100%;
     }
 
-    .menu-toggle-label {
+    .menu button {
+        font-size: 16px;
+        padding: 14px 0;
+    }
+
+    h1 {
+        font-size: 24px;
+        margin-top: 80px;
+    }
+
+    .menu-toggle {
         display: block;
-        position: absolute;
-        top: 7px;
-        right: 16px;
-        z-index: 1001;
-    }
-
-    #store-title {
-        margin: 0;
-        padding: 16px 0 8px;
-        text-align: left;
     }
 
     .nav {
@@ -194,15 +202,47 @@ h1 {
         background-color: #2f5d3f;
         width: 100%;
         padding: 8px 0;
-        margin-top: 48px;
+        text-align: center;
+        transition: max-height 0.3s ease, opacity 0.3s ease;
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
     }
 
-    .nav a {
-        padding: 12px;
-        font-size: 16px;
+    .nav.open {
+        display: flex;
+        max-height: 500px;
+        opacity: 1;
     }
 
-    .menu-toggle-checkbox:checked+header .nav {
+    .header-inner {
+        flex-direction: column;
+        align-items: center;
+        /* 修正 */
+        padding: 0 16px;
+    }
+
+    .menu-toggle-label {
+        display: block;
+    }
+
+    .menu-toggle-checkbox:checked+.menu-toggle-label+.nav {
         display: flex;
     }
+}
+
+.menu-toggle-checkbox {
+    display: none;
+}
+
+.menu-toggle-label {
+    display: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #fff;
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1001;
 }
