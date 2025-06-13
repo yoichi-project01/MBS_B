@@ -1,4 +1,11 @@
-<?php include(__DIR__ . '/../component/header.php'); ?>
+<?php 
+    include(__DIR__ . '/../component/header.php');
+
+    $message = '';
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -12,11 +19,11 @@
 <body>
     <div class="container upload-container">
         <h1>顧客情報<br>CSVアップロード</h1>
-        <form action="upload.php" method="post" enctype="multipart/form-data" id="csvForm">
-            <input type="file" name="csvfile" accept=".csv" required />
+        <form action="upload.php" method="post" enctype="multipart/form-data">
+            <input type="file" name="csv_file" accept=".csv" required />
             <button type="submit">アップロード</button>
         </form>
-        <div id="result"></div>
+        <div id="result"><?php htmlspecialchars($message) ?></div>
     </div>
 </body>
 

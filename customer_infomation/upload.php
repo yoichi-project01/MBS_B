@@ -1,73 +1,72 @@
 <?php
 require_once(__DIR__ . '/../component/db.php');
 
-if (isset($_FILES['csv_file']) && $_FILES['csv_file']['error'] === UPLOAD_ERR_OK) {
-    $tmpName = $_FILES['csv_file']['tmp_name'];
-    $handle = fopen($tmpName, 'r');
+// アップロードされたCSVファイル処理
+if (isset($_FILES['csv_file']) && is_uploaded_file($_FILES['csv_file']['tmp_name'])) {
+    $filename = $_FILES['csv_file']['tmp_name'];
+    $handle = fopen($filename, 'r');
 
-    if ($handle === false) {
-        die("CSVファイルを開けませんでした。");
-    }
+    session_start();
 
-    // ヘッダーをスキップ（必要ならコメントアウト）
-    fgetcsv($handle);
+    $rowCount = 0;
+    $isFirstRow = true;
 
-    while (($data = fgetcsv($handle)) !== false) {
-        // Shift_JIS → UTF-8 に変換
-        $data = array_map(function ($value) {
-            return mb_convert_encoding($value, 'UTF-8', 'SJIS-win');
-        }, $data);
+    while (($line = fgets($handle)) !== false) {
+        $line = mb_convert_encoding($line, 'UTF-8', 'SJIS-win');
 
-        if (count($data) < 9) continue; // 必須列が不足している場合はスキップ
+        if ($isFirstRow) {
+            $isFirstRow = false;
+            continue;
+        }
 
-        list(
+        $data = str_getcsv($line);
+        if (count($data) < 9) continue;
+        [
             $customer_no,
-            $store_name,
             $customer_name,
+            $store_name,
             $manager_name,
             $address,
             $telephone_number,
             $delivery_conditions,
             $registration_date,
             $remarks
-        ) = $data;
-
+        ] = $data;
         $stmt = $pdo->prepare("
-            INSERT INTO customers (
-                customer_no,
-                store_name,
-                customer_name,
-                manager_name,
-                address,
-                telephone_number,
-                delivery_conditions,
-                registration_date,
-                remarks
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO customers (
+        customer_no, customer_name, store_name, manager_name,
+        address, telephone_number, delivery_conditions,
+        registration_date, remarks
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+        customer_name = VALUES(customer_name),
+        store_name = VALUES(store_name),
+        manager_name = VALUES(manager_name),
+        address = VALUES(address),
+        telephone_number = VALUES(telephone_number),
+        delivery_conditions = VALUES(delivery_conditions),
+        registration_date = VALUES(registration_date),
+        remarks = VALUES(remarks)
         ");
 
-        try {
-            $stmt->execute([
-                $customer_no,
-                $store_name,
-                $customer_name,
-                $manager_name ?: null,
-                $address,
-                $telephone_number,
-                $delivery_conditions ?: null,
-                $registration_date,
-                $remarks ?: null
-            ]);
-        } catch (PDOException $e) {
-            echo "挿入エラー：" . $e->getMessage() . "<br>";
-            continue;
-        }
+        $stmt->execute([
+            (int)$customer_no,
+            $customer_name,
+            $store_name,
+            $manager_name ?: null,
+            $address,
+            $telephone_number,
+            $delivery_conditions ?: null,
+            $registration_date,
+            $remarks ?: null
+        ]);
+
+        $rowCount++;
     }
 
     fclose($handle);
-    header("Location: index.php?result=success");
+    header('Location: ' . $_SERVER['HTTP_REFERER']);
     exit;
 } else {
-    header("Location: index.php?result=fail");
-    exit;
+    print("ファイルが選択されていません。");
 }
