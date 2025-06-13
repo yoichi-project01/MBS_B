@@ -198,7 +198,7 @@ a#store-title {
     .menu-toggle-label {
         display: block;
         position: absolute;
-        top: 8px;
+        top: -5px;
         right: 16px;
         z-index: 1001;
     }
@@ -239,11 +239,7 @@ a#store-title {
         font-size: 16px;
     }
 
-    .menu-toggle-label {
-        display: block;
-    }
-
-    .menu-toggle-checkbox:checked+.menu-toggle-label+.nav {
+    .menu-toggle-checkbox:checked+header .nav {
         display: flex;
     }
 }
