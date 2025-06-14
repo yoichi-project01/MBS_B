@@ -59,6 +59,15 @@ body {
 h1 {
     font-size: 32px;
     color: #2f5d3f;
+    text-align: center;
+    line-height: 1.4;
+    white-space: pre-line;
+    /* <br>対応 */
+}
+
+h1#store-title {
+    font-size: 32px;
+    color: #2f5d3f;
     margin: 120px 0 20px;
     text-align: center;
     line-height: 1.4;
@@ -205,7 +214,7 @@ a#store-title {
 
     h1 {
         font-size: 24px;
-        margin-top: 80px;
+        margin-top: 50px;
     }
 
     .menu-toggle {
