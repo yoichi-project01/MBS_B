@@ -1,42 +1,179 @@
-.table-container {
-    width: 90%;
-    max-width: 1000px;
-    margin: 40px auto;
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(47, 93, 63, 0.1);
-    overflow-x: auto;
+/* ===================
+   基本設定
+=================== */
+* {
+    box-sizing: border-box;
 }
 
-#customerTable {
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    font-family: 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+}
+
+/* ===================
+     ヘッダー
+  =================== */
+.site-header {
     width: 100%;
-    border-collapse: collapse;
-    font-size: 16px;
-    color: #333;
+    background-color: #2f5d3f;
+    color: #ffffff;
+    padding: 16px 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
 }
 
-#customerTable th,
-#customerTable td {
-    padding: 12px 16px;
-    text-align: left;
-    border-bottom: 1px solid #e0e7e4;
+.header-inner {
+    max-width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    position: relative;
 }
 
-#customerTable th {
-    background-color: #f0f5f1;
-    color: #2f5d3f;
+.nav {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.nav a {
+    text-decoration: none;
+    color: #ffffff;
     font-weight: bold;
+    font-size: 16px;
 }
 
-#customerTable tr:nth-child(even) {
-    background-color: #f9faf9;
+.nav a:hover {
+    text-decoration: underline;
 }
 
-#customerTable tr:hover {
-    background-color: #f0f5f1;
+/* ===================
+     タイトル（h1）
+  =================== */
+h1 {
+    font-size: 32px;
+    color: #2f5d3f;
+    text-align: center;
+    line-height: 1.4;
+    white-space: pre-line;
+    /* <br>対応 */
 }
 
-#loadData {
+h1#store-title {
+    font-size: 32px;
+    color: #2f5d3f;
+    margin: 120px 0 20px;
+    text-align: center;
+    line-height: 1.4;
+    white-space: pre-line;
+    /* <br>対応 */
+}
+
+/* ===================
+     メニュー
+  =================== */
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.menu button {
+    width: 260px;
+    max-width: 90%;
+    padding: 16px 24px;
+    font-size: 18px;
+    background-color: #f8faf9;
+    color: #2f5d3f;
+    border: 2px solid #4b7a5c;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    box-shadow: 0 2px 6px rgba(47, 93, 63, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.menu button:active {
+    transform: scale(0.98);
+    box-shadow: none;
+}
+
+.menu button:hover {
+    background-color: #e3efe6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(47, 93, 63, 0.2);
+}
+
+.menu button:focus,
+.upload-container button[type="submit"]:focus {
+    outline: 2px solid #4b7a5c;
+    outline-offset: 2px;
+}
+
+.menu-toggle-checkbox {
+    display: none;
+}
+
+.menu-toggle-label {
+    display: none;
+    font-size: 28px;
+    color: #fff;
+    cursor: pointer;
+}
+
+a#store-title {
+    font: 100 16px/1.5 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+    font-weight: bold;
+    font-size: 20px;
+    color: #fff;
+}
+
+/* ===================
+     アップロードコンテナ
+  =================== */
+.container.upload-container {
+    margin-top: 120px;
+    background: #fff;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(47, 93, 63, 0.08);
+    padding: 48px 32px 32px 32px;
+    min-width: 320px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.upload-container form {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.upload-container input[type="file"] {
+    border: 1px solid #b5cbbb;
+    border-radius: 6px;
+    padding: 10px;
+    background: #fff;
+    font-size: 16px;
+}
+
+.upload-container button[type="submit"] {
     background: linear-gradient(90deg, #4b7a5c 0%, #2f5d3f 100%);
     color: #fff;
     border: none;
@@ -47,75 +184,86 @@
     cursor: pointer;
     transition: background 0.2s, box-shadow 0.2s;
     box-shadow: 0 2px 8px rgba(47, 93, 63, 0.08);
-    width: 100%;
 }
 
-#loadData:hover {
+.upload-container button[type="submit"]:hover {
     background: linear-gradient(90deg, #2f5d3f 0%, #4b7a5c 100%);
     box-shadow: 0 4px 16px rgba(47, 93, 63, 0.12);
 }
 
-.search-area {
-    width: 100%;
-    margin-bottom: 24px;
-}
-
-#searchInput {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 2px solid #b5cbbb;
-    border-radius: 8px;
-    outline: none;
-    transition: border-color 0.2s;
-}
-
-#searchInput:focus {
-    border-color: #2f5d3f;
-}
-
-.sort-controls {
-    width: 90%;
-    max-width: 1000px;
-    margin: 20px auto;
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.sort-btn {
-    background: #ffffff;
-    border: 2px solid #b5cbbb;
-    border-radius: 8px;
-    padding: 8px 16px;
-    font-size: 14px;
-    color: #2f5d3f;
-    cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s;
-}
-
-.sort-btn:hover {
-    background-color: #f0f5f1;
-    border-color: #2f5d3f;
-}
-
-@media (max-width: 768px) {
-    #customerTable {
-        font-size: 14px;
+@media (max-width: 480px) {
+    .container.upload-container {
+        padding: 24px 8px 16px 8px;
+        margin-top: 80px;
+        min-width: unset;
+        max-width: 100%;
     }
 
-    #customerTable th,
-    #customerTable td {
-        padding: 8px 12px;
-    }
-
-    #loadData, #searchInput {
+    .menu button {
         font-size: 16px;
-        padding: 12px;
+        padding: 14px 0;
     }
 
-    .sort-btn {
-        font-size: 12px;
-        padding: 6px 12px;
+    .menu-toggle-label {
+        display: block;
+        position: absolute;
+        top: -5px;
+        right: 16px;
+        z-index: 1001;
     }
+
+    h1 {
+        font-size: 24px;
+        margin-top: 50px;
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    h2#store-title {
+        margin: 0;
+        padding: 16px 0 8px;
+        text-align: left;
+    }
+
+    .nav {
+        display: none;
+        flex-direction: column;
+        background-color: #2f5d3f;
+        width: 100%;
+        padding: 8px 0;
+        margin-top: 48px;
+    }
+
+    .header-inner {
+        flex-direction: column;
+        align-items: center;
+        /* 修正 */
+        padding: 0 16px;
+    }
+
+    .nav a {
+        padding: 12px;
+        font-size: 16px;
+    }
+
+    .menu-toggle-checkbox:checked+header .nav {
+        display: flex;
+    }
+}
+
+/* テーブルのソートボタン */
+.sort-icon {
+    background: none;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 4px;
+    color: #2f5d3f;
+    transition: color 0.2s;
+}
+
+.sort-icon:hover {
+    color: #1a3c28;
 }
