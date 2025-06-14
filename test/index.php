@@ -1,26 +1,16 @@
+<?php include(__DIR__ . '/../component/header.php');?>
+
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>顧客別売上・リードタイム</title>
-    <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <!-- ヘッダー -->
-    <header class="site-header">
-        <div class="header-inner">
-            <div id="store-title">顧客情報システム</div>
-            <nav class="nav">
-                <a href="../index.html">ホーム</a>
-                <a href="../customer-information/index.html">顧客情報</a>
-                <a href="../order list/index.php">注文リスト</a>
-                <a href="index.php">売上・リードタイム</a>
-            </nav>
-        </div>
-    </header>
 
+<body>
     <!-- メインコンテンツ -->
     <h1>顧客別累計売上と平均リードタイム</h1>
     <div class="upload-area">
@@ -59,4 +49,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>

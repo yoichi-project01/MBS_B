@@ -4,8 +4,6 @@
     $message = '';
 ?>
 
-
-
 <!DOCTYPE html>
 <html lang="ja">
 
