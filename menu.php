@@ -20,9 +20,9 @@ if ($storeName) {
         <h1 id="store-title"><?php echo htmlspecialchars($storeName); ?><br>受注管理システム</h1>
 
         <div class="menu">
-            <button class="menu-button" data-path="customer_infomation/index.php">顧客情報</button>
+            <button class="menu-button" data-path="customer_information/index.php">顧客情報</button>
             <button class="menu-button" data-path="statistics/index.php">統計情報</button>
-            <button class="menu-button" data-path="orderlist/index.php">注文書</button>
+            <button class="menu-button" data-path="order_list/index.php">注文書</button>
             <button class="menu-button" data-path="delivery/index.php">納品書</button>
         </div>
     </main>
