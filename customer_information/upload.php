@@ -23,8 +23,8 @@ if (isset($_FILES['csv_file']) && is_uploaded_file($_FILES['csv_file']['tmp_name
         if (count($data) < 9) continue;
         [
             $customer_no,
-            $customer_name,
             $store_name,
+            $customer_name,
             $manager_name,
             $address,
             $telephone_number,
@@ -34,7 +34,7 @@ if (isset($_FILES['csv_file']) && is_uploaded_file($_FILES['csv_file']['tmp_name
         ] = $data;
         $stmt = $pdo->prepare("
         INSERT INTO customers (
-        customer_no, customer_name, store_name, manager_name,
+        customer_no, store_name, customer_name, manager_name,
         address, telephone_number, delivery_conditions,
         registration_date, remarks
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -51,8 +51,8 @@ if (isset($_FILES['csv_file']) && is_uploaded_file($_FILES['csv_file']['tmp_name
 
         $stmt->execute([
             (int)$customer_no,
-            $customer_name,
             $store_name,
+            $customer_name,
             $manager_name ?: null,
             $address,
             $telephone_number,

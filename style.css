@@ -221,10 +221,9 @@ a#store-title {
         display: block;
     }
 
-    h2#store-title {
+    a#store-title {
         margin: 0;
         padding: 16px 0 8px;
-        text-align: left;
     }
 
     .nav {
