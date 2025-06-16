@@ -75,6 +75,16 @@ h1#store-title {
     /* <br>対応 */
 }
 
+h1.store-title {
+    font-size: 32px;
+    color: #2f5d3f;
+    margin: 120px 0 20px;
+    text-align: center;
+    line-height: 1.4;
+    white-space: pre-line;
+    /* <br>対応 */
+}
+
 /* ===================
      メニュー
   =================== */
