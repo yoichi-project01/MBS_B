@@ -55,7 +55,7 @@ try {
 
 <body>
     <main class="main-content">
-        <h1 id="store-title">顧客別累計売上と<br>平均リードタイム</h1>
+        <h1 id="store-title">統計情報</h1>
 
         <div class="search-area">
             <input type="text" id="searchInput" placeholder="顧客名で検索..." onkeyup="filterTable()">
