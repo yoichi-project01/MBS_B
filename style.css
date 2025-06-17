@@ -192,7 +192,8 @@ a#store-title {
 .search-area {
     width: 100%;
     max-width: 480px;
-    margin-bottom: 24px;
+    margin: 0 auto 24px;
+    padding: 0 16px;
 }
 
 .search-area input[type="text"] {
@@ -201,16 +202,17 @@ a#store-title {
     font-size: 16px;
     border: 1px solid #b5cbbb;
     border-radius: 6px;
-    box-sizing: border-box;
 }
 
 /* テーブル全体を横スクロール対応 */
 .table-container {
     width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 16px;
     overflow-x: auto;
 }
 
-/* テーブルの基本スタイル */
 table#customerTable {
     width: 100%;
     border-collapse: collapse;
@@ -265,7 +267,7 @@ table#customerTable th {
     .menu-toggle-label {
         display: block;
         position: absolute;
-        top: -5px;
+        top: 10px;
         right: 16px;
         z-index: 1001;
     }
@@ -313,6 +315,7 @@ table#customerTable th {
 
     .search-area {
         max-width: 100%;
+        padding: 0 8px;
         margin-bottom: 16px;
     }
 

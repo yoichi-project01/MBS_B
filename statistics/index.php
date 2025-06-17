@@ -48,56 +48,52 @@ try {
 
 <head>
     <meta charset="UTF-8">
-    <title>顧客別売上・リードタイム</title>
+    <title>統計情報</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../style.css">
 </head>
 
 <body>
-    <main class="main-content">
-        <h1 id="store-title">統計情報</h1>
+    <h1 id="store-title">統計情報</h1>
 
-        <div class="search-area">
-            <input type="text" id="searchInput" placeholder="顧客名で検索..." onkeyup="filterTable()">
-        </div>
+    <div class="search-area">
+        <input type="text" id="searchInput" placeholder="顧客名で検索..." onkeyup="filterTable()">
+    </div>
 
-        <div class="table-container">
-            <table id="customerTable">
-                <thead>
-                    <tr>
-                        <!-- 顧客NO 列を削除 -->
-                        <th>顧客名</th>
-                        <th>
-                            売上（円）
-                            <button class="sort-icon" data-column="sales_by_customer" data-order="asc">▲</button>
-                            <button class="sort-icon" data-column="sales_by_customer" data-order="desc">▼</button>
-                        </th>
-                        <th>
-                            リードタイム
-                            <button class="sort-icon" data-column="lead_time" data-order="asc">▲</button>
-                            <button class="sort-icon" data-column="lead_time" data-order="desc">▼</button>
-                        </th>
-                        <th>
-                            配達回数
-                            <button class="sort-icon" data-column="delivery_amount" data-order="asc">▲</button>
-                            <button class="sort-icon" data-column="delivery_amount" data-order="desc">▼</button>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($rows as $row): ?>
-                    <tr>
-                        <!-- 顧客NOのセルを削除 -->
-                        <td data-column="customer_name"><?= htmlspecialchars($row['customer_name']) ?></td>
-                        <td data-column="sales_by_customer"><?= number_format($row['sales_by_customer']) ?></td>
-                        <td data-column="lead_time"><?= formatLeadTime($row['lead_time']) ?></td>
-                        <td data-column="delivery_amount"><?= $row['delivery_amount'] ?></td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    </main>
+    <div class="table-container">
+        <table id="customerTable">
+            <thead>
+                <tr>
+                    <th>顧客名</th>
+                    <th>
+                        売上（円）
+                        <button class="sort-icon" data-column="sales_by_customer" data-order="asc">▲</button>
+                        <button class="sort-icon" data-column="sales_by_customer" data-order="desc">▼</button>
+                    </th>
+                    <th>
+                        リードタイム
+                        <button class="sort-icon" data-column="lead_time" data-order="asc">▲</button>
+                        <button class="sort-icon" data-column="lead_time" data-order="desc">▼</button>
+                    </th>
+                    <th>
+                        配達回数
+                        <button class="sort-icon" data-column="delivery_amount" data-order="asc">▲</button>
+                        <button class="sort-icon" data-column="delivery_amount" data-order="desc">▼</button>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($rows as $row): ?>
+                <tr>
+                    <td data-column="customer_name"><?= htmlspecialchars($row['customer_name']) ?></td>
+                    <td data-column="sales_by_customer"><?= number_format($row['sales_by_customer']) ?></td>
+                    <td data-column="lead_time"><?= formatLeadTime($row['lead_time']) ?></td>
+                    <td data-column="delivery_amount"><?= $row['delivery_amount'] ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
 
     <script src="statistics.js"></script>
 </body>
