@@ -17,13 +17,12 @@ session_start();
 </head>
 
 <body>
-    <div class="container upload-container">
-        <h1>顧客情報<br>CSVアップロード</h1>
-        <form action="upload.php" method="post" enctype="multipart/form-data">
-            <input type="file" name="csv_file" accept=".csv" required />
-            <button type="submit">アップロード</button>
-        </form>
-    </div>
+    <h1>顧客情報<br>CSVアップロード</h1>
+
+    <form action="upload.php" method="post" enctype="multipart/form-data" class="upload-form">
+        <input type="file" name="csv_file" accept=".csv" required />
+        <button type="submit">アップロード</button>
+    </form>
 
     <!-- ✅ SweetAlert 表示 -->
     <?php if (isset($_SESSION['upload_status'])): ?>

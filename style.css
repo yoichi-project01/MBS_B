@@ -13,8 +13,8 @@ body {
 }
 
 /* ===================
-     ヘッダー
-  =================== */
+   ヘッダー
+=================== */
 .site-header {
     width: 100%;
     background-color: #2f5d3f;
@@ -54,27 +54,18 @@ body {
 }
 
 /* ===================
-     タイトル（h1）
-  =================== */
+   タイトル（h1）
+=================== */
 h1 {
     font-size: 32px;
     color: #2f5d3f;
     text-align: center;
     line-height: 1.4;
-    white-space: pre-line;
-    /* <br>対応 */
-}
-
-h1#store-title {
-    font-size: 32px;
-    color: #2f5d3f;
     margin: 120px 0 20px;
-    text-align: center;
-    line-height: 1.4;
     white-space: pre-line;
-    /* <br>対応 */
 }
 
+h1#store-title,
 h1.store-title {
     font-size: 32px;
     color: #2f5d3f;
@@ -82,12 +73,11 @@ h1.store-title {
     text-align: center;
     line-height: 1.4;
     white-space: pre-line;
-    /* <br>対応 */
 }
 
 /* ===================
-     メニュー
-  =================== */
+   メニュー
+=================== */
 .menu {
     display: flex;
     flex-direction: column;
@@ -126,7 +116,7 @@ h1.store-title {
 }
 
 .menu button:focus,
-.upload-container button[type="submit"]:focus {
+.upload-form button[type="submit"]:focus {
     outline: 2px solid #4b7a5c;
     outline-offset: 2px;
 }
@@ -150,32 +140,18 @@ a#store-title {
 }
 
 /* ===================
-     アップロードコンテナ
-  =================== */
-.container.upload-container {
-    margin-top: 120px;
-    background: #fff;
-    border: none;
-    border-radius: 16px;
-    box-shadow: 0 4px 24px rgba(47, 93, 63, 0.08);
-    padding: 48px 32px 32px 32px;
-    min-width: 320px;
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.upload-container form {
-    margin-top: 32px;
+   アップロードフォーム（コンテナなし）
+=================== */
+.upload-form {
+    margin: 0 auto;
+    padding: 0 16px;
+    max-width: 480px;
     display: flex;
     flex-direction: column;
     gap: 24px;
 }
 
-.upload-container input[type="file"] {
+.upload-form input[type="file"] {
     border: 1px solid #b5cbbb;
     border-radius: 6px;
     padding: 10px;
@@ -183,7 +159,7 @@ a#store-title {
     font-size: 16px;
 }
 
-.upload-container button[type="submit"] {
+.upload-form button[type="submit"] {
     background: linear-gradient(90deg, #4b7a5c 0%, #2f5d3f 100%);
     color: #fff;
     border: none;
@@ -196,17 +172,89 @@ a#store-title {
     box-shadow: 0 2px 8px rgba(47, 93, 63, 0.08);
 }
 
-.upload-container button[type="submit"]:hover {
+.upload-form button[type="submit"]:hover {
     background: linear-gradient(90deg, #2f5d3f 0%, #4b7a5c 100%);
     box-shadow: 0 4px 16px rgba(47, 93, 63, 0.12);
 }
 
+/* メインコンテンツ用（コンテナなしで中央寄せ） */
+.main-content {
+    max-width: 960px;
+    margin: 120px auto 40px;
+    /* ヘッダー分の余白上部+余白 */
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 検索入力のスタイル */
+.search-area {
+    width: 100%;
+    max-width: 480px;
+    margin-bottom: 24px;
+}
+
+.search-area input[type="text"] {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 16px;
+    border: 1px solid #b5cbbb;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+/* テーブル全体を横スクロール対応 */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* テーブルの基本スタイル */
+table#customerTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+}
+
+table#customerTable th,
+table#customerTable td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+table#customerTable th {
+    background-color: #f8faf9;
+    position: relative;
+}
+
+.sort-icon {
+    font-size: 12px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: #2f5d3f;
+    margin-left: 4px;
+}
+
+/* ===================
+   モバイル対応
+=================== */
 @media (max-width: 480px) {
-    .container.upload-container {
-        padding: 24px 8px 16px 8px;
+    h1 {
+        font-size: 24px;
         margin-top: 80px;
-        min-width: unset;
-        max-width: 100%;
+    }
+
+    .upload-form {
+        padding: 0 8px;
+        gap: 20px;
+    }
+
+    .upload-form button[type="submit"] {
+        font-size: 16px;
+        padding: 12px 0;
     }
 
     .menu button {
@@ -220,11 +268,6 @@ a#store-title {
         top: -5px;
         right: 16px;
         z-index: 1001;
-    }
-
-    h1 {
-        font-size: 24px;
-        margin-top: 50px;
     }
 
     .menu-toggle {
@@ -248,7 +291,6 @@ a#store-title {
     .header-inner {
         flex-direction: column;
         align-items: center;
-        /* 修正 */
         padding: 0 16px;
     }
 
@@ -259,5 +301,28 @@ a#store-title {
 
     .menu-toggle-checkbox:checked+header .nav {
         display: flex;
+    }
+
+    .main-content {
+        margin: 80px 16px 20px;
+    }
+
+    h1#store-title {
+        font-size: 24px;
+    }
+
+    .search-area {
+        max-width: 100%;
+        margin-bottom: 16px;
+    }
+
+    table#customerTable th,
+    table#customerTable td {
+        padding: 10px 8px;
+        font-size: 14px;
+    }
+
+    .sort-icon {
+        font-size: 10px;
     }
 }
