@@ -23,20 +23,31 @@ function formatLeadTime($secondsFloat)
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 
-    $sql = "
-        SELECT
-            c.customer_no,
-            c.customer_name,
-            s.sales_by_customer,
-            s.lead_time,
-            s.delivery_amount
-        FROM statistics_information s
-        JOIN customers c ON s.customer_no = c.customer_no
-        ORDER BY c.customer_no ASC
-        ";
+    // GETパラメータ「store」を取得
+    $selectedStore = isset($_GET['store']) ? $_GET['store'] : '';
+    $rows = [];
 
-    $stmt = $pdo->query($sql);
-    $rows = $stmt->fetchAll();
+    if (!empty($selectedStore)) {
+        $sql = "
+            SELECT
+                c.customer_no,
+                c.customer_name,
+                c.store_name,
+                s.sales_by_customer,
+                s.lead_time,
+                s.delivery_amount
+            FROM statistics_information s
+            JOIN customers c ON s.customer_no = c.customer_no
+            WHERE c.store_name = :store
+            ORDER BY c.customer_no ASC
+        ";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':store', $selectedStore, PDO::PARAM_STR);
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
+    }
+
+    $storeName = htmlspecialchars($selectedStore);
 } catch (PDOException $e) {
     echo "DBエラー: " . htmlspecialchars($e->getMessage());
     exit;
@@ -54,13 +65,16 @@ try {
 </head>
 
 <body>
-    <h1 id="store-title">統計情報</h1>
+    <h1>統計情報</h1>
 
     <div class="search-area">
         <input type="text" id="searchInput" placeholder="顧客名で検索..." onkeyup="filterTable()">
     </div>
 
     <div class="table-container">
+        <?php if (empty($rows)): ?>
+        <p>該当するデータがありません。</p>
+        <?php else: ?>
         <table id="customerTable">
             <thead>
                 <tr>
@@ -93,6 +107,7 @@ try {
                 <?php endforeach; ?>
             </tbody>
         </table>
+        <?php endif; ?>
     </div>
 
     <script src="statistics.js"></script>

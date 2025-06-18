@@ -20,4 +20,4 @@ $storeName = $_GET['store'] ?? '';
             <a href="/MBS_B/delivery_list/index.php?store=<?= urlencode($storeName) ?>">納品書</a>
         </nav>
     </div>
-</header
+</header>

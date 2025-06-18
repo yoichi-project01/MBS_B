@@ -272,6 +272,17 @@ table#customerTable th {
         z-index: 1001;
     }
 
+    .site-header {
+        width: 100%;
+        background-color: #2f5d3f;
+        color: #ffffff;
+        padding: 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;   
+    }
+
     .menu-toggle {
         display: block;
     }
