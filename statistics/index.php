@@ -2,6 +2,9 @@
 include(__DIR__ . '/../component/header.php');
 require_once(__DIR__ . '/../component/db.php');
 
+// ページあたりの件数
+$perPage = 5;
+
 // リードタイム（秒数）を「日 時間 分 秒」に変換する関数
 function formatLeadTime($secondsFloat)
 {
@@ -20,14 +23,30 @@ function formatLeadTime($secondsFloat)
     return trim($result);
 }
 
+// 現在のページ番号
+$page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 ? (int) $_GET['page'] : 1;
+
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 
-    // GETパラメータ「store」を取得
     $selectedStore = isset($_GET['store']) ? $_GET['store'] : '';
     $rows = [];
+    $totalCount = 0;
 
     if (!empty($selectedStore)) {
+        // 件数取得
+        $countSql = "
+            SELECT COUNT(*) FROM statistics_information s
+            JOIN customers c ON s.customer_no = c.customer_no
+            WHERE c.store_name = :store
+        ";
+        $countStmt = $pdo->prepare($countSql);
+        $countStmt->bindValue(':store', $selectedStore, PDO::PARAM_STR);
+        $countStmt->execute();
+        $totalCount = (int) $countStmt->fetchColumn();
+
+        $offset = ($page - 1) * $perPage;
+
         $sql = "
             SELECT
                 c.customer_no,
@@ -40,14 +59,18 @@ try {
             JOIN customers c ON s.customer_no = c.customer_no
             WHERE c.store_name = :store
             ORDER BY c.customer_no ASC
+            LIMIT :limit OFFSET :offset
         ";
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':store', $selectedStore, PDO::PARAM_STR);
+        $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
         $rows = $stmt->fetchAll();
     }
 
     $storeName = htmlspecialchars($selectedStore);
+    $totalPages = ceil($totalCount / $perPage);
 } catch (PDOException $e) {
     echo "DBエラー: " . htmlspecialchars($e->getMessage());
     exit;
