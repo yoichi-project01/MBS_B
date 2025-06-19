@@ -240,6 +240,27 @@ table#customerTable th {
     margin-left: 4px;
 }
 
+.pagination {
+    margin: 24px 0;
+    text-align: center;
+    font-size: 16px;
+}
+
+.pagination a {
+    color: #2f5d3f;
+    text-decoration: none;
+    margin: 0 16px;
+    font-weight: bold;
+}
+
+.pagination a:hover {
+    text-decoration: underline;
+}
+
+.pagination span {
+    margin: 0 8px;
+}
+
 /* ===================
    モバイル対応
 =================== */
