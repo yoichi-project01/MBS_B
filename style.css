@@ -241,24 +241,117 @@ table#customerTable th {
 }
 
 .pagination {
-    margin: 24px 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    border-top: 1px solid #ccc;
     text-align: center;
+    padding: 12px 0;
     font-size: 16px;
+    z-index: 999;
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
 }
 
-.pagination a {
+.pagination a,
+.pagination span {
     color: #2f5d3f;
     text-decoration: none;
-    margin: 0 16px;
     font-weight: bold;
+    min-width: 48px;
+    text-align: center;
 }
 
 .pagination a:hover {
     text-decoration: underline;
 }
 
-.pagination span {
-    margin: 0 8px;
+.pagination .placeholder {
+    color: #aaa;
+    pointer-events: none;
+    cursor: default;
+}
+
+.table-container {
+    margin-bottom: 80px;
+    /* 固定ページネーションと重ならないように */
+}
+
+/* テーブル全体のボーダー設定 */
+#customerTable {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* 各列の固定幅 */
+#customerTable th:nth-child(1),
+#customerTable td:nth-child(1) {
+    width: 25%;
+}
+
+#customerTable th:nth-child(2),
+#customerTable td:nth-child(2) {
+    width: 25%;
+}
+
+#customerTable th:nth-child(3),
+#customerTable td:nth-child(3) {
+    width: 25%;
+}
+
+#customerTable th:nth-child(4),
+#customerTable td:nth-child(4) {
+    width: 25%;
+}
+
+/* ヘッダー・ボディのセルに下線と右線をつける */
+#customerTable th,
+#customerTable td {
+    border-bottom: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+/* 最後の列には右線をつけない（ダブル線防止のため） */
+#customerTable th:last-child,
+#customerTable td:last-child {
+    border-right: none;
+}
+
+.search-button{
+    margin-top: 12px;
+    width: 100%;
+    padding: 10px 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(90deg, #4b7a5c 0%, #2f5d3f 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(47, 93, 63, 0.08);
+    transition: background 0.2s, box-shadow 0.2s
+}
+
+.search-area{
+    width: 100%; 
+    padding: 10px 14px; 
+    font-size: 16px; 
+    border: 1px solid #b5cbbb; 
+    border-radius: 6px;
+}
+
+.search-from{
+    max-width: 480px; 
+    margin: 0 auto 24px; 
+    padding: 0 16px;
 }
 
 /* ===================
