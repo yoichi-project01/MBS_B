@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once 'db_connect.php'; // 正しくデータベースに接続されることを確認してください
+// require_once 'db_connect.php'; // 正しくデータベースに接続されることを確認してください - コメントアウト
 
 $search_keyword = $_GET['search'] ?? '';
 $message = $_SESSION['message'] ?? '';
@@ -16,10 +16,40 @@ $records_per_page = 10; // 1ページあたりの表示件数
 $current_page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $offset = ($current_page - 1) * $records_per_page;
 
-// --- データベースから注文書データを取得 ---
+// --- データベースから注文書データを取得 (ダミーデータに変更) ---
 $orders = [];
 $total_orders = 0;
 
+// ダミーデータの生成
+$all_dummy_orders = [];
+for ($i = 1; $i <= 50; $i++) {
+    $customer_name = "ダミー顧客 " . str_pad($i, 2, '0', STR_PAD_LEFT);
+    if ($i % 5 == 0) { // 特定の顧客名に検索キーワードが含まれるようにする
+        $customer_name = "テスト顧客 " . str_pad($i, 2, '0', STR_PAD_LEFT);
+    }
+    $all_dummy_orders[] = [
+        'order_no' => 'ORD' . str_pad($i, 4, '0', STR_PAD_LEFT),
+        'customer_no' => 'CUST' . str_pad($i, 3, '0', STR_PAD_LEFT),
+        'customer_name' => $customer_name,
+        'registration_date' => date('Y-m-d', strtotime('-' . $i . ' days')),
+    ];
+}
+
+// 検索キーワードに基づいてダミーデータをフィルタリング
+$filtered_dummy_orders = array_filter($all_dummy_orders, function($order) use ($search_keyword) {
+    if (empty($search_keyword)) {
+        return true;
+    }
+    // 顧客名または注文IDで検索
+    return stripos($order['customer_name'], $search_keyword) !== false || $order['order_no'] === strtoupper($search_keyword);
+});
+
+$total_orders = count($filtered_dummy_orders);
+
+// ページネーションに基づいてダミーデータをスライス
+$orders = array_slice($filtered_dummy_orders, $offset, $records_per_page);
+
+/*
 try {
     // まず、条件に合う全件数を取得
     $count_sql = "SELECT COUNT(*) FROM orders o JOIN customers c ON o.customer_no = c.customer_no";
@@ -51,10 +81,12 @@ try {
     $stmt_data = $pdo->prepare($data_sql);
     $stmt_data->execute($params);
     $orders = $stmt_data->fetchAll(PDO::FETCH_ASSOC);
+
 } catch (PDOException $e) {
     error_log("データベースエラー (order_history.php): " . $e->getMessage());
     $error_message = "注文書データの読み込み中にエラーが発生しました。システム管理者に連絡してください。<br>エラー詳細: " . $e->getMessage();
 }
+*/
 
 // ページ数が0になるのを防ぐ
 $total_pages = max(1, ceil($total_orders / $records_per_page));

@@ -1,8 +1,9 @@
 <?php
 session_start();
 
-require_once 'db_connect.php';
+// require_once 'db_connect.php'; // データベース接続はダミーデータ表示のためコメントアウト
 
+$order_no = $_GET['order_no'] ?? null;
 $message = $_SESSION['message'] ?? '';
 $error_message = $_SESSION['error_message'] ?? '';
 
@@ -10,297 +11,175 @@ $error_message = $_SESSION['error_message'] ?? '';
 unset($_SESSION['message']);
 unset($_SESSION['error_message']);
 
-$order_no = $_GET['order_no'] ?? null;
+// ダミーデータ
+$dummy_order = null;
+$dummy_order_items = [];
 
-if (!$order_no) {
-    $_SESSION['error_message'] = "表示する注文書が指定されていません。";
-    header('Location: order_history.php');
-    exit();
+if ($order_no) {
+    // 実際のデータベースから取得する代わりに、order_noに基づいてダミーデータを生成
+    // 例として、特定のorder_noには固定のダミーデータを割り当てる
+    switch ($order_no) {
+        case 'ORD0001':
+            $dummy_order = [
+                'order_no' => 'ORD0001',
+                'registration_date' => '2022/11/24',
+                'customer_name' => '木村 紗希',
+                'remarks' => '初回注文。特別割引適用。',
+            ];
+            $dummy_order_items = [
+                ['item_name' => '週間BCN 10月号', 'quantity' => 1, 'unit_price' => 1100, 'summary' => ''],
+                ['item_name' => '日経コンピューター 10月号', 'quantity' => 2, 'unit_price' => 1000, 'summary' => ''],
+                ['item_name' => '週間マガジン 10月号', 'quantity' => 1, 'unit_price' => 800, 'summary' => ''],
+            ];
+            break;
+        case 'ORD0002':
+            $dummy_order = [
+                'order_no' => 'ORD0002',
+                'registration_date' => '2022/11/20',
+                'customer_name' => '株式会社ABC',
+                'remarks' => '急ぎでの納品希望。',
+            ];
+            $dummy_order_items = [
+                ['item_name' => 'PHPフレームワーク入門', 'quantity' => 3, 'unit_price' => 2500, 'summary' => ''],
+                ['item_name' => 'データベース設計実践ガイド', 'quantity' => 1, 'unit_price' => 3200, 'summary' => ''],
+            ];
+            break;
+        default:
+            // 該当する注文番号がなければ、メッセージを表示
+            $error_message = "指定された注文書No (" . htmlspecialchars($order_no, ENT_QUOTES) . ") のデータは見つかりませんでした。";
+            break;
+    }
+} else {
+    $error_message = "注文書が指定されていません。";
 }
 
-$order = null;
-$order_items = [];
-$total_amount = 0; // 合計金額を初期化
-
+// データベース連携部分はコメントアウト
+/*
 try {
-    // 注文書詳細の取得
-    $sql_order = "SELECT o.order_no, o.customer_no, c.customer_name, o.registration_date
-                  FROM orders o
-                  JOIN customers c ON o.customer_no = c.customer_no
-                  WHERE o.order_no = ?";
-    $stmt_order = $pdo->prepare($sql_order);
-    $stmt_order->execute([$order_no]);
-    $order = $stmt_order->fetch(PDO::FETCH_ASSOC);
+    if ($order_no) {
+        // 注文書メインデータを取得
+        $sql_order = "SELECT o.order_no, o.registration_date, c.customer_name, o.remarks FROM orders o JOIN customers c ON o.customer_no = c.customer_no WHERE o.order_no = ?";
+        $stmt_order = $pdo->prepare($sql_order);
+        $stmt_order->execute([$order_no]);
+        $order = $stmt_order->fetch(PDO::FETCH_ASSOC);
 
-    if (!$order) {
-        $_SESSION['error_message'] = "指定された注文書が見つかりません。";
-        header('Location: order_history.php');
-        exit();
+        if ($order) {
+            // 注文アイテムを取得
+            $sql_items = "SELECT item_name, quantity, unit_price, summary FROM order_items WHERE order_no = ? ORDER BY item_id ASC";
+            $stmt_items = $pdo->prepare($sql_items);
+            $stmt_items->execute([$order_no]);
+            $order_items = $stmt_items->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            $error_message = "指定された注文書No (" . htmlspecialchars($order_no, ENT_QUOTES) . ") のデータは見つかりませんでした。";
+        }
+    } else {
+        $error_message = "注文書が指定されていません。";
     }
-
-    // 注文書アイテムの取得
-    $sql_items = "SELECT oi.item_no, oi.product_id, p.product_name, oi.quantity, oi.price_at_order
-                  FROM order_items oi
-                  JOIN products p ON oi.product_id = p.product_id
-                  WHERE oi.order_no = ?";
-    $stmt_items = $pdo->prepare($sql_items);
-    $stmt_items->execute([$order_no]);
-    $order_items = $stmt_items->fetchAll(PDO::FETCH_ASSOC);
-
-    // 合計金額の計算
-    foreach ($order_items as $item) {
-        $total_amount += $item['quantity'] * $item['price_at_order'];
-    }
-
 } catch (PDOException $e) {
     error_log("データベースエラー (order_detail.php): " . $e->getMessage());
-    $_SESSION['error_message'] = "注文書詳細の読み込み中にエラーが発生しました。システム管理者に連絡してください。<br>エラー詳細: " . $e->getMessage();
-    header('Location: order_history.php');
-    exit();
+    $error_message = "注文書データの読み込み中にエラーが発生しました。システム管理者に連絡してください。<br>エラー詳細: " . $e->getMessage();
 }
+*/
 ?>
 
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>注文書詳細 - No.<?= htmlspecialchars($order['order_no'], ENT_QUOTES) ?></title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0; padding: 0;
-            background-color: #f4f4f4;
-            display: flex; justify-content: center; align-items: flex-start;
-            min-height: 100vh;
-        }
-        .container {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            width: 90%;
-            max-width: 800px;
-            margin-top: 20px;
-            overflow: hidden;
-        }
-        .header {
-            background-color: #28a745; /* Green */
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 1.2em;
-        }
-        .nav-buttons {
-            display: flex;
-        }
-        .nav-buttons button {
-            background-color: #218838;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            margin-left: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: background-color 0.3s ease;
-        }
-        .nav-buttons button:hover {
-            background-color: #1e7e34;
-        }
-        .content {
-            padding: 20px;
-        }
-        .message {
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-        }
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .section-title {
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            color: #333;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-        }
-        .detail-item {
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-        }
-        .detail-item label {
-            font-weight: bold;
-            width: 120px; /* ラベルの幅を固定 */
-            flex-shrink: 0;
-        }
-        .detail-item span {
-            flex-grow: 1;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table th, table td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-        table th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-            color: #555;
-        }
-        table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        table tfoot td {
-            font-weight: bold;
-            background-color: #f2f2f2;
-        }
-        .action-buttons {
-            margin-top: 30px;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-        .action-buttons button {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease;
-        }
-        .edit-button {
-            background-color: #007bff; /* Blue */
-            color: white;
-        }
-        .edit-button:hover {
-            background-color: #0056b3;
-        }
-        .delete-button {
-            background-color: #dc3545; /* Red */
-            color: white;
-        }
-        .delete-button:hover {
-            background-color: #c82333;
-        }
-        .back-button {
-            padding: 10px 20px;
-            background-color: #6c757d; /* Gray */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .back-button:hover {
-            background-color: #5a6268;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>注文書詳細</title>
+    <link rel="stylesheet" href="../style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>緑橋書店 受注管理システム</h1>
-            <div class="nav-buttons">
-                <button onclick="location.href='#'">顧客情報</button>
-                <button onclick="location.href='#'">統計情報</button>
-                <button onclick="location.href='order_history.php'">注文書</button>
-                <button onclick="location.href='#'">納品書</button>
-            </div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a id="store-title">緑橋書店 受注管理システム</a>
+            <nav class="nav">
+                <a href="#">顧客情報</a>
+                <a href="#">統計情報</a>
+                <a href="order_history.php">注文書</a>
+                <a href="#">納品書</a>
+            </nav>
         </div>
+    </header>
+    <main class="main-content" style="max-width: 800px;">
+        <?php if (!empty($message)): ?>
+            <div class="message success"><?= htmlspecialchars($message, ENT_QUOTES) ?></div>
+        <?php endif; ?>
+        <?php if (!empty($error_message)): ?>
+            <div class="message error"><?= htmlspecialchars($error_message, ENT_QUOTES) ?></div>
+        <?php endif; ?>
 
-        <div class="content">
-            <?php if (!empty($message)): ?>
-                <div class="message success"><?= htmlspecialchars($message, ENT_QUOTES) ?></div>
-            <?php endif; ?>
-            <?php if (!empty($error_message)): ?>
-                <div class="message error"><?= htmlspecialchars($error_message, ENT_QUOTES) ?></div>
-            <?php endif; ?>
-
-            <div class="section-title">注文書詳細 - No.<?= htmlspecialchars($order['order_no'], ENT_QUOTES) ?></div>
-
-            <div class="order-details">
-                <div class="detail-item">
-                    <label>顧客名:</label>
-                    <span><?= htmlspecialchars($order['customer_name'], ENT_QUOTES) ?></span>
-                </div>
-                <div class="detail-item">
-                    <label>登録日:</label>
-                    <span><?= htmlspecialchars($order['registration_date'], ENT_QUOTES) ?></span>
-                </div>
+        <div class="order-detail-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; gap: 16px;">
+            <div class="order-no" style="font-size: 1.1em; font-weight: bold; color: var(--main-green); background: var(--bg-light); border-radius: 8px; padding: 8px 18px; box-shadow: 0 2px 8px rgba(47,93,63,0.06);">
+                注文書No：<?= htmlspecialchars($order_no ?? '', ENT_QUOTES) ?>
             </div>
-
-            <div class="order-items-section">
-                <h3>注文アイテム</h3>
-                <?php if (empty($order_items)): ?>
-                    <p>この注文書にはアイテムが登録されていません。</p>
-                <?php else: ?>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>アイテムNo</th>
-                                <th>商品名</th>
-                                <th>数量</th>
-                                <th>単価</th>
-                                <th>小計</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($order_items as $item): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($item['item_no'], ENT_QUOTES) ?></td>
-                                    <td><?= htmlspecialchars($item['product_name'], ENT_QUOTES) ?></td>
-                                    <td><?= htmlspecialchars($item['quantity'], ENT_QUOTES) ?></td>
-                                    <td><?= htmlspecialchars(number_format($item['price_at_order']), ENT_QUOTES) ?></td>
-                                    <td><?= htmlspecialchars(number_format($item['quantity'] * $item['price_at_order']), ENT_QUOTES) ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="4" style="text-align: right;"><strong>合計金額:</strong></td>
-                                <td><strong><?= htmlspecialchars(number_format($total_amount), ENT_QUOTES) ?></strong></td>
-                            </tr>
-                        </tfoot>
-                    </table>
+            <div class="menu" style="flex-direction: row; gap: 12px; margin: 0;">
+                <button type="button" class="back-button" onclick="location.href='order_history.php'">注文書一覧へ戻る</button>
+                <?php if ($dummy_order): ?>
+                    <button type="button" class="delete-button" style="background: #ffc107; color: #333;" onclick="if(confirm('この注文書を削除してもよろしいですか？')) { location.href='order_delete.php?order_no=<?= htmlspecialchars($order_no, ENT_QUOTES) ?>'; }">注文書削除</button>
                 <?php endif; ?>
             </div>
-
-            <div class="action-buttons">
-                <button class="edit-button" onclick="location.href='order_edit.php?order_no=<?= htmlspecialchars($order['order_no'], ENT_QUOTES) ?>'">編集</button>
-                <button class="delete-button" onclick="confirmDelete(<?= htmlspecialchars($order['order_no'], ENT_QUOTES) ?>)">削除</button>
-            </div>
-
-            <div style="margin-top: 30px; text-align: center;">
-                <button class="back-button" onclick="location.href='order_history.php'">注文履歴に戻る</button>
-            </div>
         </div>
-    </div>
 
-    <script>
-        function confirmDelete(orderNo) {
-            if (confirm('注文No ' + orderNo + ' を本当に削除してもよろしいですか？この操作は元に戻せません。')) {
-                window.location.href = 'order_delete.php?order_no=' + orderNo;
-            }
-        }
-    </script>
+        <?php if ($dummy_order): ?>
+            <section class="order-info" style="margin-bottom: 24px;">
+                <div style="display: flex; gap: 32px; flex-wrap: wrap;">
+                    <div>
+                        <strong>登録日:</strong>
+                        <span><?= htmlspecialchars($dummy_order['registration_date'], ENT_QUOTES) ?></span>
+                    </div>
+                    <div>
+                        <strong>顧客名:</strong>
+                        <span><?= htmlspecialchars($dummy_order['customer_name'], ENT_QUOTES) ?></span>
+                    </div>
+                </div>
+            </section>
+
+            <div class="table-container">
+                <table class="order-detail-table" id="orderDetailTable">
+                    <thead>
+                        <tr>
+                            <th>品名</th>
+                            <th>数量</th>
+                            <th>単価</th>
+                            <th>小計</th>
+                            <th>摘要</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $total = 0;
+                        foreach ($dummy_order_items as $item):
+                            $subtotal = $item['quantity'] * $item['unit_price'];
+                            $total += $subtotal;
+                        ?>
+                        <tr>
+                            <td><?= htmlspecialchars($item['item_name'], ENT_QUOTES) ?></td>
+                            <td style="text-align:right;"><?= htmlspecialchars($item['quantity'], ENT_QUOTES) ?></td>
+                            <td style="text-align:right;"><?= number_format($item['unit_price']) ?> 円</td>
+                            <td style="text-align:right;"><?= number_format($subtotal) ?> 円</td>
+                            <td><?= htmlspecialchars($item['summary'], ENT_QUOTES) ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3" style="text-align:right;">合計</th>
+                            <th style="text-align:right;"><?= number_format($total) ?> 円</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="remarks-section" style="margin-top: 18px; width: 100%;">
+                <label for="remarks" style="font-weight: bold; color: var(--main-green);">備考</label>
+                <textarea id="remarks" name="remarks" readonly style="width: 100%; min-height: 60px; border-radius: 8px; border: 1.5px solid #b5cbbb; padding: 10px; font-size: 1em; background: #f8faf9;"><?= htmlspecialchars($dummy_order['remarks'], ENT_QUOTES) ?></textarea>
+            </div>
+        <?php else: ?>
+            <p style="text-align: center; color: #666;">表示する注文書データがありません。</p>
+        <?php endif; ?>
+    </main>
 </body>
 </html>
