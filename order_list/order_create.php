@@ -1,4 +1,5 @@
 <?php
+include(__DIR__ . '/../component/header.php');
 session_start();
 require_once 'db_connect.php';
 
@@ -97,27 +98,20 @@ if (isset($_GET['message'])) {
 ?>
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>注文書作成画面</title>
-<link rel="stylesheet" href="../style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>注文書作成画面</title>
+    <link rel="stylesheet" href="../style.css">
 </head>
+
 <body>
-    <header class="site-header">
-        <div class="header-inner">
-            <a id="store-title">緑橋書店 受注管理システム</a>
-            <nav class="nav">
-                <a href="#">顧客情報</a>
-                <a href="#">統計情報</a>
-                <a href="order_history.php">注文書</a>
-                <a href="#">納品書</a>
-            </nav>
-        </div>
-    </header>
     <main class="main-content" style="max-width:900px;">
         <h1 class="section-title" style="margin-bottom: 18px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-plus" style="vertical-align: middle;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-plus"
+                style="vertical-align: middle;">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                 <polyline points="14 2 14 8 20 8"></polyline>
                 <line x1="12" y1="18" x2="12" y2="12"></line>
@@ -127,10 +121,10 @@ if (isset($_GET['message'])) {
         </h1>
 
         <?php if (!empty($message)): ?>
-            <div class="message success"><?= $message ?></div>
+        <div class="message success"><?= $message ?></div>
         <?php endif; ?>
         <?php if (!empty($error_message)): ?>
-            <div class="message error"><?= $error_message ?></div>
+        <div class="message error"><?= $error_message ?></div>
         <?php endif; ?>
 
         <div class="menu" style="margin-bottom: 24px; flex-direction: row; gap: 32px;">
@@ -164,25 +158,34 @@ if (isset($_GET['message'])) {
                     </thead>
                     <tbody id="itemTableBody">
                         <?php if (empty($order_items)): ?>
-                            <tr>
-                                <td colspan="6" style="text-align: center; color: #777;">品目がありません。<br>「品目を追加」ボタンで品目を追加してください。</td>
-                            </tr>
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: #777;">
+                                品目がありません。<br>「品目を追加」ボタンで品目を追加してください。</td>
+                        </tr>
                         <?php else: ?>
-                            <?php foreach ($order_items as $index => $item): ?>
-                                <tr data-index="<?= $index ?>">
-                                    <td><input type="text" name="books[]" value="<?= htmlspecialchars($item['books'] ?? '', ENT_QUOTES) ?>" placeholder="書籍名"></td>
-                                    <td><input type="number" name="order_volume[]" value="<?= htmlspecialchars($item['order_volume'] ?? 0, ENT_QUOTES) ?>" min="0"></td>
-                                    <td><input type="number" name="price[]" value="<?= htmlspecialchars($item['price'] ?? 0, ENT_QUOTES) ?>" min="0"></td>
-                                    <td><textarea name="abstract[]" placeholder="備考・要約"><?= htmlspecialchars($item['abstract'] ?? '', ENT_QUOTES) ?></textarea></td>
-                                    <td class="sub-total"></td>
-                                    <td><button type="button" class="delete-button" data-index="<?= $index ?>">削除</button></td>
-                                </tr>
-                            <?php endforeach; ?>
+                        <?php foreach ($order_items as $index => $item): ?>
+                        <tr data-index="<?= $index ?>">
+                            <td><input type="text" name="books[]"
+                                    value="<?= htmlspecialchars($item['books'] ?? '', ENT_QUOTES) ?>" placeholder="書籍名">
+                            </td>
+                            <td><input type="number" name="order_volume[]"
+                                    value="<?= htmlspecialchars($item['order_volume'] ?? 0, ENT_QUOTES) ?>" min="0">
+                            </td>
+                            <td><input type="number" name="price[]"
+                                    value="<?= htmlspecialchars($item['price'] ?? 0, ENT_QUOTES) ?>" min="0"></td>
+                            <td><textarea name="abstract[]"
+                                    placeholder="備考・要約"><?= htmlspecialchars($item['abstract'] ?? '', ENT_QUOTES) ?></textarea>
+                            </td>
+                            <td class="sub-total"></td>
+                            <td><button type="button" class="delete-button" data-index="<?= $index ?>">削除</button></td>
+                        </tr>
+                        <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
                 </table>
             </div>
-            <div class="total-display" style="text-align:right; margin-top:10px;">合計金額: <span id="grandTotal">0</span> 円</div>
+            <div class="total-display" style="text-align:right; margin-top:10px;">合計金額: <span id="grandTotal">0</span> 円
+            </div>
             <button type="button" id="addItemButton" class="add-item-button">品目を追加</button>
         </div>
 
@@ -190,13 +193,14 @@ if (isset($_GET['message'])) {
             <button type="button" class="back-button" onclick="location.href='order_history.php'">注文書履歴に戻る</button>
             <form action="order_create.php" method="POST" style="display: inline;">
                 <input type="hidden" name="action" value="save_order">
-                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
+                <input type="hidden" name="csrf_token"
+                    value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
                 <button type="submit" class="save-button" id="saveOrderButton">注文書を登録</button>
             </form>
         </div>
     </main>
 
-<script>
+    <script>
     document.addEventListener('DOMContentLoaded', () => {
         const itemTableBody = document.getElementById('itemTableBody');
         const addItemButton = document.getElementById('addItemButton');
@@ -213,7 +217,12 @@ if (isset($_GET['message'])) {
             };
         }
 
-        function getItemRowHtml(item = { books: '', order_volume: 0, price: 0, abstract: '' }, index) {
+        function getItemRowHtml(item = {
+            books: '',
+            order_volume: 0,
+            price: 0,
+            abstract: ''
+        }, index) {
             return `
                 <tr data-index="${index}">
                     <td><input type="text" name="books[]" value="${item.books}" placeholder="書籍名"></td>
@@ -254,7 +263,8 @@ if (isset($_GET['message'])) {
                 }
                 itemsData.push({
                     books: row.querySelector('input[name="books[]"]').value,
-                    order_volume: row.querySelector('input[name="order_volume[]"]').value,
+                    order_volume: row.querySelector('input[name="order_volume[]"]')
+                        .value,
                     price: row.querySelector('input[name="price[]"]').value,
                     abstract: row.querySelector('textarea[name="abstract[]"]').value
                 });
@@ -262,8 +272,8 @@ if (isset($_GET['message'])) {
 
             const customerNo = "<?= $customer_no ?>";
             if (!customerNo) {
-                 console.warn("顧客が選択されていないため、品目データはセッションに保存されません。");
-                 return;
+                console.warn("顧客が選択されていないため、品目データはセッションに保存されません。");
+                return;
             }
 
             try {
@@ -289,20 +299,26 @@ if (isset($_GET['message'])) {
             }
         }, 800);
 
-        function addItem(item = { books: '', order_volume: 0, price: 0, abstract: '' }) {
+        function addItem(item = {
+            books: '',
+            order_volume: 0,
+            price: 0,
+            abstract: ''
+        }) {
             const noItemRow = itemTableBody.querySelector('td[colspan="6"]');
             if (noItemRow) {
                 noItemRow.parentElement.remove();
             }
 
             const existingRows = Array.from(itemTableBody.children);
-            const newIndex = existingRows.length > 0 ? Math.max(...existingRows.map(row => parseInt(row.dataset.index) || 0)) + 1 : 0;
-            
+            const newIndex = existingRows.length > 0 ? Math.max(...existingRows.map(row => parseInt(row.dataset
+                .index) || 0)) + 1 : 0;
+
             const newRow = document.createElement('tr');
             newRow.setAttribute('data-index', newIndex);
             newRow.innerHTML = getItemRowHtml(item, newIndex);
             itemTableBody.appendChild(newRow);
-            
+
             attachEventListenersToRow(newRow);
             calculateGrandTotal();
             updateSessionItems();
@@ -324,7 +340,8 @@ if (isset($_GET['message'])) {
                         row.remove();
                         calculateGrandTotal();
                         if (itemTableBody.rows.length === 0) {
-                            itemTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #777;">品目がありません。<br>「品目を追加」ボタンで品目を追加してください。</td></tr>`;
+                            itemTableBody.innerHTML =
+                                `<tr><td colspan="6" style="text-align: center; color: #777;">品目がありません。<br>「品目を追加」ボタンで品目を追加してください。</td></tr>`;
                         }
                         updateSessionItems();
                     }
@@ -349,6 +366,7 @@ if (isset($_GET['message'])) {
             console.log("顧客が選択されていないため、注文書登録ボタンは無効です。");
         }
     });
-</script>
+    </script>
 </body>
+
 </html>

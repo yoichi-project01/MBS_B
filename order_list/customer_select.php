@@ -1,4 +1,5 @@
 <?php
+include(__DIR__ . '/../component/header.php');
 session_start();
 
 require_once 'db_connect.php';
@@ -67,17 +68,6 @@ if (empty($_SESSION['csrf_token'])) {
 </head>
 
 <body>
-    <header class="site-header">
-        <div class="header-inner">
-            <a id="store-title">緑橋書店 受注管理システム</a>
-            <nav class="nav">
-                <a href="#">顧客情報</a>
-                <a href="#">統計情報</a>
-                <a href="order_history.php">注文書</a>
-                <a href="#">納品書</a>
-            </nav>
-        </div>
-    </header>
     <main class="main-content" style="margin-top: 90px;">
         <h1 class="section-title" style="margin-bottom: 18px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"

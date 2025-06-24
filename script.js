@@ -1,5 +1,27 @@
 document.body.style.overflow = 'hidden';
 
+// --- ハンバーガーメニュー(jQuery)対応 ---
+$(function() {
+  // メニュー開閉
+  $('#menu-btn').on('click', function(e) {
+    e.stopPropagation();
+    $('.nav').toggleClass('open');
+    $('.menu-overlay').toggleClass('active');
+    // メニューが開いている間はスクロール禁止
+    if ($('.nav').hasClass('open')) {
+      $('body').css('overflow', 'hidden');
+    } else {
+      $('body').css('overflow', '');
+    }
+  });
+  // オーバーレイまたはメニュー内リンククリックで閉じる
+  $('.menu-overlay, .nav a').on('click', function() {
+    $('.nav').removeClass('open');
+    $('.menu-overlay').removeClass('active');
+    $('body').css('overflow', '');
+  });
+});
+
 // 書店名をローカルストレージに保存し、GETで次のページへ遷移
 function selectedStore(storeName) {
   localStorage.setItem('selectedStore', storeName);

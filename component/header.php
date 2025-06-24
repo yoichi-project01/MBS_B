@@ -1,17 +1,13 @@
 <?php
 $storeName = $_GET['store'] ?? '';
 ?>
-<!-- ☰ のトグル用 hidden チェックボックス -->
-<input type="checkbox" id="menu-toggle" class="menu-toggle-checkbox">
-
+<!-- jQuery用: チェックボックス不要 -->
 <header class="site-header">
     <div class="header-inner">
         <!-- ☰ハンバーガーアイコン -->
-        <label for="menu-toggle" class="menu-toggle-label">☰</label>
-
+        <label class="menu-toggle-label" id="menu-btn" tabindex="0" aria-label="メニューを開く">☰</label>
         <!-- 左側のタイトル -->
         <a id="store-title"><?php echo htmlspecialchars($storeName . " 受注管理"); ?></a>
-
         <!-- ナビゲーションメニュー -->
         <nav class="nav">
             <a href="/MBS_B/customer_information/index.php?store=<?= urlencode($storeName) ?>">顧客情報</a>
@@ -20,4 +16,5 @@ $storeName = $_GET['store'] ?? '';
             <a href="/MBS_B/delivery_list/index.php?store=<?= urlencode($storeName) ?>">納品書</a>
         </nav>
     </div>
+    <div class="menu-overlay"></div>
 </header>
