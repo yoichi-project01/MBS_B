@@ -1,4 +1,5 @@
 <?php
+include(__DIR__ . '/../component/header.php');
 session_start();
 
 // --- GETパラメータから納品書番号を取得 ---
@@ -120,238 +121,266 @@ function formatCustomerName($customer_name, $store_name) {
 ?>
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>納品書詳細</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f2f5;
-        }
-        .header {
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 1.8em;
-        }
-        .nav-buttons button {
-            background-color: #5cb85c;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            margin-left: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s;
-        }
-        .nav-buttons button:hover {
-            background-color: #4cae4c;
-        }
-        .container {
-            max-width: 800px; /* 詳細画面なので少し幅を狭める */
-            margin: 20px auto;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            position: relative; /* 「戻る」ボタンの基準 */
-        }
-        .back-button-container {
-            position: absolute;
-            top: 20px;
-            left: 30px;
-            z-index: 10;
-        }
-        .back-button-container .back-button {
-            background-color: #dc3545; /* 赤色 */
-            color: white;
-            border: 1px solid #dc3545;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.95em;
-            transition: background-color 0.3s, border-color 0.3s;
-        }
-        .back-button-container .back-button:hover {
-            background-color: #c82333;
-            border-color: #bd2130;
-        }
-        .detail-header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-left: 100px; /* 戻るボタンのスペース */
-        }
-        .detail-header h2 {
-            font-size: 2em;
-            color: #333;
-            margin-bottom: 5px;
-        }
-        .detail-header p {
-            font-size: 1.1em;
-            color: #555;
-        }
-        .info-section {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
-        }
-        .info-block {
-            flex: 1;
-        }
-        .info-block p {
-            margin: 5px 0;
-            font-size: 1em;
-            color: #444;
-        }
-        .info-block strong {
-            display: inline-block;
-            width: 80px; /* ラベルの幅を固定 */
-            color: #333;
-        }
-        .delivery-items-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        .delivery-items-table th, .delivery-items-table td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-        .delivery-items-table th {
-            background-color: #e9ecef;
-            font-weight: bold;
-            color: #555;
-            white-space: nowrap;
-        }
-        .delivery-items-table td {
-            vertical-align: middle;
-        }
-        .text-right {
-            text-align: right;
-        }
-        .summary-section {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 30px;
-        }
-        .summary-table {
-            width: 300px;
-            border-collapse: collapse;
-        }
-        .summary-table td {
-            border: 1px solid #ddd;
-            padding: 8px 10px;
-        }
-        .summary-table .label {
-            background-color: #f5f5f5;
-            font-weight: bold;
-            text-align: left;
-            width: 100px;
-        }
-        .summary-table .value {
-            text-align: right;
-            font-weight: bold;
-            color: #333;
-        }
-        .summary-table .grand-total {
-            background-color: #e9f5e9;
-            font-size: 1.2em;
-            color: #0056b3;
-        }
-        .no-data-message {
-            text-align: center;
-            color: #777;
-            padding: 20px;
-        }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f2f5;
+    }
+
+    .header {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header h1 {
+        margin: 0;
+        font-size: 1.8em;
+    }
+
+    .nav-buttons button {
+        background-color: #5cb85c;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        margin-left: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s;
+    }
+
+    .nav-buttons button:hover {
+        background-color: #4cae4c;
+    }
+
+    .container {
+        max-width: 800px;
+        /* 詳細画面なので少し幅を狭める */
+        margin: 20px auto;
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+        /* 「戻る」ボタンの基準 */
+    }
+
+    .back-button-container {
+        position: absolute;
+        top: 20px;
+        left: 30px;
+        z-index: 10;
+    }
+
+    .back-button-container .back-button {
+        background-color: #dc3545;
+        /* 赤色 */
+        color: white;
+        border: 1px solid #dc3545;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.95em;
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .back-button-container .back-button:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+
+    .detail-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-left: 100px;
+        /* 戻るボタンのスペース */
+    }
+
+    .detail-header h2 {
+        font-size: 2em;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .detail-header p {
+        font-size: 1.1em;
+        color: #555;
+    }
+
+    .info-section {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+    }
+
+    .info-block {
+        flex: 1;
+    }
+
+    .info-block p {
+        margin: 5px 0;
+        font-size: 1em;
+        color: #444;
+    }
+
+    .info-block strong {
+        display: inline-block;
+        width: 80px;
+        /* ラベルの幅を固定 */
+        color: #333;
+    }
+
+    .delivery-items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .delivery-items-table th,
+    .delivery-items-table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+    }
+
+    .delivery-items-table th {
+        background-color: #e9ecef;
+        font-weight: bold;
+        color: #555;
+        white-space: nowrap;
+    }
+
+    .delivery-items-table td {
+        vertical-align: middle;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+
+    .summary-section {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 30px;
+    }
+
+    .summary-table {
+        width: 300px;
+        border-collapse: collapse;
+    }
+
+    .summary-table td {
+        border: 1px solid #ddd;
+        padding: 8px 10px;
+    }
+
+    .summary-table .label {
+        background-color: #f5f5f5;
+        font-weight: bold;
+        text-align: left;
+        width: 100px;
+    }
+
+    .summary-table .value {
+        text-align: right;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .summary-table .grand-total {
+        background-color: #e9f5e9;
+        font-size: 1.2em;
+        color: #0056b3;
+    }
+
+    .no-data-message {
+        text-align: center;
+        color: #777;
+        padding: 20px;
+    }
     </style>
 </head>
-<body>
-    <div class="header">
-        <h1>緑橋書店 受注管理システム</h1>
-        <div class="nav-buttons">
-            <button onclick="location.href='#'">顧客情報</button>
-            <button onclick="location.href='#'">統計情報</button>
-            <button onclick="location.href='#'">注文書</button>
-            <button onclick="location.href='delivery_history.php'">納品書</button>
-        </div>
-    </div>
 
+<body>
     <div class="container">
         <div class="back-button-container">
             <button type="button" class="back-button" onclick="location.href='delivery_history.php'">一覧に戻る</button>
         </div>
 
         <?php if (!empty($delivery)): ?>
-            <div class="detail-header">
-                <h2>納品書</h2>
-                <p>No. <?= htmlspecialchars($delivery['delivery_no']) ?></p>
-            </div>
+        <div class="detail-header">
+            <h2>納品書</h2>
+            <p>No. <?= htmlspecialchars($delivery['delivery_no']) ?></p>
+        </div>
 
-            <div class="info-section">
-                <div class="info-block">
-                    <p><strong>顧客名:</strong> <?= formatCustomerName($delivery['customer_name'], $delivery['store_name']) ?></p>
-                </div>
-                <div class="info-block" style="text-align: right;">
-                    <p><strong>納品日:</strong> <?= htmlspecialchars($delivery['delivery_date']) ?></p>
-                </div>
+        <div class="info-section">
+            <div class="info-block">
+                <p><strong>顧客名:</strong> <?= formatCustomerName($delivery['customer_name'], $delivery['store_name']) ?>
+                </p>
             </div>
+            <div class="info-block" style="text-align: right;">
+                <p><strong>納品日:</strong> <?= htmlspecialchars($delivery['delivery_date']) ?></p>
+            </div>
+        </div>
 
-            <table class="delivery-items-table">
-                <thead>
-                    <tr>
-                        <th>品名</th>
-                        <th>数量</th>
-                        <th>単価</th>
-                        <th>金額</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($delivery['items'] as $item): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($item['product_name']) ?></td>
-                            <td class="text-right"><?= number_format(htmlspecialchars($item['quantity'])) ?></td>
-                            <td class="text-right">&yen;<?= number_format(htmlspecialchars($item['unit_price'])) ?></td>
-                            <td class="text-right">&yen;<?= number_format(htmlspecialchars($item['amount'])) ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
+        <table class="delivery-items-table">
+            <thead>
+                <tr>
+                    <th>品名</th>
+                    <th>数量</th>
+                    <th>単価</th>
+                    <th>金額</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($delivery['items'] as $item): ?>
+                <tr>
+                    <td><?= htmlspecialchars($item['product_name']) ?></td>
+                    <td class="text-right"><?= number_format(htmlspecialchars($item['quantity'])) ?></td>
+                    <td class="text-right">&yen;<?= number_format(htmlspecialchars($item['unit_price'])) ?></td>
+                    <td class="text-right">&yen;<?= number_format(htmlspecialchars($item['amount'])) ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+
+        <div class="summary-section">
+            <table class="summary-table">
+                <tr>
+                    <td class="label">小計</td>
+                    <td class="value">&yen;<?= number_format(htmlspecialchars($delivery['sub_total_amount'])) ?></td>
+                </tr>
+                <tr>
+                    <td class="label">消費税 (10%)</td>
+                    <td class="value">&yen;<?= number_format(htmlspecialchars($delivery['tax_amount'])) ?></td>
+                </tr>
+                <tr>
+                    <td class="label grand-total">合計金額</td>
+                    <td class="value grand-total">&yen;<?= number_format(htmlspecialchars($delivery['grand_total'])) ?>
+                    </td>
+                </tr>
             </table>
-
-            <div class="summary-section">
-                <table class="summary-table">
-                    <tr>
-                        <td class="label">小計</td>
-                        <td class="value">&yen;<?= number_format(htmlspecialchars($delivery['sub_total_amount'])) ?></td>
-                    </tr>
-                    <tr>
-                        <td class="label">消費税 (10%)</td>
-                        <td class="value">&yen;<?= number_format(htmlspecialchars($delivery['tax_amount'])) ?></td>
-                    </tr>
-                    <tr>
-                        <td class="label grand-total">合計金額</td>
-                        <td class="value grand-total">&yen;<?= number_format(htmlspecialchars($delivery['grand_total'])) ?></td>
-                    </tr>
-                </table>
-            </div>
+        </div>
         <?php else: ?>
-            <div class="no-data-message">
-                <p>この納品書番号のデータは見つかりませんでした。</p>
-                <p><button onclick="location.href='delivery_history.php'">納品書履歴に戻る</button></p>
-            </div>
+        <div class="no-data-message">
+            <p>この納品書番号のデータは見つかりませんでした。</p>
+            <p><button onclick="location.href='delivery_history.php'">納品書履歴に戻る</button></p>
+        </div>
         <?php endif; ?>
     </div>
 </body>
+
 </html>

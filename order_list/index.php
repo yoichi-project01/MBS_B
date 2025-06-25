@@ -3,6 +3,7 @@ include(__DIR__ . '/../component/header.php');
 session_start();
 
 $search_keyword = $_GET['search'] ?? '';
+$shop_name = $_GET['shop_name'] ?? '';
 $message = $_SESSION['message'] ?? '';
 $error_message = $_SESSION['error_message'] ?? '';
 unset($_SESSION['message'], $_SESSION['error_message']);
@@ -64,7 +65,8 @@ $total_pages = max(1, ceil($total_orders / $records_per_page));
             <!-- 横並びのボタンエリア -->
             <div style="display: flex; gap: 12px;">
                 <button type="submit" class="search-button">検索</button>
-                <button type="button" class="search-button" onclick="location.href='order_create.php'">新規作成</button>
+                <button type="button" class="search-button"
+                    onclick="location.href='order_create.php<?= $shop_name ? '?shop_name=' . urlencode($shop_name) : '' ?>'">新規作成</button>
             </div>
         </form>
     </div>

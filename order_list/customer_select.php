@@ -6,6 +6,7 @@ require_once 'db_connect.php';
 
 $search_keyword = $_GET['search'] ?? '';
 $selected_customer_id = $_GET['customer_id'] ?? null;
+$shop_name = $_GET['shop_name'] ?? ''; // 追加: shop_nameをGETで取得
 $selected_customer_name = ''; // 選択された顧客名を保持するための変数
 
 $customers = [];
@@ -41,7 +42,11 @@ if ($selected_customer_id !== null) {
         $selected_customer_name = $first_customer['name']; // 表示用
 
         // 顧客を選択したら、order_create.php へリダイレクト
-        header('Location: order_create.php');
+        $redirect_url = 'order_create.php';
+        if (!empty($shop_name)) {
+            $redirect_url .= '?shop_name=' . urlencode($shop_name);
+        }
+        header('Location: ' . $redirect_url);
         exit;
     } else {
         // 無効なcustomer_idが指定された場合
@@ -93,7 +98,7 @@ if (empty($_SESSION['csrf_token'])) {
             現在選択中の顧客: <span id="selectedCustomerDisplay"></span>
         </div>
         <div class="menu" style="margin-top: 18px;">
-            <button type="button" class="back-button" onclick="location.href='index.php'">戻る</button>
+            <button type="button" class="back-button" onclick="location.href='index.php<?= $shop_name ? '?shop_name=' . urlencode($shop_name) : '' ?>'">戻る</button>
             <button type="button" class="select-button" id="selectCustomerButton" disabled>この顧客を選択</button>
         </div>
     </main>

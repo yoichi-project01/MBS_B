@@ -3,6 +3,7 @@ session_start();
 require_once 'db_connect.php';
 
 $order_no = $_GET['order_no'] ?? null;
+$shop_name = $_GET['shop_name'] ?? '';
 
 if (!$order_no) {
     $_SESSION['error_message'] = "削除する注文書が指定されていません。";
@@ -25,13 +26,12 @@ try {
 
     $pdo->commit();
     $_SESSION['message'] = "注文書No " . htmlspecialchars($order_no, ENT_QUOTES) . " が正常に削除されました。";
-    header('Location: order_history.php');
+    header('Location: order_history.php' . ($shop_name ? '?shop_name=' . urlencode($shop_name) : ''));
     exit();
-
 } catch (PDOException $e) {
     $pdo->rollBack();
     error_log("データベースエラー (order_delete.php): " . $e->getMessage());
     $_SESSION['error_message'] = "注文書No " . htmlspecialchars($order_no, ENT_QUOTES) . " の削除中にエラーが発生しました。システム管理者に連絡してください。<br>エラー詳細: " . $e->getMessage();
-    header('Location: order_detail.php?order_no=' . urlencode($order_no)); // 削除失敗時は詳細画面に戻す
+    header('Location: order_detail.php?order_no=' . urlencode($order_no) . ($shop_name ? '&shop_name=' . urlencode($shop_name) : ''));
     exit();
 }

@@ -5,6 +5,7 @@ session_start();
 // require_once 'db_connect.php'; // データベース接続はダミーデータ表示のためコメントアウト
 
 $order_no = $_GET['order_no'] ?? null;
+$shop_name = $_GET['shop_name'] ?? '';
 $message = $_SESSION['message'] ?? '';
 $error_message = $_SESSION['error_message'] ?? '';
 
@@ -128,10 +129,10 @@ try {
                 注文書No：<?= htmlspecialchars($order_no ?? '', ENT_QUOTES) ?>
             </div>
             <div class="menu" style="flex-direction: row; gap: 12px; margin: 0;">
-                <button type="button" class="back-button" onclick="location.href='order_history.php'">注文書一覧へ戻る</button>
+                <button type="button" class="back-button" onclick="location.href='order_history.php<?= $shop_name ? '?shop_name=' . urlencode($shop_name) : '' ?>'">注文書一覧へ戻る</button>
                 <?php if ($dummy_order): ?>
                     <button type="button" class="delete-button" style="background: #ffc107; color: #333;"
-                        onclick="if(confirm('この注文書を削除してもよろしいですか？')) { location.href='order_delete.php?order_no=<?= htmlspecialchars($order_no, ENT_QUOTES) ?>'; }">注文書削除</button>
+                        onclick="if(confirm('この注文書を削除してもよろしいですか？')) { location.href='order_delete.php?order_no=<?= htmlspecialchars($order_no, ENT_QUOTES) ?><?= $shop_name ? '&shop_name=' . urlencode($shop_name) : '' ?>'; }">注文書削除</button>
                 <?php endif; ?>
             </div>
         </div>
