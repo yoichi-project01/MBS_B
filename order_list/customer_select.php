@@ -22,7 +22,6 @@ try {
         ];
     }
     $customers = $formatted_customers;
-
 } catch (PDOException $e) {
     error_log("データベースエラー (customer_select.php): " . $e->getMessage());
     $customers = [];
@@ -31,7 +30,7 @@ try {
 // URLにcustomer_idが指定されている場合、セッションに保存
 if ($selected_customer_id !== null) {
     // 選択された顧客情報を検索
-    $found_customer = array_filter($customers, function($customer) use ($selected_customer_id) {
+    $found_customer = array_filter($customers, function ($customer) use ($selected_customer_id) {
         return $customer['id'] == $selected_customer_id;
     });
 
@@ -40,7 +39,7 @@ if ($selected_customer_id !== null) {
         $_SESSION['temp_order_customer_no'] = $first_customer['id'];
         $_SESSION['temp_order_customer_name'] = $first_customer['name'];
         $selected_customer_name = $first_customer['name']; // 表示用
-        
+
         // 顧客を選択したら、order_create.php へリダイレクト
         header('Location: order_create.php');
         exit;
@@ -86,7 +85,7 @@ if (empty($_SESSION['csrf_token'])) {
         <div class="table-container" style="max-width: 500px;">
             <ul id="customerList" class="customer-list" style="list-style:none; margin:0; padding:0;">
                 <?php if (empty($customers)): ?>
-                <li>顧客データがありません。</li>
+                    <li>顧客データがありません。</li>
                 <?php endif; ?>
             </ul>
         </div>
@@ -94,128 +93,128 @@ if (empty($_SESSION['csrf_token'])) {
             現在選択中の顧客: <span id="selectedCustomerDisplay"></span>
         </div>
         <div class="menu" style="margin-top: 18px;">
-            <button type="button" class="back-button" onclick="location.href='order_history.php'">戻る</button>
+            <button type="button" class="back-button" onclick="location.href='index.php'">戻る</button>
             <button type="button" class="select-button" id="selectCustomerButton" disabled>この顧客を選択</button>
         </div>
     </main>
     <script>
-    const allCustomers = <?= json_encode($customers) ?>; // PHPから顧客データをJSに渡す
-    const customerSearchInput = document.getElementById('customerSearch');
-    const customerListUl = document.getElementById('customerList');
-    const selectCustomerButton = document.getElementById('selectCustomerButton');
-    const currentSelectionDiv = document.getElementById('currentSelection');
-    const selectedCustomerDisplaySpan = document.getElementById('selectedCustomerDisplay');
+        const allCustomers = <?= json_encode($customers) ?>; // PHPから顧客データをJSに渡す
+        const customerSearchInput = document.getElementById('customerSearch');
+        const customerListUl = document.getElementById('customerList');
+        const selectCustomerButton = document.getElementById('selectCustomerButton');
+        const currentSelectionDiv = document.getElementById('currentSelection');
+        const selectedCustomerDisplaySpan = document.getElementById('selectedCustomerDisplay');
 
-    let selectedCustomerId = null;
-    let selectedCustomerName = ''; // 選択された顧客の名前を保持
+        let selectedCustomerId = null;
+        let selectedCustomerName = ''; // 選択された顧客の名前を保持
 
-    // 顧客リストをフィルタリングしてレンダリングする関数
-    function filterAndRenderCustomers() {
-        const searchTerm = customerSearchInput.value.toLowerCase();
-        const fragment = document.createDocumentFragment();
-        let hasResults = false;
+        // 顧客リストをフィルタリングしてレンダリングする関数
+        function filterAndRenderCustomers() {
+            const searchTerm = customerSearchInput.value.toLowerCase();
+            const fragment = document.createDocumentFragment();
+            let hasResults = false;
 
-        allCustomers.forEach(customer => {
-            // 顧客名に検索キーワードが含まれるかチェック
-            if (customer.name.toLowerCase().includes(searchTerm)) {
-                hasResults = true;
-                const li = document.createElement('li');
-                li.textContent = customer.name;
-                li.setAttribute('data-customer-id', customer.id);
-                li.setAttribute('data-customer-name', customer.name);
+            allCustomers.forEach(customer => {
+                // 顧客名に検索キーワードが含まれるかチェック
+                if (customer.name.toLowerCase().includes(searchTerm)) {
+                    hasResults = true;
+                    const li = document.createElement('li');
+                    li.textContent = customer.name;
+                    li.setAttribute('data-customer-id', customer.id);
+                    li.setAttribute('data-customer-name', customer.name);
 
-                const idSpan = document.createElement('span');
-                idSpan.className = 'customer-id';
-                idSpan.textContent = `(ID: ${customer.id})`;
-                li.appendChild(idSpan);
+                    const idSpan = document.createElement('span');
+                    idSpan.className = 'customer-id';
+                    idSpan.textContent = `(ID: ${customer.id})`;
+                    li.appendChild(idSpan);
 
-                if (customer.id == selectedCustomerId) {
-                    li.classList.add('selected');
-                    selectedCustomerName = customer.name; // 選択中の顧客名を更新
-                }
-
-                li.addEventListener('click', () => {
-                    // 既に選択されている要素の 'selected' クラスを削除
-                    const currentlySelected = customerListUl.querySelector('.selected');
-                    if (currentlySelected) {
-                        currentlySelected.classList.remove('selected');
+                    if (customer.id == selectedCustomerId) {
+                        li.classList.add('selected');
+                        selectedCustomerName = customer.name; // 選択中の顧客名を更新
                     }
-                    // クリックされた要素に 'selected' クラスを追加
-                    li.classList.add('selected');
-                    selectedCustomerId = customer.id;
-                    selectedCustomerName = customer.name; // 選択された顧客名を更新
-                    selectCustomerButton.disabled = false; // ボタンを有効化
-                    updateCurrentSelectionDisplay(); // 表示を更新
-                });
-                fragment.appendChild(li);
+
+                    li.addEventListener('click', () => {
+                        // 既に選択されている要素の 'selected' クラスを削除
+                        const currentlySelected = customerListUl.querySelector('.selected');
+                        if (currentlySelected) {
+                            currentlySelected.classList.remove('selected');
+                        }
+                        // クリックされた要素に 'selected' クラスを追加
+                        li.classList.add('selected');
+                        selectedCustomerId = customer.id;
+                        selectedCustomerName = customer.name; // 選択された顧客名を更新
+                        selectCustomerButton.disabled = false; // ボタンを有効化
+                        updateCurrentSelectionDisplay(); // 表示を更新
+                    });
+                    fragment.appendChild(li);
+                }
+            });
+
+            // リストをクリアしてから新しい要素を追加
+            customerListUl.innerHTML = '';
+            if (hasResults) {
+                customerListUl.appendChild(fragment);
+            } else {
+                const noResultLi = document.createElement('li');
+                noResultLi.textContent = '該当する顧客が見つかりません。';
+                customerListUl.appendChild(noResultLi);
+            }
+
+            updateCurrentSelectionDisplay(); // フィルタリング後に表示を更新
+        }
+
+        // 現在選択中の顧客を表示する関数
+        function updateCurrentSelectionDisplay() {
+            if (selectedCustomerId && selectedCustomerName) {
+                selectedCustomerDisplaySpan.textContent = `${selectedCustomerName} (ID: ${selectedCustomerId})`;
+                currentSelectionDiv.style.display = 'block';
+            } else {
+                currentSelectionDiv.style.display = 'none';
+                selectedCustomerDisplaySpan.textContent = '';
+            }
+        }
+
+        // 「この顧客を選択」ボタンのクリックイベント
+        selectCustomerButton.addEventListener('click', () => {
+            if (selectedCustomerId) {
+                // 選択された顧客IDをURLパラメータとして渡し、ページをリダイレクト（PHP側で処理）
+                // PHP側でセッションに保存し、order_create.phpへリダイレクトされる
+                window.location.href = `customer_select.php?customer_id=${selectedCustomerId}`;
             }
         });
 
-        // リストをクリアしてから新しい要素を追加
-        customerListUl.innerHTML = '';
-        if (hasResults) {
-            customerListUl.appendChild(fragment);
-        } else {
-            const noResultLi = document.createElement('li');
-            noResultLi.textContent = '該当する顧客が見つかりません。';
-            customerListUl.appendChild(noResultLi);
-        }
+        // 検索入力フィールドの 'input' イベントでリアルタイムフィルタリング
+        customerSearchInput.addEventListener('input', filterAndRenderCustomers);
 
-        updateCurrentSelectionDisplay(); // フィルタリング後に表示を更新
-    }
+        // ページロード時の初期処理
+        document.addEventListener('DOMContentLoaded', () => {
+            // URLパラメータから初期検索キーワードがあれば設定
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialSearch = urlParams.get('search') || '';
+            customerSearchInput.value = initialSearch;
 
-    // 現在選択中の顧客を表示する関数
-    function updateCurrentSelectionDisplay() {
-        if (selectedCustomerId && selectedCustomerName) {
-            selectedCustomerDisplaySpan.textContent = `${selectedCustomerName} (ID: ${selectedCustomerId})`;
-            currentSelectionDiv.style.display = 'block';
-        } else {
-            currentSelectionDiv.style.display = 'none';
-            selectedCustomerDisplaySpan.textContent = '';
-        }
-    }
-
-    // 「この顧客を選択」ボタンのクリックイベント
-    selectCustomerButton.addEventListener('click', () => {
-        if (selectedCustomerId) {
-            // 選択された顧客IDをURLパラメータとして渡し、ページをリダイレクト（PHP側で処理）
-            // PHP側でセッションに保存し、order_create.phpへリダイレクトされる
-            window.location.href = `customer_select.php?customer_id=${selectedCustomerId}`;
-        }
-    });
-
-    // 検索入力フィールドの 'input' イベントでリアルタイムフィルタリング
-    customerSearchInput.addEventListener('input', filterAndRenderCustomers);
-
-    // ページロード時の初期処理
-    document.addEventListener('DOMContentLoaded', () => {
-        // URLパラメータから初期検索キーワードがあれば設定
-        const urlParams = new URLSearchParams(window.location.search);
-        const initialSearch = urlParams.get('search') || '';
-        customerSearchInput.value = initialSearch;
-
-        // 初期表示と、もしcustomer_idがURLにある場合の顧客選択
-        // このページに直接customer_idでアクセスした場合、PHP側で処理されてリダイレクトされるため、
-        // ここでselectedCustomerIdを直接セットする必要はないが、残しておく。
-        const urlCustomerId = urlParams.get('customer_id');
-        if (urlCustomerId) {
-            // PHP側でリダイレクトされるため、通常このブロックは実行されない
-            // もしリダイレクトさせたくない場合は、PHPのheader()を削除
-            selectedCustomerId = urlCustomerId;
-            const preSelectedCustomer = allCustomers.find(customer => customer.id == urlCustomerId);
-            if (preSelectedCustomer) {
-                selectedCustomerName = preSelectedCustomer.name;
+            // 初期表示と、もしcustomer_idがURLにある場合の顧客選択
+            // このページに直接customer_idでアクセスした場合、PHP側で処理されてリダイレクトされるため、
+            // ここでselectedCustomerIdを直接セットする必要はないが、残しておく。
+            const urlCustomerId = urlParams.get('customer_id');
+            if (urlCustomerId) {
+                // PHP側でリダイレクトされるため、通常このブロックは実行されない
+                // もしリダイレクトさせたくない場合は、PHPのheader()を削除
+                selectedCustomerId = urlCustomerId;
+                const preSelectedCustomer = allCustomers.find(customer => customer.id == urlCustomerId);
+                if (preSelectedCustomer) {
+                    selectedCustomerName = preSelectedCustomer.name;
+                }
             }
-        }
 
-        filterAndRenderCustomers(); // 初期フィルタリングと描画
+            filterAndRenderCustomers(); // 初期フィルタリングと描画
 
-        // URLに customer_id がある場合（かつリダイレクトされなかった場合）
-        // または、JavaScript内でselectedCustomerIdが設定された場合、ボタンを有効にする
-        if (selectedCustomerId) {
-            selectCustomerButton.disabled = false;
-        }
-    });
+            // URLに customer_id がある場合（かつリダイレクトされなかった場合）
+            // または、JavaScript内でselectedCustomerIdが設定された場合、ボタンを有効にする
+            if (selectedCustomerId) {
+                selectCustomerButton.disabled = false;
+            }
+        });
     </script>
 </body>
 

@@ -13,6 +13,8 @@ if ($storeName) {
     <title><?php echo htmlspecialchars($storeName); ?> 受注管理システム</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <!-- jQueryを追加 -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>

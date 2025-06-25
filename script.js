@@ -1,5 +1,3 @@
-document.body.style.overflow = 'hidden';
-
 // --- ハンバーガーメニュー(jQuery)対応 ---
 $(function() {
   // メニュー開閉
