@@ -2,28 +2,48 @@
     --main-green: #2f5d3f;
     --sub-green: #4b7a5c;
     --accent-green: #7ed957;
+    --light-green: #e8f5e8;
     --bg-light: #f8faf9;
     --font-color: #2f5d3f;
-    --font-family: 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
-    --radius: 12px;
-    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --shadow: 0 4px 24px rgba(47, 93, 63, 0.10);
+    --font-family: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', sans-serif;
+    --radius: 16px;
+    --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow: 0 8px 40px rgba(47, 93, 63, 0.12);
+    --shadow-hover: 0 16px 64px rgba(47, 93, 63, 0.20);
     --header-height: 68px;
 }
 
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(120deg, #e3efe6 0%, #f8faf9 100%);
     font-family: var(--font-family);
     color: var(--font-color);
+    background: linear-gradient(135deg, #e3efe6 0%, #f0f8f0 50%, #f8faf9 100%);
     min-height: 100vh;
-    padding-top: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+    position: relative;
+    padding-top: 0;
+    /* ヘッダーがある場合は var(--header-height) に変更 */
 }
+
+/* ヘッダーがある場合のbodyスタイル（コメントアウト） */
+/*
+body.with-header {
+    padding-top: var(--header-height);
+    display: block;
+    align-items: initial;
+    justify-content: initial;
+}
+*/
+
+/* ========== ヘッダー関連スタイル（元のCSS） ========== */
 
 /* ヘッダーメインスタイル */
 .site-header {
@@ -64,8 +84,8 @@ body {
     z-index: 10;
 }
 
-/* ストアタイトル */
-.store-title {
+/* ストアタイトル（ヘッダー内） */
+.site-header .store-title {
     font-weight: 800;
     font-size: 24px;
     color: #fff;
@@ -76,15 +96,16 @@ body {
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     transition: all var(--transition);
     white-space: nowrap;
+    margin-bottom: 0;
 }
 
-.store-title::before {
+.site-header .store-title::before {
     content: '📋';
     font-size: 28px;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
-.store-title:hover {
+.site-header .store-title:hover {
     transform: translateX(2px);
     text-shadow: 0 4px 12px rgba(126, 217, 87, 0.3);
 }
@@ -200,13 +221,313 @@ body {
     visibility: visible;
 }
 
+/* ========== メインコンテンツエリア（新しいデザイン） ========== */
+
+/* 背景の装飾 */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(126, 217, 87, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(75, 122, 92, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(47, 93, 63, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.container {
+    max-width: 600px;
+    width: 100%;
+    padding: 40px 20px;
+    text-align: center;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* メインページのストアタイトル */
+.container .store-title {
+    font-size: clamp(32px, 8vw, 48px);
+    font-weight: 800;
+    color: var(--main-green);
+    margin-bottom: 60px;
+    position: relative;
+    display: inline-block;
+    letter-spacing: 2px;
+    line-height: 1.2;
+}
+
+.container .store-title::before {
+    content: '📚';
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 48px;
+    filter: drop-shadow(0 4px 12px rgba(47, 93, 63, 0.3));
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateX(-50%) translateY(0px);
+    }
+
+    50% {
+        transform: translateX(-50%) translateY(-10px);
+    }
+}
+
+.container .store-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-green), var(--sub-green));
+    border-radius: 2px;
+    animation: slideIn 0.8s ease-out 0.3s both;
+}
+
+@keyframes slideIn {
+    from {
+        width: 0;
+        opacity: 0;
+    }
+
+    to {
+        width: 60px;
+        opacity: 1;
+    }
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+}
+
+.menu-button {
+    width: 100%;
+    max-width: 400px;
+    padding: 24px 32px;
+    font-size: 20px;
+    font-weight: 600;
+    font-family: var(--font-family);
+    color: var(--main-green);
+    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
+    border: 3px solid transparent;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 1px;
+    animation: slideInStagger 0.6s ease-out both;
+}
+
+.menu-button:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.menu-button:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.menu-button:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.menu-button:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.menu-button:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+@keyframes slideInStagger {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.menu-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(126, 217, 87, 0.4),
+            transparent);
+    transition: left 0.6s ease;
+}
+
+.menu-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--accent-green) 0%, var(--sub-green) 100%);
+    opacity: 0;
+    transition: opacity var(--transition);
+    border-radius: calc(var(--radius) - 3px);
+}
+
+.menu-button:hover::before {
+    left: 100%;
+}
+
+.menu-button:hover::after {
+    opacity: 0.1;
+}
+
+.menu-button:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--accent-green);
+    color: var(--main-green);
+}
+
+.menu-button:active {
+    transform: translateY(-4px) scale(0.98);
+    transition: all 0.1s ease;
+}
+
+.menu-button:focus {
+    outline: none;
+    border-color: var(--accent-green);
+    box-shadow: var(--shadow-hover), 0 0 0 4px rgba(126, 217, 87, 0.3);
+}
+
+/* 上部戻るボタンのスタイル */
+.back-button-top {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid var(--sub-green);
+    color: var(--sub-green);
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: var(--font-family);
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: 0 4px 16px rgba(47, 93, 63, 0.15);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+}
+
+.back-button-top:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: var(--main-green);
+    color: var(--main-green);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(47, 93, 63, 0.25);
+}
+
+.back-button-top:active {
+    transform: translateY(0);
+    transition: all 0.1s ease;
+}
+
+.back-button-top span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.5px;
+}
+
+/* 店舗選択ページ（index.html）のボタンのみアイコンを非表示にする */
+.store-selection .menu-button span::before {
+    display: none;
+}
+
+/* 店舗アイコンの設定（menu.php用） */
+.menu-button span {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.menu-button span::before {
+    content: '🏪';
+    font-size: 24px;
+    filter: grayscale(0.3);
+    transition: all var(--transition);
+}
+
+.menu-button:hover span::before {
+    filter: grayscale(0);
+    transform: scale(1.1);
+}
+
+/* メニューボタンごとのアイコン設定（menu.php用） */
+.menu-button:nth-child(1) span::before {
+    content: '👥';
+    /* 顧客情報 */
+}
+
+.menu-button:nth-child(2) span::before {
+    content: '📊';
+    /* 統計情報 */
+}
+
+.menu-button:nth-child(3) span::before {
+    content: '📋';
+    /* 注文書 */
+}
+
+.menu-button:nth-child(4) span::before {
+    content: '📦';
+    /* 納品書 */
+}
+
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
+
+    /* ヘッダー関連 */
     .header-inner {
         padding: 0 16px;
     }
 
-    .store-title {
+    .site-header .store-title {
         font-size: 20px;
     }
 
@@ -231,6 +552,7 @@ body {
 
     .nav.active {
         right: 0;
+        animation: slideInFromRight 0.3s ease-out;
     }
 
     .nav-item {
@@ -246,19 +568,64 @@ body {
         transform: translateX(8px);
         box-shadow: none;
     }
+
+    /* メインコンテンツ関連 */
+    .container {
+        padding: 20px 16px;
+    }
+
+    .container .store-title {
+        margin-bottom: 40px;
+    }
+
+    .menu-button {
+        padding: 20px 24px;
+        font-size: 18px;
+    }
+
+    .back-button-top {
+        top: 16px;
+        left: 16px;
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+
+    .menu {
+        gap: 20px;
+    }
 }
 
 @media (max-width: 480px) {
+
+    /* ヘッダー関連 */
     .header-inner {
         padding: 0 12px;
     }
 
-    .store-title {
+    .site-header .store-title {
         font-size: 18px;
     }
 
-    .store-title::before {
+    .site-header .store-title::before {
         font-size: 24px;
+    }
+
+    /* メインコンテンツ関連 */
+    .container .store-title::before {
+        top: -35px;
+        font-size: 40px;
+    }
+
+    .menu-button {
+        padding: 18px 20px;
+        font-size: 16px;
+    }
+
+    .back-button-top {
+        top: 12px;
+        left: 12px;
+        padding: 8px 14px;
+        font-size: 12px;
     }
 }
 
@@ -275,19 +642,46 @@ body {
     }
 }
 
-.nav.active {
-    animation: slideInFromRight 0.3s ease-out;
-}
-
 /* ダークモード対応 */
 @media (prefers-color-scheme: dark) {
+    body {
+        background: linear-gradient(135deg, #1a2e1f 0%, #0f1f13 50%, #0a1a0d 100%);
+        color: #e8f5e8;
+    }
+
     .site-header {
         background: linear-gradient(135deg, #1a2e1f 0%, #2d4a35 100%);
         border-bottom-color: #5fa36a;
     }
+
+    .container .store-title {
+        color: #e8f5e8;
+    }
+
+    .menu-button {
+        background: linear-gradient(135deg, #2d4a35 0%, #1a2e1f 100%);
+        color: #e8f5e8;
+        border-color: transparent;
+    }
+
+    .menu-button:hover {
+        border-color: var(--accent-green);
+    }
+
+    .back-button-top {
+        background: rgba(255, 255, 255, 0.95);
+        border-color: #5fa36a;
+        color: #e8f5e8;
+    }
+
+    .back-button-top:hover {
+        background: rgba(255, 255, 255, 1);
+        border-color: var(--accent-green);
+        color: var(--main-green);
+    }
 }
 
-/* デモ用コンテンツ */
+/* ========== デモ用コンテンツ（元のCSS） ========== */
 .demo-content {
     max-width: 800px;
     margin: 60px auto;
@@ -308,4 +702,29 @@ body {
     line-height: 1.6;
     color: #666;
     font-size: 16px;
+}
+
+/* 追加のマイクロインタラクション */
+.menu-button {
+    background-image:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
+}
+
+.pulse-effect {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: var(--shadow);
+    }
+
+    50% {
+        box-shadow: var(--shadow), 0 0 0 8px rgba(126, 217, 87, 0.1);
+    }
+
+    100% {
+        box-shadow: var(--shadow);
+    }
 }

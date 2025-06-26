@@ -13,19 +13,30 @@ if ($storeName) {
     <title><?php echo htmlspecialchars($storeName); ?> 受注管理システム</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <!-- jQueryを追加 -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>
     <main class="container">
-        <h1 id="store-title"><?php echo htmlspecialchars($storeName); ?><br>受注管理システム</h1>
+        <!-- 戻るボタンをタイトルの上に配置 -->
+        <button class="back-button-top" onclick="window.location.href='index.html'">
+            <span>← 店舗選択に戻る</span>
+        </button>
+
+        <h1 class="store-title"><?php echo htmlspecialchars($storeName); ?><br>受注管理システム</h1>
 
         <div class="menu">
-            <button class="menu-button" data-path="customer_information/index.php">顧客情報</button>
-            <button class="menu-button" data-path="statistics/index.php">統計情報</button>
-            <button class="menu-button" data-path="order_list/index.php">注文書</button>
-            <button class="menu-button" data-path="delivery_list/index.php">納品書</button>
+            <button class="menu-button" data-path="customer_information/index.php">
+                <span>顧客情報</span>
+            </button>
+            <button class="menu-button" data-path="statistics/index.php">
+                <span>統計情報</span>
+            </button>
+            <button class="menu-button" data-path="order_list/index.php">
+                <span>注文書</span>
+            </button>
+            <button class="menu-button" data-path="delivery_list/index.php">
+                <span>納品書</span>
+            </button>
         </div>
     </main>
 
