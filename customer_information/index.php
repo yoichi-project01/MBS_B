@@ -43,6 +43,7 @@ session_start();
     </script>
     <?php unset($_SESSION['upload_status']); ?>
     <?php endif; ?>
+    <script src="../script.js"></script>
 </body>
 
 </html>

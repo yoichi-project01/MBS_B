@@ -5,17 +5,25 @@ const menuOverlay = document.getElementById('menuOverlay');
 
 function toggleMenu() {
     if (menuToggle && nav && menuOverlay) {
-        menuToggle.classList.toggle('active');
-        nav.classList.toggle('active');
-        menuOverlay.classList.toggle('active');
-
-        // アクセシビリティ
-        const isExpanded = nav.classList.contains('active');
-        menuToggle.setAttribute('aria-expanded', isExpanded);
-        menuToggle.setAttribute('aria-label', isExpanded ? 'メニューを閉じる' : 'メニューを開く');
-
-        // ボディのスクロールを制御
-        document.body.style.overflow = isExpanded ? 'hidden' : '';
+        const isActive = nav.classList.contains('active');
+        
+        if (isActive) {
+            // メニューを閉じる
+            menuToggle.classList.remove('active');
+            nav.classList.remove('active');
+            menuOverlay.classList.remove('active');
+            menuToggle.setAttribute('aria-expanded', 'false');
+            menuToggle.setAttribute('aria-label', 'メニューを開く');
+            document.body.style.overflow = '';
+        } else {
+            // メニューを開く
+            menuToggle.classList.add('active');
+            nav.classList.add('active');
+            menuOverlay.classList.add('active');
+            menuToggle.setAttribute('aria-expanded', 'true');
+            menuToggle.setAttribute('aria-label', 'メニューを閉じる');
+            document.body.style.overflow = 'hidden';
+        }
     }
 }
 
@@ -30,35 +38,52 @@ function closeMenu() {
     }
 }
 
-// イベントリスナー
-if (menuToggle) {
-    menuToggle.addEventListener('click', toggleMenu);
-}
-if (menuOverlay) {
-    menuOverlay.addEventListener('click', closeMenu);
-}
-
-// キーボードナビゲーション
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && nav && nav.classList.contains('active')) {
-        closeMenu();
+// DOMContentLoaded後にイベントリスナーを設定
+document.addEventListener('DOMContentLoaded', function() {
+    // ハンバーガーメニューのイベントリスナー
+    const menuToggleBtn = document.getElementById('menuToggle');
+    const navMenu = document.getElementById('nav');
+    const overlay = document.getElementById('menuOverlay');
+    
+    if (menuToggleBtn) {
+        menuToggleBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMenu();
+        });
     }
-});
+    
+    if (overlay) {
+        overlay.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeMenu();
+        });
+    }
 
-// ナビリンクをクリックしたらメニューを閉じる（モバイル）
-document.querySelectorAll('.nav-item').forEach(link => {
-    link.addEventListener('click', () => {
-        if (window.innerWidth <= 768) {
+    // ナビリンクをクリックしたらメニューを閉じる（モバイル）
+    document.querySelectorAll('.nav-item').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    closeMenu();
+                }, 100);
+            }
+        });
+    });
+
+    // キーボードナビゲーション
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && navMenu && navMenu.classList.contains('active')) {
             closeMenu();
         }
     });
-});
 
-// リサイズ時にメニューを閉じる
-window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) {
-        closeMenu();
-    }
+    // リサイズ時にメニューを閉じる
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            closeMenu();
+        }
+    });
 });
 
 // ========== スクロール効果 ==========
