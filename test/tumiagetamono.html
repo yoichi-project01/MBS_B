@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>本屋業者システム - 顧客別統計情報</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            background: linear-gradient(135deg, #2f5d3f, #4a7c59);
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(47, 93, 63, 0.3);
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .controls {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        select, input[type="text"] {
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+
+        select:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #2f5d3f;
+            box-shadow: 0 0 0 3px rgba(47, 93, 63, 0.1);
+        }
+
+        .btn {
+            background: #2f5d3f;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #1e4029;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(47, 93, 63, 0.3);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: linear-gradient(135deg, #2f5d3f, #4a7c59);
+            color: white;
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: bold;
+            position: relative;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s ease;
+        }
+
+        tr:hover td {
+            background-color: #f8f9fa;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafbfc;
+        }
+
+        .sort-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            margin-left: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.2s ease;
+        }
+
+        .sort-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .graph-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .graph-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 3% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 900px;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            transition: color 0.2s ease;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .pagination {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+        }
+
+        .pagination a, .pagination span {
+            display: inline-block;
+            padding: 10px 15px;
+            margin: 0 5px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .pagination a {
+            background: #2f5d3f;
+            color: white;
+        }
+
+        .pagination a:hover {
+            background: #1e4029;
+            transform: translateY(-2px);
+        }
+
+        .pagination .current {
+            background: #e1e5e9;
+            color: #333;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            select, input[type="text"] {
+                min-width: auto;
+                width: 100%;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+            
+            th, td {
+                padding: 12px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 本屋業者システム - 顧客別統計情報</h1>
+
+        <div class="controls">
+            <select id="storeSelect" onchange="filterData()">
+                <option value="">店舗を選択してください</option>
+            </select>
+            <input type="text" id="searchInput" placeholder="顧客名で検索..." onkeyup="filterData()">
+            <button class="btn" onclick="filterData()">🔍 検索</button>
+            <button class="btn" onclick="generateSampleData()" style="background: #ff6b6b;">📊 サンプルデータ生成</button>
+        </div>
+
+        <div class="table-container">
+            <table id="customerTable">
+                <thead>
+                    <tr>
+                        <th>
+                            顧客名
+                            <button class="sort-btn" onclick="sortTable('customer_name', 'asc')">▲</button>
+                            <button class="sort-btn" onclick="sortTable('customer_name', 'desc')">▼</button>
+                        </th>
+                        <th>
+                            売上（円）
+                            <button class="sort-btn" onclick="sortTable('sales_by_customer', 'asc')">▲</button>
+                            <button class="sort-btn" onclick="sortTable('sales_by_customer', 'desc')">▼</button>
+                        </th>
+                        <th>
+                            リードタイム
+                            <button class="sort-btn" onclick="sortTable('lead_time', 'asc')">▲</button>
+                            <button class="sort-btn" onclick="sortTable('lead_time', 'desc')">▼</button>
+                        </th>
+                        <th>
+                            配達回数
+                            <button class="sort-btn" onclick="sortTable('delivery_amount', 'asc')">▲</button>
+                            <button class="sort-btn" onclick="sortTable('delivery_amount', 'desc')">▼</button>
+                        </th>
+                        <th>グラフ</th>
+                    </tr>
+                </thead>
+                <tbody id="customerTableBody">
+                    <tr>
+                        <td colspan="5" class="no-data">
+                            📋 データがありません。「サンプルデータ生成」ボタンをクリックしてサンプルデータを作成してください。
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <!-- グラフモーダル -->
+    <div id="graphModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">売上推移グラフ</h2>
+            <div style="margin: 20px 0; height: 400px;">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // グローバル変数
+        let customers = [];
+        let filteredCustomers = [];
+        let currentPage = 1;
+        const itemsPerPage = 4;
+        let currentChart = null;
+
+        // サンプルデータ生成
+        function generateSampleData() {
+            const stores = ['緑橋本店', '今里店', '深江橋店'];
+            const customerNames = [
+                '田中商事', '佐藤書店', '鈴木文具', '高橋出版', '伊藤印刷',
+                '渡辺商店', '山田書房', '中村企画', '小林堂', '加藤商会',
+                '吉田書店', '山本文庫', '松本商事', '井上書房', '木村印刷',
+                '林書店', '清水商会', '森田出版', '池田文具', '橋本書房'
+            ];
+
+            customers = [];
+            for (let i = 0; i < 50; i++) {
+                const store = stores[Math.floor(Math.random() * stores.length)];
+                const name = customerNames[Math.floor(Math.random() * customerNames.length)] + (i > 19 ? `_${i-19}` : '');
+                const deliveryAmount = Math.floor(Math.random() * 6) + 1; // 1-6回の配達
+                
+                // 配達回数に基づいて売上履歴データを生成
+                const salesHistory = generateSalesHistory(deliveryAmount);
+                // 年間売上を売上履歴の合計として計算
+                const totalYearlySales = salesHistory.reduce((sum, item) => sum + item.sales, 0);
+                
+                customers.push({
+                    customer_no: i + 1,
+                    customer_name: name,
+                    store_name: store,
+                    sales_by_customer: totalYearlySales,
+                    lead_time: Math.floor(Math.random() * 300000) + 3600, // 1時間〜83時間（秒）
+                    delivery_amount: deliveryAmount,
+                    sales_history: salesHistory
+                });
+            }
+
+            updateStoreOptions();
+            filterData();
+            alert('✅ サンプルデータを生成しました！店舗を選択して顧客データを確認してください。');
+        }
+
+        // 売上履歴データ生成
+        function generateSalesHistory(deliveryAmount) {
+            const history = [];
+            const months = ['2024-07', '2024-08', '2024-09', '2024-10', '2024-11', '2024-12'];
+            const monthNames = ['7月', '8月', '9月', '10月', '11月', '12月'];
+            
+            // 配達回数に基づいて売上のある月を決定
+            const salesMonths = [];
+            for (let i = 0; i < deliveryAmount && i < 6; i++) {
+                let randomMonth;
+                do {
+                    randomMonth = Math.floor(Math.random() * 6);
+                } while (salesMonths.includes(randomMonth));
+                salesMonths.push(randomMonth);
+            }
+            
+            months.forEach((month, index) => {
+                const hasSales = salesMonths.includes(index);
+                history.push({
+                    month: monthNames[index],
+                    sales: hasSales ? Math.floor(Math.random() * 800000) + 50000 : 0
+                });
+            });
+            
+            return history;
+        }
+
+        // 店舗オプション更新
+        function updateStoreOptions() {
+            const storeSelect = document.getElementById('storeSelect');
+            const stores = [...new Set(customers.map(c => c.store_name))].sort();
+            
+            storeSelect.innerHTML = '<option value="">すべての店舗</option>';
+            stores.forEach(store => {
+                const option = document.createElement('option');
+                option.value = store;
+                option.textContent = store;
+                storeSelect.appendChild(option);
+            });
+        }
+
+        // データフィルタリング
+        function filterData() {
+            const selectedStore = document.getElementById('storeSelect').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            filteredCustomers = customers.filter(customer => {
+                const matchesStore = !selectedStore || customer.store_name === selectedStore;
+                const matchesSearch = !searchTerm || customer.customer_name.toLowerCase().includes(searchTerm);
+                return matchesStore && matchesSearch;
+            });
+
+            currentPage = 1;
+            updateTable();
+            updatePagination();
+        }
+
+        // テーブル更新
+        function updateTable() {
+            const tbody = document.getElementById('customerTableBody');
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageCustomers = filteredCustomers.slice(startIndex, endIndex);
+
+            if (pageCustomers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="no-data">該当するデータがありません</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = pageCustomers.map(customer => `
+                <tr>
+                    <td>${customer.customer_name}</td>
+                    <td>¥${customer.sales_by_customer.toLocaleString()}</td>
+                    <td>${formatLeadTime(customer.lead_time)}</td>
+                    <td>${customer.delivery_amount}回</td>
+                    <td>
+                        <button class="graph-btn" onclick="showSalesGraph(${customer.customer_no}, '${customer.customer_name}')">
+                            📊 グラフ
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // リードタイム格式化
+        function formatLeadTime(seconds) {
+            const days = Math.floor(seconds / 86400);
+            const hours = Math.floor((seconds % 86400) / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+
+            let result = "";
+            if (days > 0) result += `${days}日 `;
+            if (hours > 0) result += `${hours}時間 `;
+            if (minutes > 0) result += `${minutes}分 `;
+            result += `${secs}秒`;
+
+            return result.trim();
+        }
+
+        // ページネーション更新
+        function updatePagination() {
+            const pagination = document.getElementById('pagination');
+            const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
+
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            
+            // 前のページ
+            if (currentPage > 1) {
+                html += `<a href="#" onclick="changePage(${currentPage - 1})">← 前へ</a>`;
+            }
+
+            // ページ番号
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPage) {
+                    html += `<span class="current">${i}</span>`;
+                } else {
+                    html += `<a href="#" onclick="changePage(${i})">${i}</a>`;
+                }
+            }
+
+            // 次のページ
+            if (currentPage < totalPages) {
+                html += `<a href="#" onclick="changePage(${currentPage + 1})">次へ →</a>`;
+            }
+
+            pagination.innerHTML = html;
+        }
+
+        // ページ変更
+        function changePage(page) {
+            currentPage = page;
+            updateTable();
+            updatePagination();
+        }
+
+        // テーブルソート
+        function sortTable(column, order) {
+            filteredCustomers.sort((a, b) => {
+                let aVal = a[column];
+                let bVal = b[column];
+
+                if (typeof aVal === 'string') {
+                    aVal = aVal.toLowerCase();
+                    bVal = bVal.toLowerCase();
+                }
+
+                if (order === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+
+            currentPage = 1;
+            updateTable();
+            updatePagination();
+        }
+
+        // グラフ表示
+        function showSalesGraph(customerNo, customerName) {
+            const customer = customers.find(c => c.customer_no === customerNo);
+            if (!customer) return;
+
+            document.getElementById('modalTitle').textContent = `${customerName} - 売上推移グラフ（過去6ヶ月）`;
+            createChart(customer.sales_history);
+            document.getElementById('graphModal').style.display = 'block';
+        }
+
+        // チャート作成
+        function createChart(salesHistory) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            const labels = salesHistory.map(item => item.month);
+            const data = salesHistory.map(item => item.sales);
+
+            currentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '売上（円）',
+                        data: data,
+                        borderColor: '#2f5d3f',
+                        backgroundColor: 'rgba(47, 93, 63, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#2f5d3f',
+                        pointBorderColor: '#fff',
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 14,
+                                    family: "'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif"
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            borderColor: '#2f5d3f',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    return '売上: ¥' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '¥' + value.toLocaleString();
+                                },
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // モーダル閉じる
+        function closeModal() {
+            document.getElementById('graphModal').style.display = 'none';
+            if (currentChart) {
+                currentChart.destroy();
+                currentChart = null;
+            }
+        }
+
+        // モーダル外クリックで閉じる
+        window.onclick = function(event) {
+            const modal = document.getElementById('graphModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初期状態では空のテーブルを表示
+            updateTable();
+        });
+    </script>
+</body>
+</html>
