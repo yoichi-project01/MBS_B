@@ -11,6 +11,7 @@
     --shadow: 0 8px 40px rgba(47, 93, 63, 0.12);
     --shadow-hover: 0 16px 64px rgba(47, 93, 63, 0.20);
     --header-height: 68px;
+    color-scheme: light;
 }
 
 * {
