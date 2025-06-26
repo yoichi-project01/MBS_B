@@ -4,428 +4,556 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>改善されたヘッダーデザイン</title>
+    <title>緑橋書店 受注管理システム</title>
     <style>
-    /* CSS変数定義 */
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap');
+
     :root {
-        --main-green: #2f5d3f;
-        --sub-green: #4b7a5c;
+        --primary-green: #2d5a3d;
+        --secondary-green: #4a7c59;
         --accent-green: #7ed957;
-        --bg-light: #f8faf9;
-        --font-color: #2f5d3f;
-        --font-family: 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
-        --radius: 12px;
-        --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        --shadow: 0 4px 24px rgba(47, 93, 63, 0.10);
-        --header-height: 68px;
+        --light-green: #e8f5e8;
+        --dark-green: #1a3d2b;
+        --bg-gradient: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 50%, #d4edda 100%);
+        --card-bg: rgba(255, 255, 255, 0.95);
+        --text-primary: #2d5a3d;
+        --text-secondary: #5a7063;
+        --shadow-light: 0 4px 20px rgba(45, 90, 61, 0.08);
+        --shadow-medium: 0 8px 30px rgba(45, 90, 61, 0.12);
+        --shadow-heavy: 0 15px 50px rgba(45, 90, 61, 0.15);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     * {
+        margin: 0;
+        padding: 0;
         box-sizing: border-box;
     }
 
     body {
-        margin: 0;
-        padding: 0;
-        background: linear-gradient(120deg, #e3efe6 0%, #f8faf9 100%);
-        font-family: var(--font-family);
-        color: var(--font-color);
+        font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: var(--bg-gradient);
+        color: var(--text-primary);
         min-height: 100vh;
-        padding-top: var(--header-height);
+        line-height: 1.6;
+        overflow-x: hidden;
     }
 
-    /* ヘッダーメインスタイル */
-    .site-header {
+    /* 背景装飾 */
+    body::before {
+        content: '';
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background: linear-gradient(135deg, var(--main-green) 0%, var(--sub-green) 100%);
-        backdrop-filter: blur(10px);
-        border-bottom: 2px solid var(--accent-green);
-        box-shadow: 0 8px 32px rgba(47, 93, 63, 0.15);
-        z-index: 1000;
-        transition: all var(--transition);
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background:
+            radial-gradient(circle at 25% 25%, rgba(126, 217, 87, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 75% 75%, rgba(45, 90, 61, 0.05) 0%, transparent 50%);
+        animation: float 20s ease-in-out infinite;
+        z-index: -1;
     }
 
-    .site-header::before {
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: rotate(0deg) scale(1);
+        }
+
+        50% {
+            transform: rotate(180deg) scale(1.1);
+        }
+    }
+
+    /* コンテナ */
+    .container {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+        position: relative;
+    }
+
+    /* メインタイトル */
+    .main-title {
+        text-align: center;
+        margin-bottom: 3rem;
+        position: relative;
+    }
+
+    .store-name {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 900;
+        color: var(--primary-green);
+        margin-bottom: 0.5rem;
+        position: relative;
+        display: inline-block;
+    }
+
+    .store-name::before {
+        content: '📚';
+        position: absolute;
+        left: -60px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.8em;
+        opacity: 0.8;
+    }
+
+    .store-name::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--accent-green), var(--secondary-green));
+        border-radius: 2px;
+    }
+
+    .system-name {
+        font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+        font-weight: 500;
+        color: var(--text-secondary);
+        letter-spacing: 0.05em;
+    }
+
+    /* メニューカード */
+    .menu-container {
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        border-radius: var(--border-radius);
+        padding: 3rem;
+        box-shadow: var(--shadow-heavy);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        width: 100%;
+        max-width: 500px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .menu-container::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg,
-                rgba(126, 217, 87, 0.1) 0%,
-                rgba(47, 93, 63, 0.05) 100%);
-        pointer-events: none;
+        height: 4px;
+        background: linear-gradient(90deg, var(--accent-green), var(--secondary-green), var(--primary-green));
     }
 
-    .header-inner {
-        max-width: 1200px;
-        margin: 0 auto;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 32px;
-        height: var(--header-height);
+    .menu-title {
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-green);
+        margin-bottom: 2rem;
         position: relative;
-        z-index: 10;
     }
 
-    /* ストアタイトル */
-    .store-title {
-        font-weight: 800;
-        font-size: 24px;
-        color: #fff;
+    /* メニューボタン */
+    .menu-grid {
         display: flex;
-        align-items: center;
-        gap: 12px;
-        letter-spacing: 1px;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        transition: all var(--transition);
-        white-space: nowrap;
+        flex-direction: column;
+        gap: 1rem;
     }
 
-    .store-title::before {
-        content: '📋';
-        font-size: 28px;
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-    }
-
-    .store-title:hover {
-        transform: translateX(2px);
-        text-shadow: 0 4px 12px rgba(126, 217, 87, 0.3);
-    }
-
-    /* ナビゲーション */
-    .nav {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-    }
-
-    .nav-item {
-        position: relative;
+    .menu-button {
+        background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 1.2rem 2rem;
+        font-size: 1.1rem;
         font-weight: 600;
-        font-size: 16px;
-        color: #fff;
-        padding: 12px 20px;
-        border-radius: 8px;
-        transition: all var(--transition);
-        text-decoration: none;
-        letter-spacing: 0.5px;
+        color: white;
+        cursor: pointer;
+        transition: var(--transition);
+        position: relative;
         overflow: hidden;
+        font-family: inherit;
+        box-shadow: var(--shadow-light);
     }
 
-    .nav-item::before {
+    .menu-button::before {
         content: '';
         position: absolute;
         top: 0;
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(90deg,
-                transparent,
-                var(--accent-green),
-                transparent);
-        transition: left var(--transition);
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.6s;
     }
 
-    .nav-item:hover::before {
+    .menu-button:hover::before {
         left: 100%;
     }
 
-    .nav-item:hover {
-        background: rgba(126, 217, 87, 0.2);
+    .menu-button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(126, 217, 87, 0.3);
+        box-shadow: var(--shadow-medium);
+        background: linear-gradient(135deg, var(--secondary-green) 0%, var(--accent-green) 100%);
     }
 
-    .nav-item:focus-visible {
-        outline: 2px solid var(--accent-green);
-        outline-offset: 2px;
+    .menu-button:active {
+        transform: translateY(0);
+        box-shadow: var(--shadow-light);
     }
 
-    /* ハンバーガーメニュー */
-    .menu-toggle {
-        display: none;
-        flex-direction: column;
-        cursor: pointer;
-        padding: 8px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 6px;
-        transition: all var(--transition);
-        border: none;
+    /* 店舗選択モード */
+    .store-selection .menu-button {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        color: var(--primary-green);
+        border: 2px solid var(--light-green);
+    }
+
+    .store-selection .menu-button:hover {
+        background: linear-gradient(135deg, var(--light-green) 0%, #ffffff 100%);
+        border-color: var(--accent-green);
+        color: var(--dark-green);
+    }
+
+    /* 機能メニューモード */
+    .function-menu .menu-button {
         position: relative;
-        z-index: 1001;
+        padding-left: 3.5rem;
     }
 
-    .menu-toggle:hover {
-        background: rgba(126, 217, 87, 0.2);
-        transform: scale(1.05);
+    .function-menu .menu-button::after {
+        position: absolute;
+        left: 1.2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.2em;
     }
 
-    .hamburger-line {
-        width: 25px;
-        height: 3px;
-        background: #fff;
-        margin: 3px 0;
-        border-radius: 2px;
-        transition: all var(--transition);
-        transform-origin: center;
+    .menu-button[data-function="customer"]::after {
+        content: '👥';
     }
 
-    .menu-toggle.active .hamburger-line:nth-child(1) {
-        transform: rotate(45deg) translate(6px, 6px);
+    .menu-button[data-function="statistics"]::after {
+        content: '📊';
     }
 
-    .menu-toggle.active .hamburger-line:nth-child(2) {
-        opacity: 0;
-        transform: scaleX(0);
+    .menu-button[data-function="orders"]::after {
+        content: '📋';
     }
 
-    .menu-toggle.active .hamburger-line:nth-child(3) {
-        transform: rotate(-45deg) translate(6px, -6px);
+    .menu-button[data-function="delivery"]::after {
+        content: '🚚';
     }
 
-    /* モバイルメニューオーバーレイ */
-    .menu-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        opacity: 0;
-        visibility: hidden;
-        transition: all var(--transition);
-        z-index: 999;
-        backdrop-filter: blur(4px);
+    /* 戻るボタン */
+    .back-button {
+        position: absolute;
+        top: 2rem;
+        left: 2rem;
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid var(--light-green);
+        border-radius: 50px;
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--primary-green);
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
-    .menu-overlay.active {
-        opacity: 1;
-        visibility: visible;
+    .back-button:hover {
+        background: var(--light-green);
+        transform: translateX(-4px);
+    }
+
+    .back-button::before {
+        content: '←';
+        font-size: 1.1em;
+    }
+
+    /* ステータス表示 */
+    .status-bar {
+        position: absolute;
+        top: 2rem;
+        right: 2rem;
+        background: rgba(126, 217, 87, 0.1);
+        border: 1px solid var(--accent-green);
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--primary-green);
+    }
+
+    /* アニメーション */
+    .fade-in {
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .slide-in {
+        animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
     }
 
     /* レスポンシブデザイン */
     @media (max-width: 768px) {
-        .header-inner {
-            padding: 0 16px;
+        .container {
+            padding: 1rem;
         }
 
-        .store-title {
-            font-size: 20px;
+        .menu-container {
+            padding: 2rem 1.5rem;
         }
 
-        .menu-toggle {
-            display: flex;
+        .store-name::before {
+            left: -40px;
+            font-size: 0.7em;
         }
 
-        .nav {
-            position: fixed;
-            top: var(--header-height);
-            right: -300px;
-            width: 280px;
-            height: calc(100vh - var(--header-height));
-            background: linear-gradient(180deg, var(--main-green) 0%, var(--sub-green) 100%);
-            flex-direction: column;
-            padding: 32px 0;
-            gap: 0;
-            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
-            transition: right var(--transition);
-            overflow-y: auto;
+        .back-button {
+            top: 1rem;
+            left: 1rem;
+            padding: 0.6rem 1rem;
         }
 
-        .nav.active {
-            right: 0;
-        }
-
-        .nav-item {
-            width: 100%;
-            padding: 20px 32px;
-            border-radius: 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 18px;
-        }
-
-        .nav-item:hover {
-            background: rgba(126, 217, 87, 0.15);
-            transform: translateX(8px);
-            box-shadow: none;
+        .status-bar {
+            top: 1rem;
+            right: 1rem;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
         }
     }
 
     @media (max-width: 480px) {
-        .header-inner {
-            padding: 0 12px;
+        .main-title {
+            margin-bottom: 2rem;
         }
 
-        .store-title {
-            font-size: 18px;
+        .menu-container {
+            padding: 1.5rem 1rem;
         }
 
-        .store-title::before {
-            font-size: 24px;
+        .store-name::before {
+            display: none;
+        }
+
+        .function-menu .menu-button {
+            padding-left: 1rem;
+            text-align: center;
+        }
+
+        .function-menu .menu-button::after {
+            display: none;
         }
     }
 
-    /* アニメーション */
-    @keyframes slideInFromRight {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
+    /* ローディングアニメーション */
+    .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+        margin-left: 10px;
+    }
 
+    @keyframes spin {
         to {
-            transform: translateX(0);
-            opacity: 1;
+            transform: rotate(360deg);
         }
     }
 
-    .nav.active {
-        animation: slideInFromRight 0.3s ease-out;
+    /* ホバーエフェクト強化 */
+    .menu-button {
+        position: relative;
+        overflow: hidden;
     }
 
-    /* ダークモード対応 */
-    @media (prefers-color-scheme: dark) {
-        .site-header {
-            background: linear-gradient(135deg, #1a2e1f 0%, #2d4a35 100%);
-            border-bottom-color: #5fa36a;
-        }
+    .menu-button::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: width 0.4s, height 0.4s;
     }
 
-    /* デモ用コンテンツ */
-    .demo-content {
-        max-width: 800px;
-        margin: 60px auto;
-        padding: 40px 20px;
-        background: #fff;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        text-align: center;
-    }
-
-    .demo-content h2 {
-        color: var(--main-green);
-        font-size: 28px;
-        margin-bottom: 20px;
-    }
-
-    .demo-content p {
-        line-height: 1.6;
-        color: #666;
-        font-size: 16px;
+    .menu-button:active::after {
+        width: 300px;
+        height: 300px;
     }
     </style>
 </head>
 
 <body>
-    <header class="site-header">
-        <div class="header-inner">
-            <a href="#" class="store-title">サンプル店舗 受注管理</a>
+    <div class="container">
+        <!-- 店舗選択画面 -->
+        <div id="store-selection" class="store-selection fade-in">
+            <div class="main-title">
+                <h1 class="store-name">緑橋書店</h1>
+                <p class="system-name">受注管理システム</p>
+            </div>
 
-            <nav class="nav" id="nav">
-                <a href="#" class="nav-item">顧客情報</a>
-                <a href="#" class="nav-item">統計情報</a>
-                <a href="#" class="nav-item">注文書</a>
-                <a href="#" class="nav-item">納品書</a>
-            </nav>
-
-            <button class="menu-toggle" id="menuToggle" aria-label="メニューを開く">
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-            </button>
+            <div class="menu-container">
+                <h2 class="menu-title">店舗を選択してください</h2>
+                <div class="menu-grid">
+                    <button class="menu-button" onclick="selectStore('緑橋本店')">緑橋本店</button>
+                    <button class="menu-button" onclick="selectStore('今里店')">今里店</button>
+                    <button class="menu-button" onclick="selectStore('深江橋店')">深江橋店</button>
+                </div>
+            </div>
         </div>
-        <div class="menu-overlay" id="menuOverlay"></div>
-    </header>
 
-    <main class="demo-content">
-        <h2>改善されたヘッダーデザイン</h2>
-        <p>このヘッダーは以下の改善が施されています：</p>
-        <ul style="text-align: left; max-width: 600px; margin: 20px auto;">
-            <li><strong>モダンなグラデーション効果</strong> - より洗練された背景デザイン</li>
-            <li><strong>スムーズなアニメーション</strong> - ホバー効果とトランジション</li>
-            <li><strong>改善されたモバイル対応</strong> - スライドインメニューとオーバーレイ</li>
-            <li><strong>アクセシビリティ向上</strong> - フォーカス表示とARIAラベル</li>
-            <li><strong>アイコンの追加</strong> - 視覚的な改善</li>
-            <li><strong>レスポンシブデザイン</strong> - 全デバイス対応</li>
-        </ul>
-        <p>画面サイズを変更してモバイル表示も確認してみてください！</p>
-    </main>
+        <!-- 機能メニュー画面 -->
+        <div id="function-menu" class="function-menu" style="display: none;">
+            <button class="back-button slide-in" onclick="goBack()">店舗選択に戻る</button>
+            <div class="status-bar slide-in" id="selected-store"></div>
+
+            <div class="main-title fade-in">
+                <h1 class="store-name" id="current-store-name">緑橋本店</h1>
+                <p class="system-name">受注管理システム</p>
+            </div>
+
+            <div class="menu-container fade-in">
+                <h2 class="menu-title">機能を選択してください</h2>
+                <div class="menu-grid">
+                    <button class="menu-button" data-function="customer"
+                        onclick="navigateToFunction('customer_information/index.php')">
+                        顧客情報管理
+                    </button>
+                    <button class="menu-button" data-function="statistics"
+                        onclick="navigateToFunction('statistics/index.php')">
+                        統計情報表示
+                    </button>
+                    <button class="menu-button" data-function="orders"
+                        onclick="navigateToFunction('order_list/index.php')">
+                        注文書管理
+                    </button>
+                    <button class="menu-button" data-function="delivery"
+                        onclick="navigateToFunction('delivery_list/index.php')">
+                        納品書管理
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
-    // ハンバーガーメニューの制御
-    const menuToggle = document.getElementById('menuToggle');
-    const nav = document.getElementById('nav');
-    const menuOverlay = document.getElementById('menuOverlay');
+    let selectedStoreName = '';
 
-    function toggleMenu() {
-        menuToggle.classList.toggle('active');
-        nav.classList.toggle('active');
-        menuOverlay.classList.toggle('active');
+    // 店舗選択
+    function selectStore(storeName) {
+        selectedStoreName = storeName;
 
-        // アクセシビリティ
-        const isExpanded = nav.classList.contains('active');
-        menuToggle.setAttribute('aria-expanded', isExpanded);
-        menuToggle.setAttribute('aria-label', isExpanded ? 'メニューを閉じる' : 'メニューを開く');
-
-        // ボディのスクロールを制御
-        document.body.style.overflow = isExpanded ? 'hidden' : '';
-    }
-
-    function closeMenu() {
-        menuToggle.classList.remove('active');
-        nav.classList.remove('active');
-        menuOverlay.classList.remove('active');
-        menuToggle.setAttribute('aria-expanded', 'false');
-        menuToggle.setAttribute('aria-label', 'メニューを開く');
-        document.body.style.overflow = '';
-    }
-
-    // イベントリスナー
-    menuToggle.addEventListener('click', toggleMenu);
-    menuOverlay.addEventListener('click', closeMenu);
-
-    // キーボードナビゲーション
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && nav.classList.contains('active')) {
-            closeMenu();
-        }
-    });
-
-    // ナビリンクをクリックしたらメニューを閉じる（モバイル）
-    document.querySelectorAll('.nav-item').forEach(link => {
-        link.addEventListener('click', () => {
-            if (window.innerWidth <= 768) {
-                closeMenu();
+        // ボタンにローディング表示
+        const buttons = document.querySelectorAll('#store-selection .menu-button');
+        buttons.forEach(btn => {
+            if (btn.textContent === storeName) {
+                btn.innerHTML = storeName + '<span class="loading"></span>';
+                btn.style.pointerEvents = 'none';
             }
         });
-    });
 
-    // リサイズ時にメニューを閉じる
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) {
-            closeMenu();
+        // 少し遅延を入れてスムーズな遷移を演出
+        setTimeout(() => {
+            document.getElementById('store-selection').style.display = 'none';
+            document.getElementById('function-menu').style.display = 'block';
+            document.getElementById('current-store-name').textContent = storeName;
+            document.getElementById('selected-store').textContent = `選択中: ${storeName}`;
+
+            // アニメーションクラスを再適用
+            const elements = document.querySelectorAll('#function-menu .fade-in, #function-menu .slide-in');
+            elements.forEach(el => {
+                el.style.animation = 'none';
+                el.offsetHeight; // リフロー
+                el.style.animation = null;
+            });
+        }, 800);
+    }
+
+    // 戻る
+    function goBack() {
+        document.getElementById('function-menu').style.display = 'none';
+        document.getElementById('store-selection').style.display = 'block';
+
+        // ボタンをリセット
+        const buttons = document.querySelectorAll('#store-selection .menu-button');
+        buttons.forEach(btn => {
+            btn.innerHTML = btn.textContent.replace(/選択中.*/, '').trim();
+            btn.style.pointerEvents = 'auto';
+        });
+    }
+
+    // 機能画面への遷移
+    function navigateToFunction(path) {
+        const button = event.target;
+        button.style.pointerEvents = 'none';
+        button.innerHTML += '<span class="loading"></span>';
+
+        // 実際のアプリケーションでは、ここでページ遷移や Ajax 呼び出しを行う
+        setTimeout(() => {
+            // デモ用のアラート
+            alert(
+                `${selectedStoreName}の${button.textContent.replace('管理', '').replace('表示', '')}機能に遷移します。\n実際のシステムでは ${path} にアクセスします。`);
+
+            // ボタンをリセット
+            button.style.pointerEvents = 'auto';
+            button.innerHTML = button.innerHTML.replace('<span class="loading"></span>', '');
+        }, 1000);
+    }
+
+    // キーボードナビゲーション
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const functionMenu = document.getElementById('function-menu');
+            if (functionMenu.style.display !== 'none') {
+                goBack();
+            }
         }
     });
 
-    // スクロール時のヘッダー効果
-    let lastScrollY = window.scrollY;
-    const header = document.querySelector('.site-header');
-
-    window.addEventListener('scroll', () => {
-        const currentScrollY = window.scrollY;
-
-        if (currentScrollY > 100) {
-            header.style.boxShadow = '0 12px 40px rgba(47, 93, 63, 0.25)';
-        } else {
-            header.style.boxShadow = '0 8px 32px rgba(47, 93, 63, 0.15)';
-        }
-
-        lastScrollY = currentScrollY;
+    // 初期アニメーション
+    document.addEventListener('DOMContentLoaded', function() {
+        // ページ読み込み完了後に要素を順次表示
+        const elements = document.querySelectorAll('.fade-in');
+        elements.forEach((el, index) => {
+            el.style.animationDelay = `${index * 0.1}s`;
+        });
     });
     </script>
 </body>
