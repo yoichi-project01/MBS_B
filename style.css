@@ -31,20 +31,18 @@ body {
     overflow-x: hidden;
     position: relative;
     padding-top: 0;
-    /* ヘッダーがある場合は var(--header-height) に変更 */
 }
 
-/* ヘッダーがある場合のbodyスタイル（コメントアウト） */
-/*
+/* ヘッダーがある場合のbodyスタイル */
 body.with-header {
     padding-top: var(--header-height);
-    display: block;
-    align-items: initial;
-    justify-content: initial;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - var(--header-height));
 }
-*/
 
-/* ========== ヘッダー関連スタイル（元のCSS） ========== */
+/* ========== ヘッダー関連スタイル ========== */
 
 /* ヘッダーメインスタイル */
 .site-header {
@@ -235,7 +233,7 @@ body.with-header {
     visibility: visible;
 }
 
-/* ========== メインコンテンツエリア（新しいデザイン） ========== */
+/* ========== メインコンテンツエリア ========== */
 
 /* 背景の装飾 */
 body::before {
@@ -259,6 +257,19 @@ body::before {
     padding: 40px 20px;
     text-align: center;
     animation: fadeInUp 0.8s ease-out;
+}
+
+/* ヘッダーありのページ用コンテナスタイル */
+body.with-header .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - var(--header-height) - 80px);
 }
 
 @keyframes fadeInUp {
@@ -465,6 +476,14 @@ body::before {
     z-index: 100;
 }
 
+/* ヘッダーありのページでの戻るボタン位置調整 */
+body.with-header .back-button-top {
+    position: absolute;
+    top: calc(var(--header-height) + 20px);
+    left: 20px;
+    z-index: 10;
+}
+
 .back-button-top:hover {
     background: rgba(255, 255, 255, 1);
     border-color: var(--main-green);
@@ -501,7 +520,6 @@ body::before {
 }
 
 .menu-button span::before {
-    content: '🏪';
     font-size: 24px;
     filter: grayscale(0.3);
     transition: all var(--transition);
@@ -512,28 +530,243 @@ body::before {
     transform: scale(1.1);
 }
 
-/* メニューボタンごとのアイコン設定（menu.php用） */
-.menu-button:nth-child(1) span::before {
-    content: '👥';
-    /* 顧客情報 */
+/* ========== 顧客情報ページ専用スタイル ========== */
+
+.page-title {
+    font-size: clamp(28px, 6vw, 36px);
+    font-weight: 800;
+    color: var(--main-green);
+    margin-bottom: 40px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    letter-spacing: 1px;
 }
 
-.menu-button:nth-child(2) span::before {
-    content: '📊';
-    /* 統計情報 */
+.page-title i {
+    font-size: 32px;
+    color: var(--accent-green);
 }
 
-.menu-button:nth-child(3) span::before {
-    content: '📋';
-    /* 注文書 */
+.upload-container {
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-.menu-button:nth-child(4) span::before {
-    content: '📦';
-    /* 納品書 */
+.upload-form {
+    margin-bottom: 40px;
 }
 
-/* レスポンシブデザイン */
+.file-upload-area {
+    border: 3px dashed var(--sub-green);
+    border-radius: var(--radius);
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition);
+    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.file-upload-area::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(126, 217, 87, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.file-upload-area:hover::before {
+    left: 100%;
+}
+
+.file-upload-area:hover {
+    border-color: var(--accent-green);
+    background: linear-gradient(135deg, #f8faf9 0%, #e8f5e8 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.file-upload-area.drag-over {
+    border-color: var(--accent-green);
+    background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+    transform: scale(1.02);
+}
+
+.file-upload-area.file-selected {
+    border-color: var(--accent-green);
+    border-style: solid;
+    background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+}
+
+.file-upload-content {
+    position: relative;
+    z-index: 2;
+}
+
+.upload-icon {
+    font-size: 48px;
+    color: var(--sub-green);
+    margin-bottom: 16px;
+    transition: all var(--transition);
+}
+
+.file-upload-area:hover .upload-icon {
+    color: var(--accent-green);
+    transform: scale(1.1);
+}
+
+.file-upload-content h3 {
+    font-size: 20px;
+    color: var(--main-green);
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.file-upload-content p {
+    color: var(--sub-green);
+    font-size: 14px;
+    margin-bottom: 0;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(126, 217, 87, 0.1);
+    border-radius: 8px;
+    margin-top: 16px;
+    position: relative;
+    z-index: 2;
+}
+
+.file-info i {
+    font-size: 24px;
+    color: var(--accent-green);
+}
+
+.file-name {
+    font-weight: 600;
+    color: var(--main-green);
+}
+
+.file-size {
+    color: var(--sub-green);
+    font-size: 14px;
+}
+
+.upload-button {
+    width: 100%;
+    padding: 16px 32px;
+    font-size: 18px;
+    font-weight: 600;
+    font-family: var(--font-family);
+    color: #fff;
+    background: linear-gradient(135deg, var(--main-green) 0%, var(--sub-green) 100%);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    letter-spacing: 0.5px;
+}
+
+.upload-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    background: linear-gradient(135deg, var(--sub-green) 0%, var(--main-green) 100%);
+}
+
+.upload-button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.upload-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.help-section {
+    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(126, 217, 87, 0.2);
+}
+
+.help-section h4 {
+    color: var(--main-green);
+    margin-bottom: 16px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.help-section h4 i {
+    color: var(--accent-green);
+}
+
+.help-content p {
+    margin-bottom: 12px;
+    color: var(--font-color);
+    line-height: 1.6;
+}
+
+.csv-format {
+    background: var(--light-green);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+    border-left: 4px solid var(--accent-green);
+}
+
+.csv-format code {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: var(--main-green);
+    font-weight: 600;
+}
+
+.format-notes {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0 0;
+}
+
+.format-notes li {
+    padding: 8px 0;
+    color: var(--font-color);
+    position: relative;
+    padding-left: 24px;
+    line-height: 1.5;
+}
+
+.format-notes li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--accent-green);
+    font-weight: bold;
+}
+
+/* ========== レスポンシブデザイン ========== */
 @media (max-width: 768px) {
 
     /* ヘッダー関連 */
@@ -553,7 +786,6 @@ body::before {
         position: fixed;
         top: var(--header-height);
         right: -320px;
-        /* 幅を少し広げる */
         width: 300px;
         height: calc(100vh - var(--header-height));
         background: linear-gradient(180deg, var(--main-green) 0%, var(--sub-green) 100%);
@@ -596,14 +828,18 @@ body::before {
         transform: translateX(12px);
     }
 
-    /* 最後のナビアイテムの境界線を削除 */
     .nav-item:last-child {
-        border-bottom: none;   
+        border-bottom: none;
     }
-    
+
     /* メインコンテンツ関連 */
     .container {
         padding: 20px 16px;
+    }
+
+    body.with-header .container {
+        padding: 20px 16px;
+        min-height: calc(100vh - var(--header-height) - 40px);
     }
 
     .container .store-title {
@@ -622,8 +858,33 @@ body::before {
         font-size: 13px;
     }
 
+    body.with-header .back-button-top {
+        top: calc(var(--header-height) + 10px);
+        left: 16px;
+    }
+
     .menu {
         gap: 20px;
+    }
+
+    /* 顧客情報ページ関連 */
+    .page-title {
+        font-size: 24px;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 30px;
+    }
+
+    .file-upload-area {
+        padding: 30px 16px;
+    }
+
+    .upload-icon {
+        font-size: 40px;
+    }
+
+    .help-section {
+        padding: 20px;
     }
 }
 
@@ -659,9 +920,50 @@ body::before {
         padding: 8px 14px;
         font-size: 12px;
     }
+
+    body.with-header .back-button-top {
+        top: calc(var(--header-height) + 8px);
+        left: 12px;
+    }
+
+    .container {
+        padding: 16px 12px;
+    }
+
+    body.with-header .container {
+        padding: 16px 12px;
+        min-height: calc(100vh - var(--header-height) - 32px);
+    }
+
+    /* 顧客情報ページ関連 */
+    .page-title {
+        font-size: 20px;
+        margin-bottom: 24px;
+    }
+
+    .file-upload-area {
+        padding: 24px 12px;
+    }
+
+    .upload-icon {
+        font-size: 36px;
+    }
+
+    .file-upload-content h3 {
+        font-size: 18px;
+    }
+
+    .upload-button {
+        font-size: 16px;
+        padding: 14px 24px;
+    }
+
+    .upload-container {
+        padding: 0 12px;
+    }
 }
 
-/* アニメーション */
+/* ========== アニメーション ========== */
 @keyframes slideInFromRight {
     from {
         transform: translateX(100%);
@@ -671,109 +973,6 @@ body::before {
     to {
         transform: translateX(0);
         opacity: 1;
-    }
-}
-
-/* ダークモード対応 */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --main-green-dark: #5fa36a;
-        --sub-green-dark: #4b8a58;
-        --accent-green-dark: #7ed957;
-        --light-green-dark: #1a2e1f;
-        --bg-light-dark: #0f1f13;
-        --font-color-dark: #e8f5e8;
-        --shadow-dark: 0 8px 40px rgba(0, 0, 0, 0.4);
-        --shadow-hover-dark: 0 16px 64px rgba(0, 0, 0, 0.6);
-    }
-
-    body {
-        background: linear-gradient(135deg, #1a2e1f 0%, #0f1f13 50%, #0a1a0d 100%);
-        color: var(--font-color-dark);
-    }
-
-    body::before {
-        background:
-            radial-gradient(circle at 20% 30%, rgba(126, 217, 87, 0.05) 0%, transparent 50%),
-            radial-gradient(circle at 80% 70%, rgba(75, 122, 92, 0.08) 0%, transparent 50%),
-            radial-gradient(circle at 50% 50%, rgba(47, 93, 63, 0.03) 0%, transparent 70%);
-    }
-
-    .site-header {
-        background: linear-gradient(135deg, #1a2e1f 0%, #2d4a35 100%);
-        border-bottom-color: var(--accent-green-dark);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    }
-
-    .site-header::before {
-        background: linear-gradient(135deg,
-                rgba(126, 217, 87, 0.08) 0%,
-                rgba(47, 93, 63, 0.03) 100%);
-    }
-
-    .site-header .store-title {
-        color: var(--font-color-dark);
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    }
-
-    .site-header .store-title:hover {
-        text-shadow: 0 4px 12px rgba(126, 217, 87, 0.4);
-    }
-
-    .nav-item {
-        color: var(--font-color-dark);
-    }
-
-    .nav-item:hover {
-        background: rgba(126, 217, 87, 0.15);
-        box-shadow: 0 4px 12px rgba(126, 217, 87, 0.2);
-    }
-
-    .menu-toggle {
-        background: rgba(255, 255, 255, 0.08);
-    }
-
-    .menu-toggle:hover {
-        background: rgba(126, 217, 87, 0.15);
-    }
-
-    .hamburger-line {
-        background: var(--font-color-dark);
-    }
-
-    .menu-overlay {
-        background: rgba(0, 0, 0, 0.7);
-    }
-
-    .nav {
-        background: linear-gradient(180deg, #1a2e1f 0%, #2d4a35 100%);
-        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5);
-    }
-
-    .nav-item {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .nav-item:hover {
-        background: rgba(126, 217, 87, 0.12);
-    }
-
-    .container .store-title {
-        color: var(--main-green-dark);
-    }
-
-    .menu-button {
-        background: linear-gradient(135deg, #2d4a35 0%, #1a2e1f 100%);
-        color: var(--font-color-dark);
-        border: 3px solid rgba(95, 163, 106, 0.3);
-        box-shadow: var(--shadow-dark);
-    }
-
-    .menu-button::before {
-        background: linear-gradient(90deg,
-                transparent,
-                rgba(126, 217, 87, 0.3),
-                transparent);
     }
 }
 

@@ -13,6 +13,7 @@ if ($storeName) {
     <title><?php echo htmlspecialchars($storeName); ?> 受注管理システム</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
@@ -26,7 +27,10 @@ if ($storeName) {
 
         <div class="menu">
             <button class="menu-button" data-path="customer_information/index.php">
-                <span>顧客情報</span>
+                <span>
+                    <i class="fas fa-users"></i>
+                    顧客情報
+                </span>
             </button>
             <button class="menu-button" data-path="statistics/index.php">
                 <span>統計情報</span>
