@@ -1,3 +1,6 @@
+// ========== 統合されたJavaScriptファイル ==========
+// script.js と customer.js を結合
+
 // ========== ハンバーガーメニューの制御 ==========
 const menuToggle = document.getElementById('menuToggle');
 const nav = document.getElementById('nav');
@@ -37,54 +40,6 @@ function closeMenu() {
         document.body.style.overflow = '';
     }
 }
-
-// DOMContentLoaded後にイベントリスナーを設定
-document.addEventListener('DOMContentLoaded', function() {
-    // ハンバーガーメニューのイベントリスナー
-    const menuToggleBtn = document.getElementById('menuToggle');
-    const navMenu = document.getElementById('nav');
-    const overlay = document.getElementById('menuOverlay');
-    
-    if (menuToggleBtn) {
-        menuToggleBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMenu();
-        });
-    }
-    
-    if (overlay) {
-        overlay.addEventListener('click', function(e) {
-            e.preventDefault();
-            closeMenu();
-        });
-    }
-
-    // ナビリンクをクリックしたらメニューを閉じる（モバイル）
-    document.querySelectorAll('.nav-item').forEach(link => {
-        link.addEventListener('click', () => {
-            if (window.innerWidth <= 768) {
-                setTimeout(() => {
-                    closeMenu();
-                }, 100);
-            }
-        });
-    });
-
-    // キーボードナビゲーション
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && navMenu && navMenu.classList.contains('active')) {
-            closeMenu();
-        }
-    });
-
-    // リサイズ時にメニューを閉じる
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) {
-            closeMenu();
-        }
-    });
-});
 
 // ========== スクロール効果 ==========
 let lastScrollY = window.scrollY;
@@ -275,8 +230,203 @@ function setupFocusManagement() {
     });
 }
 
-// ========== ページ読み込み時の処理 ==========
-document.addEventListener('DOMContentLoaded', () => {
+// ========== 顧客情報CSVアップロード機能 ==========
+function initializeCustomerUpload() {
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const csvFile = document.getElementById('csvFile');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const uploadButton = document.getElementById('uploadButton');
+
+    // 要素が存在しない場合は初期化をスキップ
+    if (!fileUploadArea || !csvFile) {
+        return;
+    }
+
+    // ファイル選択エリアのクリックイベント
+    fileUploadArea.addEventListener('click', function(e) {
+        if (e.target !== csvFile) {
+            csvFile.click();
+        }
+    });
+
+    // ドラッグ&ドロップ機能
+    fileUploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        fileUploadArea.classList.add('drag-over');
+    });
+
+    fileUploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        fileUploadArea.classList.remove('drag-over');
+    });
+
+    fileUploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        fileUploadArea.classList.remove('drag-over');
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFileSelect(files[0]);
+        }
+    });
+
+    // ファイル選択イベント
+    csvFile.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            handleFileSelect(e.target.files[0]);
+        }
+    });
+
+    // ファイル選択処理
+    function handleFileSelect(file) {
+        // ファイル形式チェック
+        if (!file.name.toLowerCase().endsWith('.csv')) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ファイル形式エラー',
+                    text: 'CSVファイルを選択してください。',
+                    confirmButtonColor: '#dc3545'
+                });
+            } else {
+                alert('CSVファイルを選択してください。');
+            }
+            return;
+        }
+
+        // ファイルサイズチェック (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ファイルサイズエラー',
+                    text: 'ファイルサイズは5MB以下にしてください。',
+                    confirmButtonColor: '#dc3545'
+                });
+            } else {
+                alert('ファイルサイズは5MB以下にしてください。');
+            }
+            return;
+        }
+
+        // ファイル情報を表示
+        if (fileName) fileName.textContent = file.name;
+        if (fileSize) fileSize.textContent = formatFileSize(file.size);
+        if (fileInfo) fileInfo.style.display = 'flex';
+        fileUploadArea.classList.add('file-selected');
+        if (uploadButton) uploadButton.disabled = false;
+    }
+
+    // ファイルサイズのフォーマット
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // フォーム送信時の処理
+    const form = document.querySelector('.upload-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (uploadButton) {
+                uploadButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> アップロード中...';
+                uploadButton.disabled = true;
+            }
+        });
+    }
+}
+
+// ========== ユーティリティ関数 ==========
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// ========== アニメーション用のIntersection Observer ==========
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.animation = 'fadeInUp 0.6s ease-out forwards';
+            observer.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+
+// 要素が後から追加される場合のために、MutationObserverでも監視
+const mutationObserver = new MutationObserver((mutations) => {
+    mutations.forEach(mutation => {
+        mutation.addedNodes.forEach(node => {
+            if (node.nodeType === 1 && node.classList.contains('menu-button')) {
+                observer.observe(node);
+            }
+        });
+    });
+});
+
+// ========== DOMContentLoaded後の初期化処理 ==========
+document.addEventListener('DOMContentLoaded', function() {
+    // ========== ハンバーガーメニューの初期化 ==========
+    const menuToggleBtn = document.getElementById('menuToggle');
+    const navMenu = document.getElementById('nav');
+    const overlay = document.getElementById('menuOverlay');
+    
+    if (menuToggleBtn) {
+        menuToggleBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMenu();
+        });
+    }
+    
+    if (overlay) {
+        overlay.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeMenu();
+        });
+    }
+
+    // ナビリンクをクリックしたらメニューを閉じる（モバイル）
+    document.querySelectorAll('.nav-item').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    closeMenu();
+                }, 100);
+            }
+        });
+    });
+
+    // キーボードナビゲーション
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && navMenu && navMenu.classList.contains('active')) {
+            closeMenu();
+        }
+    });
+
+    // リサイズ時にメニューを閉じる
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            closeMenu();
+        }
+    });
+
+    // ========== 店舗選択機能の初期化 ==========
     // URLパラメータから店舗情報を取得
     const params = new URLSearchParams(window.location.search);
     const store = params.get('store');
@@ -328,10 +478,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 各種機能を初期化
+    // ========== 各種機能の初期化 ==========
     enhanceMenuButtons();
     addRippleStyles();
     setupFocusManagement();
+    initializeCustomerUpload(); // 顧客アップロード機能の初期化
+    
+    // 監視開始
+    mutationObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
     
     // ページ読み込み完了のアニメーション
     document.body.style.opacity = '0';
@@ -340,6 +497,21 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.opacity = '1';
     }, 100);
 });
+
+// ========== スクロールイベントの最適化 ==========
+// スクロールイベントをデバウンス
+const debouncedScrollHandler = debounce(() => {
+    const currentScrollY = window.scrollY;
+    if (header) {
+        if (currentScrollY > 100) {
+            header.style.boxShadow = '0 12px 40px rgba(47, 93, 63, 0.25)';
+        } else {
+            header.style.boxShadow = '0 8px 32px rgba(47, 93, 63, 0.15)';
+        }
+    }
+}, 10);
+
+window.addEventListener('scroll', debouncedScrollHandler);
 
 // ========== エラーハンドリング ==========
 window.addEventListener('error', (e) => {
@@ -374,63 +546,4 @@ window.addEventListener('load', () => {
     if (loadTime > 3000) {
         console.warn('ページの読み込みが遅い可能性があります:', loadTime + 'ms');
     }
-});
-
-// ========== ユーティリティ関数 ==========
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// スクロールイベントをデバウンス
-const debouncedScrollHandler = debounce(() => {
-    const currentScrollY = window.scrollY;
-    if (header) {
-        if (currentScrollY > 100) {
-            header.style.boxShadow = '0 12px 40px rgba(47, 93, 63, 0.25)';
-        } else {
-            header.style.boxShadow = '0 8px 32px rgba(47, 93, 63, 0.15)';
-        }
-    }
-}, 10);
-
-window.addEventListener('scroll', debouncedScrollHandler);
-
-// ========== アニメーション用のIntersection Observer ==========
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.animation = 'fadeInUp 0.6s ease-out forwards';
-            observer.unobserve(entry.target);
-        }
-    });
-}, observerOptions);
-
-// 要素が後から追加される場合のために、MutationObserverでも監視
-const mutationObserver = new MutationObserver((mutations) => {
-    mutations.forEach(mutation => {
-        mutation.addedNodes.forEach(node => {
-            if (node.nodeType === 1 && node.classList.contains('menu-button')) {
-                observer.observe(node);
-            }
-        });
-    });
-});
-
-// 監視開始
-mutationObserver.observe(document.body, {
-    childList: true,
-    subtree: true
 });
