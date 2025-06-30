@@ -2,259 +2,9 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>本屋業者システム - 顧客別統計情報</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>本屋業者システム - 顧客別統計情報</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
-            background-color: #f5f7fa;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        h1 {
-            background: linear-gradient(135deg, #2f5d3f, #4a7c59);
-            color: white;
-            text-align: center;
-            padding: 30px;
-            margin-bottom: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(47, 93, 63, 0.3);
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .controls {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-            margin-bottom: 25px;
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        select, input[type="text"] {
-            padding: 12px 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            min-width: 200px;
-        }
-
-        select:focus, input[type="text"]:focus {
-            outline: none;
-            border-color: #2f5d3f;
-            box-shadow: 0 0 0 3px rgba(47, 93, 63, 0.1);
-        }
-
-        .btn {
-            background: #2f5d3f;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .btn:hover {
-            background: #1e4029;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(47, 93, 63, 0.3);
-        }
-
-        .table-container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            background: linear-gradient(135deg, #2f5d3f, #4a7c59);
-            color: white;
-            padding: 18px 15px;
-            text-align: left;
-            font-weight: bold;
-            position: relative;
-        }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            transition: background-color 0.2s ease;
-        }
-
-        tr:hover td {
-            background-color: #f8f9fa;
-        }
-
-        tr:nth-child(even) {
-            background-color: #fafbfc;
-        }
-
-        .sort-btn {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            margin-left: 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: background-color 0.2s ease;
-        }
-
-        .sort-btn:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        .graph-btn {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .graph-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 3% auto;
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 900px;
-            position: relative;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            animation: modalSlideIn 0.3s ease;
-        }
-
-        @keyframes modalSlideIn {
-            from { opacity: 0; transform: translateY(-50px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 32px;
-            font-weight: bold;
-            cursor: pointer;
-            position: absolute;
-            right: 20px;
-            top: 15px;
-            transition: color 0.2s ease;
-        }
-
-        .close:hover {
-            color: #333;
-        }
-
-        .pagination {
-            text-align: center;
-            margin-top: 30px;
-            padding: 20px;
-        }
-
-        .pagination a, .pagination span {
-            display: inline-block;
-            padding: 10px 15px;
-            margin: 0 5px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .pagination a {
-            background: #2f5d3f;
-            color: white;
-        }
-
-        .pagination a:hover {
-            background: #1e4029;
-            transform: translateY(-2px);
-        }
-
-        .pagination .current {
-            background: #e1e5e9;
-            color: #333;
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 60px 20px;
-            color: #666;
-            font-size: 18px;
-        }
-
-        @media (max-width: 768px) {
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            select, input[type="text"] {
-                min-width: auto;
-                width: 100%;
-            }
-            
-            table {
-                font-size: 14px;
-            }
-            
-            th, td {
-                padding: 12px 8px;
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -266,7 +16,11 @@
             </select>
             <input type="text" id="searchInput" placeholder="顧客名で検索..." onkeyup="filterData()">
             <button class="btn" onclick="filterData()">🔍 検索</button>
-            <button class="btn" onclick="generateSampleData()" style="background: #ff6b6b;">📊 サンプルデータ生成</button>
+            <button class="btn load-db-btn" onclick="loadDataFromDB()">📊 DBからデータ読み込み</button>
+        </div>
+
+        <div class="db-status" id="dbStatus">
+            💾 データベース接続待機中...
         </div>
 
         <div class="table-container">
@@ -299,7 +53,7 @@
                 <tbody id="customerTableBody">
                     <tr>
                         <td colspan="5" class="no-data">
-                            📋 データがありません。「サンプルデータ生成」ボタンをクリックしてサンプルデータを作成してください。
+                            📋 データがありません。「DBからデータ読み込み」ボタンをクリックしてデータベースからデータを取得してください。
                         </td>
                     </tr>
                 </tbody>
@@ -328,41 +82,92 @@
         const itemsPerPage = 4;
         let currentChart = null;
 
-        // サンプルデータ生成
-        function generateSampleData() {
-            const stores = ['緑橋本店', '今里店', '深江橋店'];
-            const customerNames = [
-                '田中商事', '佐藤書店', '鈴木文具', '高橋出版', '伊藤印刷',
-                '渡辺商店', '山田書房', '中村企画', '小林堂', '加藤商会',
-                '吉田書店', '山本文庫', '松本商事', '井上書房', '木村印刷',
-                '林書店', '清水商会', '森田出版', '池田文具', '橋本書房'
+        // DB接続設定（実際の環境に合わせて変更してください）
+        const DB_CONFIG = {
+            host: 'localhost',
+            database: 'mbs',
+            // 実際のアプリケーションではサーバーサイドで処理する必要があります
+        };
+
+        // DBからデータ読み込み（サーバーサイドAPI呼び出しシミュレーション）
+        async function loadDataFromDB() {
+            updateDBStatus('📡 データベースに接続中...', 'connecting');
+            
+            try {
+                // 実際の実装では、サーバーサイドAPIを呼び出します
+                const response = await fetchCustomerData();
+                
+                if (response.success) {
+                    customers = response.data;
+                    updateDBStatus(`✅ ${customers.length}件のデータを読み込みました`, 'success');
+                    updateStoreOptions();
+                    filterData();
+                } else {
+                    throw new Error(response.error || 'データの取得に失敗しました');
+                }
+            } catch (error) {
+                console.error('DB接続エラー:', error);
+                updateDBStatus('❌ データベース接続エラー: ' + error.message, 'error');
+            }
+        }
+
+        // 顧客データ取得（実際のAPI呼び出しをシミュレート）
+        async function fetchCustomerData() {
+            // 実際の実装では、以下のようなサーバーサイドAPIを呼び出します
+            /*
+            const response = await fetch('/api/customers', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            return await response.json();
+            */
+            
+            // デモ用のシミュレートされたデータ
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const simulatedData = generateDBBasedData();
+                    resolve({
+                        success: true,
+                        data: simulatedData
+                    });
+                }, 1500); // DB接続をシミュレート
+            });
+        }
+
+        // DBベースのデータ生成（実際のDB構造に基づく）
+        function generateDBBasedData() {
+            const dbCustomers = [
+                // 緑橋本店
+                {customer_no: 10001, store_name: '緑橋本店', customer_name: '野村圭太', sales_by_customer: 254684, lead_time: 27715681, delivery_amount: 68},
+                {customer_no: 10002, store_name: '緑橋本店', customer_name: '渡辺亮介', sales_by_customer: 3648715, lead_time: 5678514, delivery_amount: 25},
+                {customer_no: 10003, store_name: '緑橋本店', customer_name: '岩本春香', sales_by_customer: 364765, lead_time: 6971574, delivery_amount: 61},
+                {customer_no: 10004, store_name: '緑橋本店', customer_name: 'フラワーショップ ブルーム', sales_by_customer: 597415466, lead_time: 587546, delivery_amount: 125},
+                {customer_no: 10005, store_name: '緑橋本店', customer_name: '木村紗希', sales_by_customer: 57954264, lead_time: 87458755, delivery_amount: 62},
+                
+                // 今里店
+                {customer_no: 30001, store_name: '今里店', customer_name: '長田翔', sales_by_customer: 125666, lead_time: 86461, delivery_amount: 10},
+                {customer_no: 30002, store_name: '今里店', customer_name: 'サロン ラ・ルーチェ', sales_by_customer: 135462, lead_time: 65555, delivery_amount: 10},
+                {customer_no: 30003, store_name: '今里店', customer_name: '中島葵', sales_by_customer: 750000, lead_time: 988888, delivery_amount: 15},
+                
+                // 深江橋店
+                {customer_no: 20001, store_name: '深江橋店', customer_name: '伊崎佳典', sales_by_customer: 57461, lead_time: 458769, delivery_amount: 97},
+                {customer_no: 20002, store_name: '深江橋店', customer_name: 'カフェ ブルーナ', sales_by_customer: 5749456, lead_time: 784519, delivery_amount: 98}
             ];
 
-            customers = [];
-            for (let i = 0; i < 50; i++) {
-                const store = stores[Math.floor(Math.random() * stores.length)];
-                const name = customerNames[Math.floor(Math.random() * customerNames.length)] + (i > 19 ? `_${i-19}` : '');
-                const deliveryAmount = Math.floor(Math.random() * 6) + 1; // 1-6回の配達
-                
-                // 配達回数に基づいて売上履歴データを生成
-                const salesHistory = generateSalesHistory(deliveryAmount);
-                // 年間売上を売上履歴の合計として計算
-                const totalYearlySales = salesHistory.reduce((sum, item) => sum + item.sales, 0);
-                
-                customers.push({
-                    customer_no: i + 1,
-                    customer_name: name,
-                    store_name: store,
-                    sales_by_customer: totalYearlySales,
-                    lead_time: Math.floor(Math.random() * 300000) + 3600, // 1時間〜83時間（秒）
-                    delivery_amount: deliveryAmount,
-                    sales_history: salesHistory
-                });
-            }
+            // 各顧客に売上履歴を追加
+            return dbCustomers.map(customer => ({
+                ...customer,
+                sales_history: generateSalesHistory(customer.delivery_amount)
+            }));
+        }
 
-            updateStoreOptions();
-            filterData();
-            alert('✅ サンプルデータを生成しました！店舗を選択して顧客データを確認してください。');
+        // DB状態更新
+        function updateDBStatus(message, status) {
+            const statusElement = document.getElementById('dbStatus');
+            statusElement.textContent = message;
+            statusElement.className = `db-status ${status}`;
         }
 
         // 売上履歴データ生成
@@ -371,9 +176,10 @@
             const months = ['2024-07', '2024-08', '2024-09', '2024-10', '2024-11', '2024-12'];
             const monthNames = ['7月', '8月', '9月', '10月', '11月', '12月'];
             
-            // 配達回数に基づいて売上のある月を決定
             const salesMonths = [];
-            for (let i = 0; i < deliveryAmount && i < 6; i++) {
+            const maxSalesMonths = Math.min(deliveryAmount, 6);
+            
+            for (let i = 0; i < maxSalesMonths; i++) {
                 let randomMonth;
                 do {
                     randomMonth = Math.floor(Math.random() * 6);
@@ -477,12 +283,10 @@
 
             let html = '';
             
-            // 前のページ
             if (currentPage > 1) {
                 html += `<a href="#" onclick="changePage(${currentPage - 1})">← 前へ</a>`;
             }
 
-            // ページ番号
             for (let i = 1; i <= totalPages; i++) {
                 if (i === currentPage) {
                     html += `<span class="current">${i}</span>`;
@@ -491,7 +295,6 @@
                 }
             }
 
-            // 次のページ
             if (currentPage < totalPages) {
                 html += `<a href="#" onclick="changePage(${currentPage + 1})">次へ →</a>`;
             }
@@ -644,8 +447,8 @@
 
         // 初期化
         document.addEventListener('DOMContentLoaded', function() {
-            // 初期状態では空のテーブルを表示
             updateTable();
+            updateDBStatus('💾 データベース接続待機中...', 'waiting');
         });
     </script>
 </body>
