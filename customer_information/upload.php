@@ -7,6 +7,9 @@ if (isset($_FILES['csv_file']) && is_uploaded_file($_FILES['csv_file']['tmp_name
     $handle = fopen($filename, 'r');
 
     $isFirstRow = true;
+    $insertCount = 0;  // 新規追加件数
+    $updateCount = 0;  // 更新件数
+    $totalRows = 0;    // 処理した総行数
 
     while (($line = fgets($handle)) !== false) {
         $line = mb_convert_encoding($line, 'UTF-8', 'SJIS-win');
@@ -30,6 +33,11 @@ if (isset($_FILES['csv_file']) && is_uploaded_file($_FILES['csv_file']['tmp_name
             $registration_date,
             $remarks
         ] = $data;
+
+        // 既存データの確認
+        $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM customers WHERE customer_no = ?");
+        $checkStmt->execute([(int)$customer_no]);
+        $exists = $checkStmt->fetchColumn() > 0;
 
         $stmt = $pdo->prepare("
         INSERT INTO customers (
@@ -59,12 +67,23 @@ if (isset($_FILES['csv_file']) && is_uploaded_file($_FILES['csv_file']['tmp_name
             $registration_date,
             $remarks ?: null
         ]);
+
+        // 件数をカウント
+        if ($exists) {
+            $updateCount++;
+        } else {
+            $insertCount++;
+        }
+        $totalRows++;
     }
 
     fclose($handle);
 
-    // ✅ 成功フラグをセッションに保存
+    // ✅ 成功フラグと件数をセッションに保存
     $_SESSION['upload_status'] = 'success';
+    $_SESSION['insert_count'] = $insertCount;
+    $_SESSION['update_count'] = $updateCount;
+    $_SESSION['total_rows'] = $totalRows;
 
     header('Location: ' . $_SERVER['HTTP_REFERER']);
     exit;
