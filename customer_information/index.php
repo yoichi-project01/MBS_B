@@ -1,6 +1,14 @@
 <?php
+// 最初にオートローダーを読み込み
+require_once(__DIR__ . '/../component/autoloader.php');
+
+// その後にヘッダーを読み込み
 include(__DIR__ . '/../component/header.php');
-session_start();
+
+// セッション開始とCSRFトークン生成
+SessionManager::start();
+$csrfToken = CSRFProtection::getToken();
+$uploadResult = SessionManager::getUploadResult();
 ?>
 
 <!DOCTYPE html>
@@ -31,12 +39,22 @@ session_start();
         <!-- アップロードフォーム -->
         <div class="upload-container">
             <form action="upload.php" method="post" enctype="multipart/form-data" class="upload-form">
+                <!-- CSRF保護 -->
+                <?= CSRFProtection::getTokenField() ?>
+
                 <!-- ファイル選択エリア -->
                 <div class="file-upload-area" id="fileUploadArea">
                     <div class="file-upload-content">
                         <i class="fas fa-cloud-upload-alt upload-icon"></i>
                         <h3>CSVファイルをアップロード</h3>
                         <p>ファイルをドラッグ&ドロップするか、クリックして選択してください</p>
+                        <p class="file-requirements">
+                            <small>
+                                • CSVファイルのみ対応<br>
+                                • 最大ファイルサイズ: 5MB<br>
+                                • 文字コード: Shift-JIS または UTF-8
+                            </small>
+                        </p>
                         <input type="file" name="csv_file" id="csvFile" accept=".csv" required hidden />
                     </div>
                     <div class="file-info" id="fileInfo" style="display: none;">
@@ -55,70 +73,10 @@ session_start();
         </div>
     </div>
 
-    <!-- SweetAlert 表示 -->
-    <?php if (isset($_SESSION['upload_status'])): ?>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        <?php if ($_SESSION['upload_status'] === 'success'): ?>
-        <?php
-                    $insertCount = $_SESSION['insert_count'] ?? 0;
-                    $updateCount = $_SESSION['update_count'] ?? 0;
-                    $totalRows = $_SESSION['total_rows'] ?? 0;
-
-                    // メッセージを構築
-                    $message = "CSVファイルが正常にアップロードされました。\n\n";
-                    $message .= "処理結果:\n";
-                    $message .= "• 新規追加: {$insertCount}件\n";
-                    $message .= "• 更新: {$updateCount}件\n";
-                    $message .= "• 合計処理: {$totalRows}件";
-                    ?>
-
-        Swal.fire({
-            icon: 'success',
-            title: '登録が成功しました',
-            html: `
-                <div style="text-align: left; margin: 20px 0;">
-                    <p style="margin-bottom: 15px;">CSVファイルが正常にアップロードされました。</p>
-                    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #28a745;">
-                        <strong>📊 処理結果</strong><br>
-                        <div style="margin-top: 10px; line-height: 1.8;">
-                            <div><span style="color: #28a745;">✅ 新規追加:</span> <strong><?php echo $insertCount; ?>件</strong></div>
-                            <div><span style="color: #17a2b8;">🔄 更新:</span> <strong><?php echo $updateCount; ?>件</strong></div>
-                            <div style="border-top: 1px solid #dee2e6; margin-top: 8px; padding-top: 8px;">
-                                <span style="color: #6c757d;">📈 合計処理:</span> <strong><?php echo $totalRows; ?>件</strong>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `,
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#2f5d3f',
-            width: '500px',
-            timer: 8000,
-            timerProgressBar: true
-        });
-        <?php else: ?>
-        Swal.fire({
-            icon: 'error',
-            title: '登録できませんでした',
-            text: 'ファイルの形式やサイズを確認してください。',
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#dc3545'
-        });
-        <?php endif; ?>
-    });
-    </script>
-    <?php
-        // セッション変数をクリア
-        unset($_SESSION['upload_status']);
-        unset($_SESSION['insert_count']);
-        unset($_SESSION['update_count']);
-        unset($_SESSION['total_rows']);
-        ?>
-    <?php endif; ?>
+    <!-- アップロード結果のアラート表示 -->
+    <?= AlertComponent::renderUploadAlert($uploadResult) ?>
 
     <script src="../script.js"></script>
-    <script src="customer.js"></script>
 </body>
 
 </html>

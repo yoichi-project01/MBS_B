@@ -1,18 +1,40 @@
 <?php
-require_once(__DIR__ . '/../component/db.php');
-session_start();
+require_once(__DIR__ . '/../component/autoloader.php');
 
-if (isset($_FILES['csv_file']) && is_uploaded_file($_FILES['csv_file']['tmp_name'])) {
-    $filename = $_FILES['csv_file']['tmp_name'];
-    $handle = fopen($filename, 'r');
+SessionManager::start();
+CSRFProtection::validateRequest();
+
+if (!isset($_FILES['csv_file']) || !is_uploaded_file($_FILES['csv_file']['tmp_name'])) {
+    SessionManager::setUploadResult('error', ['error_message' => 'ファイルが正しくアップロードされませんでした。']);
+    header('Location: ' . $_SERVER['HTTP_REFERER']);
+    exit;
+}
+
+$file = $_FILES['csv_file'];
+$uploadHandler = new FileUploadHandler();
+
+// ファイル検証
+$fileErrors = $uploadHandler->validateFile($file);
+if (!empty($fileErrors)) {
+    SessionManager::setUploadResult('error', ['error_message' => implode(' ', $fileErrors)]);
+    header('Location: ' . $_SERVER['HTTP_REFERER']);
+    exit;
+}
+
+try {
+    $handle = fopen($file['tmp_name'], 'r');
+    if (!$handle) throw new Exception('ファイルを開けませんでした。');
 
     $isFirstRow = true;
-    $insertCount = 0;  // 新規追加件数
-    $updateCount = 0;  // 更新件数
-    $totalRows = 0;    // 処理した総行数
+    $insertCount = $updateCount = $totalRows = 0;
+    $errorRows = [];
+    $processedCustomerNos = [];
+    $validator = new Validator();
+
+    $pdo->beginTransaction();
 
     while (($line = fgets($handle)) !== false) {
-        $line = mb_convert_encoding($line, 'UTF-8', 'SJIS-win');
+        $line = mb_convert_encoding($line, 'UTF-8', ['SJIS-win', 'UTF-8', 'auto']);
 
         if ($isFirstRow) {
             $isFirstRow = false;
@@ -20,10 +42,30 @@ if (isset($_FILES['csv_file']) && is_uploaded_file($_FILES['csv_file']['tmp_name
         }
 
         $data = str_getcsv($line);
-        if (count($data) < 9) continue;
+        $currentRowNum = $totalRows + 2;
+
+        if (count($data) < 9) {
+            $errorRows[] = $currentRowNum;
+            continue;
+        }
+
+        $data = array_map('trim', $data);
+        $customerNo = $validator->validateCustomerData($data, $currentRowNum);
+
+        if ($validator->hasErrors() || $customerNo === false) {
+            $errorRows[] = $currentRowNum;
+            $validator = new Validator();
+            continue;
+        }
+
+        if (in_array($customerNo, $processedCustomerNos)) {
+            $errorRows[] = $currentRowNum;
+            continue;
+        }
+        $processedCustomerNos[] = $customerNo;
 
         [
-            $customer_no,
+            $customer_no_raw,
             $store_name,
             $customer_name,
             $manager_name,
@@ -34,63 +76,72 @@ if (isset($_FILES['csv_file']) && is_uploaded_file($_FILES['csv_file']['tmp_name
             $remarks
         ] = $data;
 
-        // 既存データの確認
         $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM customers WHERE customer_no = ?");
-        $checkStmt->execute([(int)$customer_no]);
+        $checkStmt->execute([$customerNo]);
         $exists = $checkStmt->fetchColumn() > 0;
 
         $stmt = $pdo->prepare("
-        INSERT INTO customers (
-            customer_no, store_name, customer_name, manager_name,
-            address, telephone_number, delivery_conditions,
-            registration_date, remarks
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE
-            customer_name = VALUES(customer_name),
-            store_name = VALUES(store_name),
-            manager_name = VALUES(manager_name),
-            address = VALUES(address),
-            telephone_number = VALUES(telephone_number),
-            delivery_conditions = VALUES(delivery_conditions),
-            registration_date = VALUES(registration_date),
-            remarks = VALUES(remarks)
+            INSERT INTO customers (
+                customer_no, store_name, customer_name, manager_name,
+                address, telephone_number, delivery_conditions,
+                registration_date, remarks
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+                customer_name = VALUES(customer_name),
+                store_name = VALUES(store_name),
+                manager_name = VALUES(manager_name),
+                address = VALUES(address),
+                telephone_number = VALUES(telephone_number),
+                delivery_conditions = VALUES(delivery_conditions),
+                registration_date = VALUES(registration_date),
+                remarks = VALUES(remarks)
         ");
 
         $stmt->execute([
-            (int)$customer_no,
+            $customerNo,
             $store_name,
             $customer_name,
-            $manager_name ?: null,
+            !empty($manager_name) ? $manager_name : null,
             $address,
             $telephone_number,
-            $delivery_conditions ?: null,
+            !empty($delivery_conditions) ? $delivery_conditions : null,
             $registration_date,
-            $remarks ?: null
+            !empty($remarks) ? $remarks : null
         ]);
 
-        // 件数をカウント
-        if ($exists) {
-            $updateCount++;
-        } else {
-            $insertCount++;
-        }
+        $exists ? $updateCount++ : $insertCount++;
         $totalRows++;
     }
 
     fclose($handle);
 
-    // ✅ 成功フラグと件数をセッションに保存
-    $_SESSION['upload_status'] = 'success';
-    $_SESSION['insert_count'] = $insertCount;
-    $_SESSION['update_count'] = $updateCount;
-    $_SESSION['total_rows'] = $totalRows;
+    if ($totalRows === 0) {
+        $pdo->rollBack();
+        SessionManager::setUploadResult('error', ['error_message' => '有効なデータが見つかりませんでした。']);
+        header('Location: ' . $_SERVER['HTTP_REFERER']);
+        exit;
+    }
 
-    header('Location: ' . $_SERVER['HTTP_REFERER']);
-    exit;
-} else {
-    // ❌ 失敗フラグをセッションに保存
-    $_SESSION['upload_status'] = 'error';
+    $pdo->commit();
+    SessionManager::setUploadResult('success', [
+        'insert_count' => $insertCount,
+        'update_count' => $updateCount,
+        'total_rows' => $totalRows,
+        'error_rows' => $errorRows
+    ]);
+} catch (Exception $e) {
+    if ($pdo->inTransaction()) $pdo->rollBack();
 
-    header('Location: ' . $_SERVER['HTTP_REFERER']);
-    exit;
+    $errorMessage = 'データ処理中にエラーが発生しました。';
+    if (($_ENV['ENVIRONMENT'] ?? 'development') !== 'production') {
+        $errorMessage .= ' (' . $e->getMessage() . ')';
+    }
+
+    SessionManager::setUploadResult('error', ['error_message' => $errorMessage]);
+    error_log('CSV Upload Error: ' . $e->getMessage() . ' File: ' . $file['name']);
+
+    if (isset($handle) && is_resource($handle)) fclose($handle);
 }
+
+header('Location: ' . $_SERVER['HTTP_REFERER']);
+exit;
