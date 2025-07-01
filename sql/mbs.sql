@@ -159,6 +159,20 @@ CREATE TABLE `deliveries` (
   `total_amount` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- テーブルのデータのダンプ `deliveries`
+--
+
+INSERT INTO `deliveries` (`delivery_no`, `delivery_record`, `total_amount`) VALUES
+(1, '2025-06-19', 27000),
+(2, '2025-06-19', 45600),
+(3, '2025-06-20', 30400),
+(4, '2025-06-20', 31000),
+(5, '2025-06-21', 22400),
+(6, '2025-06-21', 32000),
+(7, '2025-06-22', 16800),
+(8, '2025-06-24', 35640);
+
 -- --------------------------------------------------------
 
 --
@@ -174,6 +188,28 @@ CREATE TABLE `delivery_items` (
   `tax` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- テーブルのデータのダンプ `delivery_items`
+--
+
+INSERT INTO `delivery_items` (`delivery_item_no`, `delivery_no`, `order_item_no`, `delivery_volume`, `amount`, `tax`) VALUES
+(1, 1, 1, 10, 15000, 1500),
+(2, 1, 2, 5, 6000, 600),
+(3, 2, 3, 8, 16000, 1600),
+(4, 2, 4, 12, 21600, 2160),
+(5, 3, 5, 15, 15000, 1500),
+(6, 3, 6, 7, 15400, 1540),
+(7, 4, 7, 20, 16000, 1600),
+(8, 4, 8, 10, 15000, 1500),
+(9, 5, 9, 6, 9600, 960),
+(10, 5, 10, 9, 12600, 1260),
+(11, 6, 11, 4, 12000, 1200),
+(12, 6, 12, 8, 20000, 2000),
+(13, 7, 13, 25, 15000, 1500),
+(14, 7, 14, 12, 9600, 960),
+(15, 8, 15, 18, 16200, 1620),
+(16, 8, 16, 22, 15400, 1540);
+
 -- --------------------------------------------------------
 
 --
@@ -184,7 +220,7 @@ CREATE TABLE `orders` (
   `order_no` int(11) NOT NULL,
   `customer_no` int(11) NOT NULL,
   `registration_date` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- テーブルのデータのダンプ `orders`
@@ -214,7 +250,29 @@ CREATE TABLE `order_items` (
   `price` int(11) NOT NULL,
   `abstract` text DEFAULT NULL,
   `order_remarks` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- テーブルのデータのダンプ `order_items`
+--
+
+INSERT INTO `order_items` (`order_item_no`, `order_no`, `books`, `order_volume`, `price`, `abstract`, `order_remarks`) VALUES
+(1, 1, 'ビジネス書籍セット A', 10, 1500, '経営戦略とマーケティングの基礎', '急ぎでお願いします'),
+(2, 1, '自己啓発本セット B', 5, 1200, '個人成長とスキルアップ', NULL),
+(3, 2, '技術書籍セット C', 8, 2000, 'プログラミングとIT技術', '新刊優先'),
+(4, 2, 'デザイン書籍セット D', 12, 1800, 'グラフィックデザインとUI/UX', NULL),
+(5, 3, '料理本セット E', 15, 1000, '和食とイタリアン料理', 'カフェ用'),
+(6, 3, 'インテリア書籍セット F', 7, 2200, '店舗デザインと空間演出', '参考資料として'),
+(7, 4, '園芸書籍セット G', 20, 800, '花卉栽培と庭園デザイン', NULL),
+(8, 4, 'フラワーアレンジメント本 H', 10, 1500, '季節の花材と技法', '基礎から応用まで'),
+(9, 5, 'ヘルス&ビューティー本 I', 6, 1600, '健康管理と美容法', NULL),
+(10, 5, 'ライフスタイル本 J', 9, 1400, '暮らしを豊かにするヒント', 'お客様向け'),
+(11, 6, 'アート書籍セット K', 4, 3000, '現代アートと美術史', '高級版希望'),
+(12, 6, '写真集セット L', 8, 2500, '風景とポートレート', NULL),
+(13, 7, 'ビジネス雑誌セット M', 25, 600, '最新の業界動向', '定期購読開始'),
+(14, 7, 'トレンド情報誌 N', 12, 800, 'ファッションとライフスタイル', NULL),
+(15, 8, '建築・住宅雑誌 O', 18, 900, '最新の住宅トレンド', 'バックナンバー含む'),
+(16, 8, 'インテリア雑誌 P', 22, 700, '家具とデコレーション', '季節号重視');
 
 -- --------------------------------------------------------
 
@@ -272,7 +330,6 @@ INSERT INTO `statistics_information` (`statistics_information_no`, `customer_no`
 (35, 20001, 57461, 458769, 97),
 (36, 20002, 5749456, 784519, 98);
 
-
 --
 -- ダンプしたテーブルのインデックス
 --
@@ -305,16 +362,6 @@ ALTER TABLE `orders`
   ADD KEY `customer_no` (`customer_no`);
 
 --
--- ダンプしたテーブルの AUTO_INCREMENT
---
-
---
--- テーブルの AUTO_INCREMENT `orders`
---
-ALTER TABLE `orders`
-  MODIFY `order_no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
 -- テーブルのインデックス `order_items`
 --
 ALTER TABLE `order_items`
@@ -327,6 +374,40 @@ ALTER TABLE `order_items`
 ALTER TABLE `statistics_information`
   ADD PRIMARY KEY (`statistics_information_no`),
   ADD KEY `customer_no` (`customer_no`);
+
+--
+-- ダンプしたテーブルの AUTO_INCREMENT
+--
+
+--
+-- テーブルの AUTO_INCREMENT `deliveries`
+--
+ALTER TABLE `deliveries`
+  MODIFY `delivery_no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- テーブルの AUTO_INCREMENT `delivery_items`
+--
+ALTER TABLE `delivery_items`
+  MODIFY `delivery_item_no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- テーブルの AUTO_INCREMENT `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `order_no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- テーブルの AUTO_INCREMENT `order_items`
+--
+ALTER TABLE `order_items`
+  MODIFY `order_item_no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- テーブルの AUTO_INCREMENT `statistics_information`
+--
+ALTER TABLE `statistics_information`
+  MODIFY `statistics_information_no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- ダンプしたテーブルの制約
@@ -344,7 +425,6 @@ ALTER TABLE `delivery_items`
 --
 ALTER TABLE `orders`
   ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`customer_no`) REFERENCES `customers` (`customer_no`) ON DELETE CASCADE ON UPDATE CASCADE;
-COMMIT;
 
 --
 -- テーブルの制約 `order_items`
@@ -357,6 +437,7 @@ ALTER TABLE `order_items`
 --
 ALTER TABLE `statistics_information`
   ADD CONSTRAINT `statistics_information_ibfk_1` FOREIGN KEY (`customer_no`) REFERENCES `customers` (`customer_no`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
