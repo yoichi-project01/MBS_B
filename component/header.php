@@ -5,8 +5,9 @@ $storeName = $_GET['store'] ?? '';
 $currentPage = basename($_SERVER['PHP_SELF']);
 $requestUri = $_SERVER['REQUEST_URI'];
 
-// ページ名とアイコンのマッピング
+// ページ設定の統一化
 $pageConfig = [
+    // ファイル名ベース
     'index.php' => [
         'name' => '顧客情報CSVアップロード',
         'icon' => '👥'
@@ -14,41 +15,64 @@ $pageConfig = [
     'upload.php' => [
         'name' => '顧客情報CSVアップロード',
         'icon' => '👥'
+    ],
+
+    // ディレクトリベース（優先度高）
+    'customer_information' => [
+        'name' => '顧客情報',
+        'icon' => '👥'
+    ],
+    'statistics' => [
+        'name' => '統計情報',
+        'icon' => '📊'
+    ],
+    'order_list' => [
+        'name' => '注文書',
+        'icon' => '📋'
+    ],
+    'delivery_list' => [
+        'name' => '納品書',
+        'icon' => '🚚'
     ]
 ];
 
-// ディレクトリベースでのページ判定
-if (strpos($requestUri, '/customer_information/') !== false) {
-    $pageTitle = '顧客情報CSVアップロード';
-    $pageIcon = '👥';
-} elseif (strpos($requestUri, '/statistics/') !== false) {
-    $pageTitle = '統計情報';
-    $pageIcon = '📊';
-} elseif (strpos($requestUri, '/order_list/') !== false) {
-    $pageTitle = '注文書';
-    $pageIcon = '📋';
-} elseif (strpos($requestUri, '/delivery_list/') !== false) {
-    $pageTitle = '納品書';
-    $pageIcon = '🚚';
-} else {
-    // デフォルト（店舗選択やメインページ）
-    $pageTitle = htmlspecialchars($storeName . " 受注管理");
-    $pageIcon = '📋';
+// ページ情報を取得する関数
+function getPageInfo($requestUri, $currentPage, $pageConfig)
+{
+    // ディレクトリベースでの判定（優先）
+    foreach ($pageConfig as $key => $config) {
+        if (strpos($requestUri, "/$key/") !== false) {
+            return $config;
+        }
+    }
+
+    // ファイル名ベースでの判定
+    if (isset($pageConfig[$currentPage])) {
+        return $pageConfig[$currentPage];
+    }
+
+    // デフォルト
+    return [
+        'name' => '受注管理',
+        'icon' => '📋'
+    ];
 }
 
-// 店舗名がある場合は組み合わせ、ない場合はページ名のみ
-if (!empty($storeName) && !in_array($pageTitle, ['顧客情報CSVアップロード', '統計情報', '注文書', '納品書'])) {
-    $displayTitle = htmlspecialchars($storeName . " 受注管理");
-} elseif (!empty($storeName)) {
-    $displayTitle = htmlspecialchars($storeName . " - " . $pageTitle);
+$pageInfo = getPageInfo($requestUri, $currentPage, $pageConfig);
+
+// 表示タイトルの決定
+if (!empty($storeName)) {
+    $displayTitle = htmlspecialchars($storeName . " - " . $pageInfo['name']);
+    $pageTitle = htmlspecialchars($storeName . " - " . $pageInfo['name'] . " - 受注管理システム");
 } else {
-    $displayTitle = $pageTitle;
+    $displayTitle = $pageInfo['name'];
+    $pageTitle = $pageInfo['name'] . " - 受注管理システム";
 }
 ?>
 <header class="site-header">
     <div class="header-inner">
         <div class="store-title">
-            <span class="page-icon"><?php echo $pageIcon; ?></span>
+            <span class="page-icon"><?php echo $pageInfo['icon']; ?></span>
             <span class="page-text"><?php echo $displayTitle; ?></span>
         </div>
 
@@ -79,3 +103,13 @@ if (!empty($storeName) && !in_array($pageTitle, ['顧客情報CSVアップロー
     </div>
     <div class="menu-overlay" id="menuOverlay"></div>
 </header>
+
+<!-- ページタイトルを設定 -->
+<script>
+document.title = '<?php echo addslashes($pageTitle); ?>';
+
+// データ属性でページ情報を提供（JavaScript用）
+document.documentElement.setAttribute('data-current-page', '<?php echo addslashes($pageInfo['name']); ?>');
+document.documentElement.setAttribute('data-current-icon', '<?php echo addslashes($pageInfo['icon']); ?>');
+document.documentElement.setAttribute('data-store-name', '<?php echo addslashes($storeName); ?>');
+</script>
