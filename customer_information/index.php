@@ -30,12 +30,6 @@ $uploadResult = SessionManager::getUploadResult();
 <body class="with-header">
     <!-- メインコンテナ -->
     <div class="container">
-        <!-- ページタイトル -->
-        <h1 class="page-title">
-            <i class="fas fa-users"></i>
-            顧客情報CSVアップロード
-        </h1>
-
         <!-- アップロードフォーム -->
         <div class="upload-container">
             <form action="upload.php" method="post" enctype="multipart/form-data" class="upload-form">

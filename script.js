@@ -159,6 +159,138 @@
         }
     }
 
+    // ========== ヘッダーのページタイトル管理機能 ==========
+    
+    /**
+     * 現在のページに基づいてヘッダータイトルを更新
+     */
+    function updateHeaderTitle() {
+        const pageConfig = {
+            '/customer_information/': { name: '顧客情報', icon: '👥' },
+            '/statistics/': { name: '統計情報', icon: '📊' },
+            '/order_list/': { name: '注文書', icon: '📋' },
+            '/delivery_list/': { name: '納品書', icon: '🚚' }
+        };
+
+        const currentPath = window.location.pathname;
+        const urlParams = new URLSearchParams(window.location.search);
+        const storeName = urlParams.get('store');
+
+        let pageInfo = null;
+        
+        // 現在のパスからページ情報を取得
+        for (const [path, info] of Object.entries(pageConfig)) {
+            if (currentPath.includes(path)) {
+                pageInfo = info;
+                break;
+            }
+        }
+
+        // ヘッダータイトル要素を取得
+        const titleElement = document.querySelector('.site-header .store-title .page-text');
+        const iconElement = document.querySelector('.site-header .store-title .page-icon');
+
+        if (titleElement && iconElement && pageInfo) {
+            // アイコンを更新
+            iconElement.textContent = pageInfo.icon;
+            
+            // タイトルを更新
+            if (storeName) {
+                titleElement.textContent = `${storeName} - ${pageInfo.name}`;
+                // ページタイトルも更新
+                document.title = `${pageInfo.name} - ${storeName} 受注管理システム`;
+            } else {
+                titleElement.textContent = pageInfo.name;
+                document.title = `${pageInfo.name} - 受注管理システム`;
+            }
+
+            // アクティブなナビゲーションアイテムを設定
+            updateActiveNavItem(currentPath);
+        }
+    }
+
+    /**
+     * アクティブなナビゲーションアイテムを更新
+     */
+    function updateActiveNavItem(currentPath) {
+        // 全てのナビアイテムからactiveクラスを削除
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+
+        // 現在のページに対応するナビアイテムにactiveクラスを追加
+        const navMappings = {
+            '/customer_information/': 0,
+            '/statistics/': 1,
+            '/order_list/': 2,
+            '/delivery_list/': 3
+        };
+
+        for (const [path, index] of Object.entries(navMappings)) {
+            if (currentPath.includes(path)) {
+                const navItems = document.querySelectorAll('.nav-item');
+                if (navItems[index]) {
+                    navItems[index].classList.add('active');
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * ページ遷移時のアニメーション効果
+     */
+    function addPageTransitionEffect() {
+        const titleElement = document.querySelector('.site-header .store-title');
+        if (titleElement) {
+            titleElement.style.opacity = '0';
+            titleElement.style.transform = 'translateY(-10px)';
+            
+            setTimeout(() => {
+                titleElement.style.transition = 'all 0.4s ease';
+                titleElement.style.opacity = '1';
+                titleElement.style.transform = 'translateY(0)';
+            }, 100);
+        }
+    }
+
+    /**
+     * ブレッドクラム風の表示を追加（オプション）
+     */
+    function createBreadcrumb() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const storeName = urlParams.get('store');
+        
+        if (!storeName) return;
+
+        const breadcrumbContainer = document.createElement('div');
+        breadcrumbContainer.className = 'breadcrumb-nav';
+        breadcrumbContainer.innerHTML = `
+            <span class="breadcrumb-item">
+                <a href="/MBS_B/menu.php?store=${encodeURIComponent(storeName)}" class="breadcrumb-link">
+                    🏠 ${storeName}
+                </a>
+            </span>
+            <span class="breadcrumb-separator">›</span>
+            <span class="breadcrumb-current"></span>
+        `;
+
+        // 現在のページ名を設定
+        const currentPageSpan = breadcrumbContainer.querySelector('.breadcrumb-current');
+        const pageIcon = document.querySelector('.site-header .page-icon')?.textContent || '';
+        const pageText = document.querySelector('.site-header .page-text')?.textContent?.split(' - ').pop() || '';
+        
+        if (currentPageSpan) {
+            currentPageSpan.textContent = `${pageIcon} ${pageText}`;
+        }
+
+        // ヘッダーの下に挿入
+        const header = document.querySelector('.site-header');
+        if (header && !document.querySelector('.breadcrumb-nav')) {
+            header.parentNode.insertBefore(breadcrumbContainer, header.nextSibling);
+        }
+    }
+
     // ========== スクロール効果 ==========
     function initializeScrollEffects() {
         let lastScrollY = window.scrollY;
@@ -1369,6 +1501,13 @@
         });
     }
 
+    // ========== ヘッダー機能の初期化 ==========
+    function initializeHeaderFeatures() {
+        updateHeaderTitle();
+        addPageTransitionEffect();
+        // createBreadcrumb(); // 必要に応じてコメントアウト解除
+    }
+
     // ========== 初期化処理 ==========
     function initializeApp() {
         // 動的スタイルの追加
@@ -1384,6 +1523,9 @@
         initializeObservers();
         initializeErrorHandling();
         initializePerformanceMonitoring();
+
+        // ヘッダー機能の初期化
+        initializeHeaderFeatures();
 
         // 統計情報ページの機能を初期化（該当要素がある場合のみ）
         if (document.querySelector('.sort-btn') || document.querySelector('#graphModal')) {
@@ -1411,6 +1553,11 @@
         initializeApp();
     }
 
+    // popstate イベント（ブラウザの戻る/進むボタン）に対応
+    window.addEventListener('popstate', function() {
+        setTimeout(initializeHeaderFeatures, 50);
+    });
+
     // ========== 公開API（後方互換性のため） ==========
     window.MBS = {
         selectedStore: selectedStore,
@@ -1420,6 +1567,14 @@
         showLoadingAnimation: showLoadingAnimation,
         toggleMenu: toggleMenu,
         closeMenu: closeMenu
+    };
+
+    // ========== ヘッダー管理用グローバルAPI ==========
+    window.HeaderManager = {
+        updateTitle: updateHeaderTitle,
+        updateActiveNav: updateActiveNavItem,
+        addTransitionEffect: addPageTransitionEffect,
+        createBreadcrumb: createBreadcrumb
     };
 
     // ========== 統計情報ページ用のグローバル関数 ==========
@@ -1450,7 +1605,17 @@
         
         // 設定管理
         saveUserPreferences: saveUserPreferences,
-        loadUserPreferences: loadUserPreferences
+        loadUserPreferences: loadUserPreferences,
+
+        // ソート機能
+        handleSort: handleSort,
+        parseLeadTimeToSeconds: parseLeadTimeToSeconds,
+        
+        // 検索機能
+        handleSearchInput: handleSearchInput,
+
+        // アクセシビリティ
+        announceToScreenReader: announceToScreenReader
     };
 
 })();
