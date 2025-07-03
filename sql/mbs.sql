@@ -1,442 +1,267 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- ホスト: 127.0.0.1
--- 生成日時: 2025-06-18 05:28:31
--- サーバのバージョン： 10.4.32-MariaDB
--- PHP のバージョン: 8.2.12
+-- 修正版 MBS データベーススキーマ
+-- セキュリティとパフォーマンスを向上させた版
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
-SET time_zone = "+00:00";
-
+SET time_zone = "+09:00";
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
---
--- データベース: `mbs`
---
+-- データベースの作成（存在しない場合のみ）
+CREATE DATABASE IF NOT EXISTS `mbs` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `mbs`;
 
 -- --------------------------------------------------------
 
---
--- テーブルの構造 `customers`
---
-
+-- テーブルの構造 `customers`（修正版）
+DROP TABLE IF EXISTS `customers`;
 CREATE TABLE `customers` (
   `customer_no` int(11) NOT NULL,
   `store_name` varchar(255) NOT NULL,
   `customer_name` varchar(255) NOT NULL,
   `manager_name` varchar(255) DEFAULT NULL,
-  `address` varchar(255) NOT NULL,
+  `address` varchar(500) NOT NULL,
   `telephone_number` varchar(20) NOT NULL,
-  `delivery_conditions` text DEFAULT NULL,
+  `delivery_conditions` varchar(500) DEFAULT NULL,
   `registration_date` date NOT NULL,
-  `remarks` text DEFAULT NULL
+  `remarks` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`customer_no`),
+  KEY `idx_store_name` (`store_name`),
+  KEY `idx_customer_name` (`customer_name`),
+  KEY `idx_registration_date` (`registration_date`),
+  KEY `idx_created_at` (`created_at`),
+  CONSTRAINT `chk_customer_no` CHECK (`customer_no` > 0),
+  CONSTRAINT `chk_store_name` CHECK (`store_name` IN ('緑橋本店', '今里店', '深江橋店')),
+  CONSTRAINT `chk_registration_date` CHECK (`registration_date` >= '1900-01-01' AND `registration_date` <= '2100-12-31')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- テーブルのデータのダンプ `customers`
---
-
-INSERT INTO `customers` (`customer_no`, `store_name`, `customer_name`, `manager_name`, `address`, `telephone_number`, `delivery_conditions`, `registration_date`, `remarks`) VALUES
-(10001, '緑橋本店', '野村圭太', NULL, '大阪市東成区中本4-3-2', '06-5315-9201', NULL, '0000-00-00', '1995/2/12'),
-(10002, '緑橋本店', '渡辺亮介', NULL, '大阪市東成区深江南10-5-1', '090-5106-3240', NULL, '0000-00-00', '1995/9/9'),
-(10003, '緑橋本店', '岩本春香', NULL, '大阪市東成区深江南6-4-3', '090-8606-5951', '日中不在', '0000-00-00', '1999/7/3'),
-(10004, '緑橋本店', 'フラワーショップ ブルーム', '村上拓哉', '大阪市東成区東小橋9-1-2', '090-4362-2124', NULL, '0000-00-00', '2000/4/8'),
-(10005, '緑橋本店', '木村紗希', NULL, '大阪市東成区深江南3-8-1', '06-9830-5304', NULL, '0000-00-00', '2000/6/12'),
-(10006, '緑橋本店', '吉田翔太', NULL, '大阪市東成区深江南6-8-9', '06-1590-7049', '平日不在', '0000-00-00', '2001/8/31'),
-(10007, '緑橋本店', '竹田航介', NULL, '大阪市東成区中本10-10-8', '06-3677-8573', NULL, '0000-00-00', '2001/12/4'),
-(10008, '緑橋本店', 'カフェ ドルチェビータ', '堀田陽介', '大阪市東成区深江南6-2-4', '090-7523-5520', NULL, '0000-00-00', '2003/6/18'),
-(10009, '緑橋本店', '坂本愛', NULL, '大阪市東成区今里西9-8-3', '06-3724-7658', NULL, '0000-00-00', '2005/9/17'),
-(10010, '緑橋本店', 'ヘアサロン サニー', '今井美由紀', '大阪市東成区大今里6-1-1', '050-8454-9543', '平日不在', '0000-00-00', '2005/9/25'),
-(10011, '緑橋本店', '喫茶店 フレーバー', '柴田真樹', '大阪市東成区中本10-10-1', '06-6143-3041', NULL, '0000-00-00', '2006/11/21'),
-(10012, '緑橋本店', '木下萌', NULL, '大阪市東成区中道2-1-8 コスモビュー中道 604号室', '090-4696-7511', '宅配ボックス', '0000-00-00', '2007/4/7'),
-(10013, '緑橋本店', '川上里奈', NULL, '大阪市東成区大今里6-3-5', '090-3165-9837', NULL, '0000-00-00', '2008/12/9'),
-(10014, '緑橋本店', '青木大輝', NULL, '大阪市東成区東小橋9-7-10 アーバンステージ東小橋 305号室', '06-4981-8749', '18:00以降', '0000-00-00', '2009/9/27'),
-(10015, '緑橋本店', '鈴木花子', NULL, '大阪市東成区中道8-4-4 ハーモニーテラス森之宮 203号室', '080-9697-9221', NULL, '0000-00-00', '2009/11/29'),
-(10016, '緑橋本店', '原田直子', NULL, '大阪市東成区深江南5-9-3', '06-2638-2200', NULL, '0000-00-00', '2012/2/7'),
-(10017, '緑橋本店', 'ブックカフェ ライブラリー', '高橋健', '大阪市東成区神路6-8-8', '06-9751-3073', NULL, '0000-00-00', '2012/3/16'),
-(10018, '緑橋本店', 'コーヒーハウス レインボー', '黒田菜月', '大阪市東成区中本2-5-9', '06-2375-8022', '日中不在', '0000-00-00', '2012/4/26'),
-(10019, '緑橋本店', '雑貨＆カフェ ミモザ', '篠原海斗', '大阪市東成区中本1-1-4', '050-8976-6931', '日中不在', '0000-00-00', '2012/10/30'),
-(10020, '緑橋本店', '小川夏帆', NULL, '大阪市東成区深江南4-3-9', '090-9017-7686', NULL, '0000-00-00', '2013/5/23'),
-(10021, '緑橋本店', '森本友香', NULL, '大阪市東成区深江南3-8-9', '080-1546-6977', NULL, '0000-00-00', '2013/6/5'),
-(10022, '緑橋本店', '酒井花奈', NULL, '大阪市東成区神路8-3-8', '050-7746-1422', '平日不在', '0000-00-00', '2013/8/12'),
-(10023, '緑橋本店', '喫茶 ハーモニー', '林浩造', '大阪市東成区深江南4-5-8', '050-5837-8344', NULL, '0000-00-00', '2013/8/21'),
-(10024, '緑橋本店', '杉本健太', NULL, '大阪市東成区大今里7-7-6', '06-1128-5905', '18:00以降', '0000-00-00', '2015/1/12'),
-(10025, '緑橋本店', 'カフェ＆バー ネスト', '杉本健太', '大阪市東成区深江南10-1-10', '050-4038-8504', '日曜定休', '0000-00-00', '2015/6/5'),
-(10026, '緑橋本店', 'ヘアデザイン フロー', '山本彩香', '大阪市東成区大今里7-6-7', '06-2235-8260', NULL, '0000-00-00', '2015/7/1'),
-(10027, '緑橋本店', 'カフェ・ド・フルール', '橋本一花', '大阪市東成区深江南10-10-1', '06-8700-6700', '日中不在', '0000-00-00', '2015/9/13'),
-(10028, '緑橋本店', 'カフェ モーニンググローリー', '加藤里奈', '大阪市東成区深江南5-2-8', '06-5351-7484', NULL, '0000-00-00', '2016/3/7'),
-(10029, '緑橋本店', '川口実咲', NULL, '大阪市東成区深江南2-10-4 スカイレジデンス東成 1102号室', '090-9807-3222', NULL, '0000-00-00', '2016/8/23'),
-(10030, '緑橋本店', 'コーヒーラウンジ ソレイユ', '西峰春菜', '大阪市東成区中道2-3-5', '050-7558-1510', NULL, '0000-00-00', '2016/9/22'),
-(10031, '緑橋本店', '遠藤実花', NULL, '大阪市東成区今里西9-5-10', '06-7932-4470', '日中不在', '0000-00-00', '2017/5/10'),
-(10032, '緑橋本店', '清水美咲', NULL, '大阪市東成区深江南6-3-1 セントラルガーデン深江 101号室', '080-1536-7070', '19:00以降', '0000-00-00', '2019/10/4'),
-(10033, '緑橋本店', '大村紗英', NULL, '大阪市東成区深江南10-10-10', '06-2113-4853', '日中不在', '0000-00-00', '2020/8/25'),
-(10034, '緑橋本店', '竹内誠', NULL, '大阪市東成区中本4-3-9 サンライズコート東成 402号室', '06-4111-5861', NULL, '0000-00-00', '2021/4/30'),
-(10035, '緑橋本店', '藤田沙織', NULL, '大阪市東成区神路8-5-1', '06-8397-2982', '18:00以降', '0000-00-00', '2021/6/22'),
-(10036, '緑橋本店', '喫茶 レトロタイム', '松井元気', '大阪市東成区中本2-1-3', '050-3721-1858', '営業時間7:00～19:00', '0000-00-00', '2022/4/24'),
-(10037, '緑橋本店', '堀田陽介', NULL, '大阪市東成区深江南6-10-5', '090-4830-8724', '宅配ボックス', '0000-00-00', '2023/4/6'),
-(10038, '緑橋本店', 'レストラン パストラル', '金子友美', '大阪市東成区神路7-8-2', '06-9117-5722', NULL, '0000-00-00', '2024/2/24'),
-(10039, '緑橋本店', '吉田翔太', NULL, '大阪市東成区中道2-6-5 コンフォートヒルズ森之宮 204号室', '080-2479-7464', NULL, '0000-00-00', '2024/5/15'),
-(20001, '深江橋店', '伊崎佳典', NULL, '大阪市東成区深江北3-4-2', '090-4685-4454', NULL, '0000-00-00', '2002/5/8'),
-(20002, '深江橋店', 'カフェ ブルーナ', '斐川美津子', '大阪市東成区神路3-1-1', '06-9339-6632', NULL, '0000-00-00', '2005/4/1'),
-(30001, '今里店', '長田翔', NULL, '大阪市東成区大今里4-4-9', '080-3531-7797', '日中不在', '0000-00-00', '1995/8/13'),
-(30002, '今里店', 'サロン ラ・ルーチェ', '渡辺亮介', '大阪市東成区東小橋2-2-7', '050-5936-2768', NULL, '0000-00-00', '1996/4/17'),
-(30003, '今里店', '中島葵', NULL, '大阪市東成区神路2-7-2', '080-5835-6549', NULL, '0000-00-00', '1996/8/29'),
-(30004, '今里店', 'ギャラリーカフェ ループ', '中島葵', '大阪市東成区大今里4-5-2', '050-9467-7580', NULL, '0000-00-00', '1996/12/16'),
-(30005, '今里店', '岡田香織', NULL, '大阪市東成区東小橋3-6-6', '090-1609-5986', '平日不在', '0000-00-00', '1998/2/17'),
-(30006, '今里店', '藤井大智', NULL, '大阪市東成区今里西3-9-4', '080-2902-2592', NULL, '0000-00-00', '1998/5/10'),
-(30007, '今里店', '喫茶 ウィステリア', '藤井大智', '大阪市東成区今里西9-4-6', '090-4538-4817', NULL, '0000-00-00', '1998/8/8'),
-(30008, '今里店', '佐藤真奈美', NULL, '大阪市東成区大今里4-10-6', '050-1126-3854', '宅配ボックス', '0000-00-00', '1999/3/8'),
-(30009, '今里店', '田中一郎', NULL, '大阪市東成区東小橋3-4-9 東成グランデハイツ 101号室', '06-8541-6728', NULL, '0000-00-00', '1999/6/22'),
-(30010, '今里店', '村上拓哉', NULL, '大阪市東成区今里西3-7-10', '090-8673-2233', '19:00以降', '0000-00-00', '2000/2/2'),
-(30011, '今里店', 'フレンチカフェ ボヌール', '木村紗希', '大阪市東成区今里西9-10-4', '06-8244-4501', NULL, '0000-00-00', '2000/8/30'),
-(30012, '今里店', '長谷川航', NULL, '大阪市東成区神路6-8-1 大阪シティタワー東成 802号室', '090-6942-2627', NULL, '0000-00-00', '2001/2/14'),
-(30013, '今里店', '石田優太', NULL, '大阪市東成区神路2-2-8', '06-2133-9727', '日中不在', '0000-00-00', '2001/6/19'),
-(30014, '今里店', '井上未来', NULL, '大阪市東成区神路3-5-9', '090-6374-4626', NULL, '0000-00-00', '2001/6/27'),
-(30015, '今里店', 'カフェ まどろみ', '吉田翔太', '大阪市東成区大今里10-9-4', '080-3417-1046', '日中不在', '0000-00-00', '2001/10/28'),
-(30016, '今里店', '島田葵', NULL, '大阪市東成区大今里1-6-2', '090-8451-7038', NULL, '0000-00-00', '2001/11/27'),
-(30017, '今里店', '株式会社アズール', '竹田航介', '大阪市東成区今里西7-6-7', '050-6325-2786', '日曜定休', '0000-00-00', '2002/2/7'),
-(30018, '今里店', 'ビューティーサロン ココ', '佐久間亮太', '大阪市東成区中本5-8-4', '06-6491-2530', '火曜定休', '0000-00-00', '2003/7/20'),
-(30019, '今里店', '横山陸', NULL, '大阪市東成区神路1-2-4', '050-7062-6304', NULL, '0000-00-00', '2005/1/29'),
-(30020, '今里店', 'カフェ アンティーク', '横山陸', '大阪市東成区大今里3-7-1', '06-8018-7071', '日中不在', '0000-00-00', '2005/6/23'),
-(30021, '今里店', '柴田真樹', NULL, '大阪市東成区大今里3-2-10', '06-9423-4899', NULL, '0000-00-00', '2005/12/7'),
-(30022, '今里店', 'カフェ プティ・シャトー', '宮本涼香', '大阪市東成区東小橋4-6-4', '090-3001-8450', NULL, '0000-00-00', '2006/12/26'),
-(30023, '今里店', '石橋太一', NULL, '大阪市東成区中本6-2-4 グリーンフォレスト中本 403号室', '080-3695-5210', NULL, '0000-00-00', '2007/5/24'),
-(30024, '今里店', '中山香奈', NULL, '大阪市東成区今里西5-10-9', '06-7054-5669', '平日不在', '0000-00-00', '2007/9/9'),
-(30025, '今里店', 'カフェダイニング ロゼ', '中山香奈', '大阪市東成区東小橋2-2-9', '050-1062-8847', NULL, '0000-00-00', '2008/2/3'),
-(30026, '今里店', 'ベーカリーカフェ ココット', '西山真央', '大阪市東成区今里西5-9-8', '06-4608-1117', '木曜定休', '0000-00-00', '2008/5/23'),
-(30027, '今里店', '大野真由美', NULL, '大阪市東成区大今里2-3-9', '090-2476-5835', NULL, '0000-00-00', '2009/4/10'),
-(30028, '今里店', '伊藤優子', NULL, '大阪市東成区大今里5-6-1 ライフステージ東成 503号室', '090-1645-6061', NULL, '0000-00-00', '2009/6/8'),
-(30029, '今里店', 'フォレスト', '青木大輝', '大阪市東成区大今里3-6-7', '080-9920-6876', NULL, '0000-00-00', '2009/11/22'),
-(30030, '今里店', 'カフェ＆ベーカリー ホイットニー', '鈴木花子', '大阪市東成区大今里4-7-6', '050-5362-9254', NULL, '0000-00-00', '2010/3/9'),
-(30031, '今里店', '中村恵美', NULL, '大阪市東成区深江南9-6-1 ブライトレジデンス深江橋 701号室', '080-7807-3877', NULL, '0000-00-00', '2010/3/31'),
-(30032, '今里店', '安田陽一', NULL, '大阪市東成区大今里10-7-6', '06-6862-4441', NULL, '0000-00-00', '2010/6/25'),
-(30033, '今里店', 'イタリアン カフェ・ベッラ', '安田陽一', '大阪市東成区神路4-5-1', '050-8653-2041', '18:00以降', '0000-00-00', '2011/12/3'),
-(30034, '今里店', '株式会社レーヴ', '岡本玲奈', '大阪市東成区東小橋7-2-6', '06-8144-1027', NULL, '0000-00-00', '2012/1/18'),
-(30035, '今里店', '高橋健', NULL, '大阪市東成区神路5-7-9', '06-2040-7304', '19:00以降', '0000-00-00', '2012/3/6'),
-(30036, '今里店', '平野梨沙', NULL, '大阪市東成区神路4-7-8', '080-2911-3290', NULL, '0000-00-00', '2013/4/20'),
-(30037, '今里店', '谷川駿', NULL, '大阪市東成区神路2-3-3', '090-6772-4588', '18:00以降', '0000-00-00', '2014/10/1'),
-(30038, '今里店', '山本彩香', NULL, '大阪市東成区深江南9-9-10 クレールコート深江南 405号室', '090-8264-8285', NULL, '0000-00-00', '2015/6/28'),
-(30039, '今里店', '加藤里奈', NULL, '大阪市東成区東小橋7-6-4 パークサイドヴィラ東成 306号室', '06-2889-5279', '宅配ボックス', '0000-00-00', '2016/1/23'),
-(30040, '今里店', '奥村杏奈', NULL, '大阪市東成区今里西2-1-1 プレミアムハイム今里 201号室', '06-3532-4878', '配達は202号室へ', '0000-00-00', '2016/3/20'),
-(30041, '今里店', '喫茶 ル・クラシック', '大西拓海', '大阪市東成区今里西4-2-10', '050-2629-7897', NULL, '0000-00-00', '2016/9/28'),
-(30042, '今里店', 'サロン ラフィーネ', '今井知佳', '大阪市東成区神路1-6-9', '080-3858-2801', '平日不在', '0000-00-00', '2016/12/18'),
-(30043, '今里店', '松本大輔', NULL, '大阪市東成区深江南8-2-7', '050-4666-4898', NULL, '0000-00-00', '2017/3/21'),
-(30044, '今里店', 'コーヒーショップ オアシス', '遠藤実花', '大阪市東成区神路5-6-4', '06-7396-5345', NULL, '0000-00-00', '2017/7/13'),
-(30045, '今里店', '中田和樹', NULL, '大阪市東成区神路10-7-6', '06-4483-9179', '18:00以降', '0000-00-00', '2017/10/10'),
-(30046, '今里店', '山口颯太', NULL, '大阪市東成区東小橋5-6-5 リバーフロントハイツ鶴橋 506号室', '080-7242-7086', NULL, '0000-00-00', '2017/10/19'),
-(30047, '今里店', '石川悠真', NULL, '大阪市東成区今里西7-8-9', '06-6139-8149', NULL, '0000-00-00', '2017/10/29'),
-(30048, '今里店', 'ヘアメイク ノワール', '石川悠真', '大阪市東成区大今里5-4-7', '090-6464-4990', '営業時間10:00～18:00', '0000-00-00', '2018/8/5'),
-(30049, '今里店', '村田慎太郎', NULL, '大阪市東成区神路6-7-9', '050-2344-1243', NULL, '0000-00-00', '2018/12/8'),
-(30050, '今里店', '小林直樹', NULL, '大阪市東成区東小橋4-2-4 リバーサイドレジデンス玉造 1101号室', '06-3647-8239', NULL, '0000-00-00', '2019/2/28'),
-(30051, '今里店', '宮田志保', NULL, '大阪市東成区中本8-5-10', '090-5332-9791', NULL, '0000-00-00', '2019/5/18'),
-(30052, '今里店', 'フローリスト ピュア', '宮田志保', '大阪市東成区東小橋3-5-1', '050-6338-2862', NULL, '0000-00-00', '2019/9/16'),
-(30053, '今里店', '近藤竜也', NULL, '大阪市東成区神路5-3-8', '080-8432-7078', '18:00以降', '0000-00-00', '2019/9/23'),
-(30054, '今里店', '石井慧', NULL, '大阪市東成区大今里10-1-3', '06-2832-6947', NULL, '0000-00-00', '2019/10/10'),
-(30055, '今里店', '有限会社エクラ', '大村紗英', '大阪市東成区東小橋10-7-5 ヴィータハイム小橋 307号室', '080-3370-3129', '土日休', '0000-00-00', '2021/1/5'),
-(30056, '今里店', 'カットスタジオ エアリー', '藤田沙織', '大阪市東成区大今里4-5-10', '090-4475-1349', NULL, '0000-00-00', '2021/11/20'),
-(30057, '今里店', '山田太郎', NULL, '大阪市東成区東小橋7-5-9 ファミールヒルズ東成 704号室', '06-9348-9085', NULL, '0000-00-00', '2022/12/16'),
-(30058, '今里店', '有限会社カルチェ', '上田杏奈', '大阪市東成区大今里5-10-1', '050-3276-1710', '昼頃不在、土日休', '0000-00-00', '2024/1/21'),
-(30059, '今里店', 'アイスペース', '高木陽太', '大阪市東成区大今里3-6-7', '06-1317-9837', '日中不在', '0000-00-00', '2024/3/31'),
-(30060, '今里店', '森田智之', NULL, '大阪市東成区深江南7-1-4 エクセルハウス新深江 602号室', '090-9138-5689', NULL, '0000-00-00', '2024/8/8'),
-(30061, '今里店', 'レストラン アルバトロス', '森田智之', '大阪市東成区中本5-9-3', '06-2419-5569', NULL, '0000-00-00', '2024/10/8');
-
--- --------------------------------------------------------
-
---
--- テーブルの構造 `deliveries`
---
-
+-- テーブルの構造 `deliveries`（修正版）
+DROP TABLE IF EXISTS `deliveries`;
 CREATE TABLE `deliveries` (
-  `delivery_no` int(11) NOT NULL,
+  `delivery_no` int(11) NOT NULL AUTO_INCREMENT,
   `delivery_record` date NOT NULL,
-  `total_amount` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `total_amount` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`delivery_no`),
+  KEY `idx_delivery_record` (`delivery_record`),
+  KEY `idx_total_amount` (`total_amount`),
+  CONSTRAINT `chk_total_amount` CHECK (`total_amount` >= 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- テーブルのデータのダンプ `deliveries`
---
-
-INSERT INTO `deliveries` (`delivery_no`, `delivery_record`, `total_amount`) VALUES
-(1, '2025-06-19', 27000),
-(2, '2025-06-19', 45600),
-(3, '2025-06-20', 30400),
-(4, '2025-06-20', 31000),
-(5, '2025-06-21', 22400),
-(6, '2025-06-21', 32000),
-(7, '2025-06-22', 16800),
-(8, '2025-06-24', 35640);
-
--- --------------------------------------------------------
-
---
--- テーブルの構造 `delivery_items`
---
-
+-- テーブルの構造 `delivery_items`（修正版）
+DROP TABLE IF EXISTS `delivery_items`;
 CREATE TABLE `delivery_items` (
-  `delivery_item_no` int(11) NOT NULL,
+  `delivery_item_no` int(11) NOT NULL AUTO_INCREMENT,
   `delivery_no` int(11) NOT NULL,
   `order_item_no` int(11) NOT NULL,
   `delivery_volume` int(11) NOT NULL,
-  `amount` int(11) NOT NULL,
-  `tax` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- テーブルのデータのダンプ `delivery_items`
---
-
-INSERT INTO `delivery_items` (`delivery_item_no`, `delivery_no`, `order_item_no`, `delivery_volume`, `amount`, `tax`) VALUES
-(1, 1, 1, 10, 15000, 1500),
-(2, 1, 2, 5, 6000, 600),
-(3, 2, 3, 8, 16000, 1600),
-(4, 2, 4, 12, 21600, 2160),
-(5, 3, 5, 15, 15000, 1500),
-(6, 3, 6, 7, 15400, 1540),
-(7, 4, 7, 20, 16000, 1600),
-(8, 4, 8, 10, 15000, 1500),
-(9, 5, 9, 6, 9600, 960),
-(10, 5, 10, 9, 12600, 1260),
-(11, 6, 11, 4, 12000, 1200),
-(12, 6, 12, 8, 20000, 2000),
-(13, 7, 13, 25, 15000, 1500),
-(14, 7, 14, 12, 9600, 960),
-(15, 8, 15, 18, 16200, 1620),
-(16, 8, 16, 22, 15400, 1540);
-
--- --------------------------------------------------------
-
---
--- テーブルの構造 `orders`
---
-
-CREATE TABLE `orders` (
-  `order_no` int(11) NOT NULL,
-  `customer_no` int(11) NOT NULL,
-  `registration_date` date NOT NULL
+  `amount` decimal(10,2) NOT NULL,
+  `tax` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`delivery_item_no`),
+  KEY `idx_delivery_no` (`delivery_no`),
+  KEY `idx_order_item_no` (`order_item_no`),
+  CONSTRAINT `chk_delivery_volume` CHECK (`delivery_volume` > 0),
+  CONSTRAINT `chk_amount` CHECK (`amount` >= 0),
+  CONSTRAINT `chk_tax` CHECK (`tax` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- テーブルのデータのダンプ `orders`
---
+-- テーブルの構造 `orders`（修正版）
+DROP TABLE IF EXISTS `orders`;
+CREATE TABLE `orders` (
+  `order_no` int(11) NOT NULL AUTO_INCREMENT,
+  `customer_no` int(11) NOT NULL,
+  `registration_date` date NOT NULL,
+  `status` enum('pending','processing','completed','cancelled') NOT NULL DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`order_no`),
+  KEY `idx_customer_no` (`customer_no`),
+  KEY `idx_registration_date` (`registration_date`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `orders` (`order_no`, `customer_no`, `registration_date`) VALUES
-(1, 10002, '2025-06-18'),
-(2, 10004, '2025-06-18'),
-(3, 10004, '2025-06-18'),
-(4, 10005, '2025-06-18'),
-(5, 10006, '2025-06-18'),
-(6, 10009, '2025-06-18'),
-(7, 10005, '2025-06-18'),
-(8, 10003, '2025-06-23');
-
--- --------------------------------------------------------
-
---
--- テーブルの構造 `order_items`
---
-
+-- テーブルの構造 `order_items`（修正版）
+DROP TABLE IF EXISTS `order_items`;
 CREATE TABLE `order_items` (
-  `order_item_no` int(11) NOT NULL,
+  `order_item_no` int(11) NOT NULL AUTO_INCREMENT,
   `order_no` int(11) NOT NULL,
   `books` varchar(255) NOT NULL,
   `order_volume` int(11) NOT NULL,
-  `price` int(11) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
   `abstract` text DEFAULT NULL,
-  `order_remarks` text DEFAULT NULL
+  `order_remarks` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`order_item_no`),
+  KEY `idx_order_no` (`order_no`),
+  KEY `idx_books` (`books`),
+  CONSTRAINT `chk_order_volume` CHECK (`order_volume` > 0),
+  CONSTRAINT `chk_price` CHECK (`price` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- テーブルのデータのダンプ `order_items`
---
+-- テーブルの構造 `statistics_information`（修正版）
+DROP TABLE IF EXISTS `statistics_information`;
+CREATE TABLE `statistics_information` (
+  `statistics_information_no` int(11) NOT NULL AUTO_INCREMENT,
+  `customer_no` int(11) NOT NULL,
+  `sales_by_customer` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `lead_time` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `delivery_amount` int(11) NOT NULL DEFAULT 0,
+  `last_order_date` date DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`statistics_information_no`),
+  UNIQUE KEY `idx_customer_no` (`customer_no`),
+  KEY `idx_sales_by_customer` (`sales_by_customer`),
+  KEY `idx_lead_time` (`lead_time`),
+  KEY `idx_delivery_amount` (`delivery_amount`),
+  CONSTRAINT `chk_sales_by_customer` CHECK (`sales_by_customer` >= 0),
+  CONSTRAINT `chk_lead_time_positive` CHECK (`lead_time` >= 0),
+  CONSTRAINT `chk_delivery_amount_positive` CHECK (`delivery_amount` >= 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 外部キー制約の追加
+ALTER TABLE `delivery_items`
+  ADD CONSTRAINT `fk_delivery_items_delivery` FOREIGN KEY (`delivery_no`) REFERENCES `deliveries` (`delivery_no`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_delivery_items_order_item` FOREIGN KEY (`order_item_no`) REFERENCES `order_items` (`order_item_no`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `orders`
+  ADD CONSTRAINT `fk_orders_customer` FOREIGN KEY (`customer_no`) REFERENCES `customers` (`customer_no`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `order_items`
+  ADD CONSTRAINT `fk_order_items_order` FOREIGN KEY (`order_no`) REFERENCES `orders` (`order_no`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `statistics_information`
+  ADD CONSTRAINT `fk_statistics_customer` FOREIGN KEY (`customer_no`) REFERENCES `customers` (`customer_no`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- サンプルデータの挿入（修正版）
+INSERT INTO `customers` (`customer_no`, `store_name`, `customer_name`, `manager_name`, `address`, `telephone_number`, `delivery_conditions`, `registration_date`, `remarks`) VALUES
+(10001, '緑橋本店', '野村圭太', NULL, '大阪市東成区中本4-3-2', '06-5315-9201', NULL, '1995-02-12', NULL),
+(10002, '緑橋本店', '渡辺亮介', NULL, '大阪市東成区深江南10-5-1', '090-5106-3240', NULL, '1995-09-09', NULL),
+(10003, '緑橋本店', '岩本春香', NULL, '大阪市東成区深江南6-4-3', '090-8606-5951', '日中不在', '1999-07-03', NULL),
+(10004, '緑橋本店', 'フラワーショップ ブルーム', '村上拓哉', '大阪市東成区東小橋9-1-2', '090-4362-2124', NULL, '2000-04-08', NULL),
+(10005, '緑橋本店', '木村紗希', NULL, '大阪市東成区深江南3-8-1', '06-9830-5304', NULL, '2000-06-12', NULL),
+(20001, '深江橋店', '伊崎佳典', NULL, '大阪市東成区深江北3-4-2', '090-4685-4454', NULL, '2002-05-08', NULL),
+(20002, '深江橋店', 'カフェ ブルーナ', '斐川美津子', '大阪市東成区神路3-1-1', '06-9339-6632', NULL, '2005-04-01', NULL),
+(30001, '今里店', '長田翔', NULL, '大阪市東成区大今里4-4-9', '080-3531-7797', '日中不在', '1995-08-13', NULL),
+(30002, '今里店', 'サロン ラ・ルーチェ', '渡辺亮介', '大阪市東成区東小橋2-2-7', '050-5936-2768', NULL, '1996-04-17', NULL),
+(30003, '今里店', '中島葵', NULL, '大阪市東成区神路2-7-2', '080-5835-6549', NULL, '1996-08-29', NULL);
+
+INSERT INTO `deliveries` (`delivery_no`, `delivery_record`, `total_amount`) VALUES
+(1, '2025-06-19', 27000.00),
+(2, '2025-06-19', 45600.00),
+(3, '2025-06-20', 30400.00),
+(4, '2025-06-20', 31000.00),
+(5, '2025-06-21', 22400.00);
+
+INSERT INTO `orders` (`order_no`, `customer_no`, `registration_date`, `status`) VALUES
+(1, 10002, '2025-06-18', 'completed'),
+(2, 10004, '2025-06-18', 'completed'),
+(3, 10004, '2025-06-18', 'processing'),
+(4, 10005, '2025-06-18', 'pending'),
+(5, 10003, '2025-06-23', 'pending');
 
 INSERT INTO `order_items` (`order_item_no`, `order_no`, `books`, `order_volume`, `price`, `abstract`, `order_remarks`) VALUES
-(1, 1, 'ビジネス書籍セット A', 10, 1500, '経営戦略とマーケティングの基礎', '急ぎでお願いします'),
-(2, 1, '自己啓発本セット B', 5, 1200, '個人成長とスキルアップ', NULL),
-(3, 2, '技術書籍セット C', 8, 2000, 'プログラミングとIT技術', '新刊優先'),
-(4, 2, 'デザイン書籍セット D', 12, 1800, 'グラフィックデザインとUI/UX', NULL),
-(5, 3, '料理本セット E', 15, 1000, '和食とイタリアン料理', 'カフェ用'),
-(6, 3, 'インテリア書籍セット F', 7, 2200, '店舗デザインと空間演出', '参考資料として'),
-(7, 4, '園芸書籍セット G', 20, 800, '花卉栽培と庭園デザイン', NULL),
-(8, 4, 'フラワーアレンジメント本 H', 10, 1500, '季節の花材と技法', '基礎から応用まで'),
-(9, 5, 'ヘルス&ビューティー本 I', 6, 1600, '健康管理と美容法', NULL),
-(10, 5, 'ライフスタイル本 J', 9, 1400, '暮らしを豊かにするヒント', 'お客様向け'),
-(11, 6, 'アート書籍セット K', 4, 3000, '現代アートと美術史', '高級版希望'),
-(12, 6, '写真集セット L', 8, 2500, '風景とポートレート', NULL),
-(13, 7, 'ビジネス雑誌セット M', 25, 600, '最新の業界動向', '定期購読開始'),
-(14, 7, 'トレンド情報誌 N', 12, 800, 'ファッションとライフスタイル', NULL),
-(15, 8, '建築・住宅雑誌 O', 18, 900, '最新の住宅トレンド', 'バックナンバー含む'),
-(16, 8, 'インテリア雑誌 P', 22, 700, '家具とデコレーション', '季節号重視');
+(1, 1, 'ビジネス書籍セット A', 10, 1500.00, '経営戦略とマーケティングの基礎', '急ぎでお願いします'),
+(2, 1, '自己啓発本セット B', 5, 1200.00, '個人成長とスキルアップ', NULL),
+(3, 2, '技術書籍セット C', 8, 2000.00, 'プログラミングとIT技術', '新刊優先'),
+(4, 2, 'デザイン書籍セット D', 12, 1800.00, 'グラフィックデザインとUI/UX', NULL),
+(5, 3, '料理本セット E', 15, 1000.00, '和食とイタリアン料理', 'カフェ用');
 
--- --------------------------------------------------------
+INSERT INTO `delivery_items` (`delivery_item_no`, `delivery_no`, `order_item_no`, `delivery_volume`, `amount`, `tax`) VALUES
+(1, 1, 1, 10, 15000.00, 1500.00),
+(2, 1, 2, 5, 6000.00, 600.00),
+(3, 2, 3, 8, 16000.00, 1600.00),
+(4, 2, 4, 12, 21600.00, 2160.00),
+(5, 3, 5, 15, 15000.00, 1500.00);
 
---
--- テーブルの構造 `statistics_information`
---
+INSERT INTO `statistics_information` (`statistics_information_no`, `customer_no`, `sales_by_customer`, `lead_time`, `delivery_amount`, `last_order_date`) VALUES
+(1, 10001, 254684.00, 2.50, 68, '2025-01-15'),
+(2, 10002, 364871.00, 1.25, 25, '2025-06-18'),
+(3, 10003, 364765.00, 3.75, 61, '2025-06-23'),
+(4, 10004, 597415.00, 2.10, 125, '2025-06-18'),
+(5, 10005, 579542.00, 4.20, 62, '2025-06-18'),
+(6, 20001, 574610.00, 3.80, 97, '2025-02-10'),
+(7, 20002, 574945.00, 2.90, 98, '2025-03-22'),
+(8, 30001, 125666.00, 1.80, 10, '2025-01-08'),
+(9, 30002, 135462.00, 2.30, 10, '2025-04-15'),
+(10, 30003, 750000.00, 5.50, 15, '2025-05-20');
 
-CREATE TABLE `statistics_information` (
-  `statistics_information_no` int(11) NOT NULL,
-  `customer_no` int(11) NOT NULL,
-  `sales_by_customer` int(11) NOT NULL,
-  `lead_time` float NOT NULL,
-  `delivery_amount` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+-- AUTO_INCREMENT の設定
+ALTER TABLE `deliveries` AUTO_INCREMENT = 6;
+ALTER TABLE `delivery_items` AUTO_INCREMENT = 6;
+ALTER TABLE `orders` AUTO_INCREMENT = 6;
+ALTER TABLE `order_items` AUTO_INCREMENT = 6;
+ALTER TABLE `statistics_information` AUTO_INCREMENT = 11;
 
---
--- テーブルのデータのダンプ `statistics_information`
---
+-- パフォーマンス向上のための追加インデックス
+CREATE INDEX `idx_customers_store_registration` ON `customers` (`store_name`, `registration_date`);
+CREATE INDEX `idx_customers_name_store` ON `customers` (`customer_name`, `store_name`);
+CREATE INDEX `idx_orders_customer_date` ON `orders` (`customer_no`, `registration_date`);
+CREATE INDEX `idx_statistics_sales_delivery` ON `statistics_information` (`sales_by_customer`, `delivery_amount`);
 
-INSERT INTO `statistics_information` (`statistics_information_no`, `customer_no`, `sales_by_customer`, `lead_time`, `delivery_amount`) VALUES
-(1, 30001, 125666, 86461, 10),
-(2, 30002, 135462, 65555, 10),
-(3, 30003, 750000, 988888, 15),
-(4, 30004, 85000, 1000560, 20),
-(5, 30005, 900000, 52000, 5),
-(6, 30006, 860000, 10584, 42),
-(7, 30007, 510000, 351000, 69),
-(8, 30008, 690000, 96520, 8),
-(9, 30009, 360000, 84520, 4),
-(10, 30010, 740000, 6952050, 63),
-(11, 30011, 820000, 8452620, 47),
-(12, 30012, 690000, 5144200, 90),
-(13, 30013, 410000, 4258730, 27),
-(14, 30014, 620000, 12269700, 30),
-(15, 30015, 150000, 146655000, 80),
-(16, 30016, 855000, 47455400, 43),
-(17, 30017, 412000, 4756600000, 12),
-(18, 10001, 254684, 27715681145, 68),
-(19, 10002, 3648715, 5678514, 25),
-(20, 10003, 364765, 6971574, 61),
-(21, 10004, 597415466, 587546, 125),
-(22, 10005, 57954264, 87458755, 62),
-(23, 10006, 57489515, 51575995, 36),
-(24, 10007, 2147564, 257719, 214),
-(25, 10008, 4927, 871818, 83),
-(26, 10009, 7603, 87291, 21),
-(27, 10010, 1589, 918745, 47),
-(28, 10011, 6032, 974516, 05),
-(29, 10012, 9871, 7841265, 62),
-(30, 10013, 3048, 684574, 79),
-(31, 10014, 2185, 639487, 90),
-(32, 10015, 6410, 369716, 34),
-(33, 10016, 7306, 394574, 12),
-(34, 10017, 8592, 325181, 68),
-(35, 20001, 57461, 458769, 97),
-(36, 20002, 5749456, 784519, 98);
+-- ビューの作成（よく使用されるクエリの最適化）
+CREATE OR REPLACE VIEW `customer_summary` AS
+SELECT 
+    c.customer_no,
+    c.customer_name,
+    c.store_name,
+    c.address,
+    c.telephone_number,
+    c.registration_date,
+    COALESCE(s.sales_by_customer, 0) as total_sales,
+    COALESCE(s.delivery_amount, 0) as delivery_count,
+    COALESCE(s.lead_time, 0) as avg_lead_time,
+    s.last_order_date,
+    c.created_at,
+    c.updated_at
+FROM customers c
+LEFT JOIN statistics_information s ON c.customer_no = s.customer_no;
 
---
--- ダンプしたテーブルのインデックス
---
+-- セキュリティ向上のためのトリガー（ログ記録用）
+DELIMITER $$
 
---
--- テーブルのインデックス `customers`
---
-ALTER TABLE `customers`
-  ADD PRIMARY KEY (`customer_no`);
+CREATE TRIGGER `customers_update_log` 
+AFTER UPDATE ON `customers`
+FOR EACH ROW
+BEGIN
+    INSERT INTO `audit_log` (`table_name`, `operation`, `record_id`, `old_values`, `new_values`, `user`, `timestamp`)
+    VALUES (
+        'customers', 
+        'UPDATE', 
+        NEW.customer_no,
+        CONCAT('name:', OLD.customer_name, ',store:', OLD.store_name),
+        CONCAT('name:', NEW.customer_name, ',store:', NEW.store_name),
+        USER(),
+        NOW()
+    );
+END$$
 
---
--- テーブルのインデックス `deliveries`
---
-ALTER TABLE `deliveries`
-  ADD PRIMARY KEY (`delivery_no`);
+DELIMITER ;
 
---
--- テーブルのインデックス `delivery_items`
---
-ALTER TABLE `delivery_items`
-  ADD PRIMARY KEY (`delivery_item_no`),
-  ADD KEY `delivery_no` (`delivery_no`),
-  ADD KEY `order_item_no` (`order_item_no`);
-
---
--- テーブルのインデックス `orders`
---
-ALTER TABLE `orders`
-  ADD PRIMARY KEY (`order_no`),
-  ADD KEY `customer_no` (`customer_no`);
-
---
--- テーブルのインデックス `order_items`
---
-ALTER TABLE `order_items`
-  ADD PRIMARY KEY (`order_item_no`),
-  ADD KEY `order_no` (`order_no`);
-
---
--- テーブルのインデックス `statistics_information`
---
-ALTER TABLE `statistics_information`
-  ADD PRIMARY KEY (`statistics_information_no`),
-  ADD KEY `customer_no` (`customer_no`);
-
---
--- ダンプしたテーブルの AUTO_INCREMENT
---
-
---
--- テーブルの AUTO_INCREMENT `deliveries`
---
-ALTER TABLE `deliveries`
-  MODIFY `delivery_no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- テーブルの AUTO_INCREMENT `delivery_items`
---
-ALTER TABLE `delivery_items`
-  MODIFY `delivery_item_no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
-
---
--- テーブルの AUTO_INCREMENT `orders`
---
-ALTER TABLE `orders`
-  MODIFY `order_no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- テーブルの AUTO_INCREMENT `order_items`
---
-ALTER TABLE `order_items`
-  MODIFY `order_item_no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
-
---
--- テーブルの AUTO_INCREMENT `statistics_information`
---
-ALTER TABLE `statistics_information`
-  MODIFY `statistics_information_no` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
-
---
--- ダンプしたテーブルの制約
---
-
---
--- テーブルの制約 `delivery_items`
---
-ALTER TABLE `delivery_items`
-  ADD CONSTRAINT `delivery_items_ibfk_1` FOREIGN KEY (`delivery_no`) REFERENCES `deliveries` (`delivery_no`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `delivery_items_ibfk_2` FOREIGN KEY (`order_item_no`) REFERENCES `order_items` (`order_item_no`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- テーブルの制約 `orders`
---
-ALTER TABLE `orders`
-  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`customer_no`) REFERENCES `customers` (`customer_no`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- テーブルの制約 `order_items`
---
-ALTER TABLE `order_items`
-  ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_no`) REFERENCES `orders` (`order_no`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- テーブルの制約 `statistics_information`
---
-ALTER TABLE `statistics_information`
-  ADD CONSTRAINT `statistics_information_ibfk_1` FOREIGN KEY (`customer_no`) REFERENCES `customers` (`customer_no`) ON DELETE CASCADE ON UPDATE CASCADE;
+-- 監査ログテーブル（セキュリティ向上）
+CREATE TABLE IF NOT EXISTS `audit_log` (
+  `log_id` int(11) NOT NULL AUTO_INCREMENT,
+  `table_name` varchar(64) NOT NULL,
+  `operation` enum('INSERT','UPDATE','DELETE') NOT NULL,
+  `record_id` int(11) NOT NULL,
+  `old_values` text DEFAULT NULL,
+  `new_values` text DEFAULT NULL,
+  `user` varchar(255) NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`log_id`),
+  KEY `idx_table_operation` (`table_name`, `operation`),
+  KEY `idx_timestamp` (`timestamp`),
+  KEY `idx_record_id` (`record_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 COMMIT;
 

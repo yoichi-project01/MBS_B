@@ -42,6 +42,25 @@ body.with-header {
     min-height: calc(100vh - var(--header-height));
 }
 
+/* 統計情報ページ専用のbodyスタイル */
+body.with-header.statistics-page {
+    height: 100vh;
+    overflow: hidden;
+}
+
+body.with-header.statistics-page .container {
+    height: calc(100vh - var(--header-height));
+    max-height: calc(100vh - var(--header-height));
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 40px 20px 15px 20px;
+    min-height: auto;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
 /* ========== セキュリティ関連のCSS ========== */
 /* XSS対策のためのコンテンツセキュリティ強化 */
 img,
@@ -56,6 +75,11 @@ embed {
 .user-content {
     word-wrap: break-word;
     overflow-wrap: break-word;
+}
+
+/* セキュリティ強化：外部スクリプトブロック */
+script[src]:not([src*="cdnjs.cloudflare.com"]):not([src*="cdn.jsdelivr.net"]) {
+    display: none !important;
 }
 
 /* ========== アクセシビリティ改善 ========== */
@@ -651,6 +675,13 @@ body.with-header .back-button-top {
     justify-content: center;
     gap: 16px;
     letter-spacing: 1px;
+    flex-shrink: 0;
+}
+
+.page-title::before {
+    content: '📊';
+    font-size: 32px;
+    color: var(--accent-green);
 }
 
 .page-title i {
@@ -919,40 +950,87 @@ body.with-header .back-button-top {
     color: #38a169;
 }
 
+/* エラーコンテナ（統計ページ等で使用） */
+.error-container {
+    text-align: center;
+    padding: 50px;
+    color: #dc3545;
+    background: #fff;
+    border-radius: 8px;
+    margin: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: 2px solid #dc3545;
+}
+
+.error-container h2 {
+    margin-bottom: 20px;
+    color: #dc3545;
+}
+
+.error-container a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.error-container a:hover {
+    text-decoration: underline;
+}
+
 /* ========== 統計情報ページ専用スタイル ========== */
-.search-container {
-    max-width: 600px;
-    margin: 0 auto 40px auto;
-    padding: 0 20px;
+
+/* 統計ページタイトル専用スタイル */
+.statistics-page .page-title {
+    font-size: clamp(28px, 6vw, 36px);
+    font-weight: 800;
+    color: var(--main-green);
+    margin-bottom: 30px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    letter-spacing: 1px;
+    flex-shrink: 0;
 }
 
-.search-form {
-    width: 100%;
+.statistics-page .page-title::before {
+    content: '📊';
+    font-size: 32px;
+    color: var(--accent-green);
 }
 
-.search-input-container {
+/* コントロールパネル */
+.enhanced-controls {
+    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
+    padding: 15px;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(47, 93, 63, 0.15);
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+    border: 2px solid rgba(126, 217, 87, 0.2);
+}
+
+/* 検索フォームコンテナ */
+.search-form-container {
     display: flex;
     gap: 12px;
     align-items: center;
-    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
-    border-radius: var(--radius);
-    padding: 8px;
-    box-shadow: var(--shadow);
-    border: 2px solid transparent;
-    transition: all var(--transition);
-}
-
-.search-input-container:focus-within {
-    border-color: var(--accent-green);
-    box-shadow: var(--shadow-hover);
+    justify-content: center;
+    width: 100%;
 }
 
 .search-input {
+    padding: 10px 14px !important;
+    font-size: 14px !important;
     flex: 1;
-    padding: 12px 16px;
-    border: none;
+    max-width: 300px;
+    border: 2px solid rgba(126, 217, 87, 0.3);
     border-radius: 8px;
-    font-size: 16px;
     font-family: var(--font-family);
     background: transparent;
     color: var(--font-color);
@@ -961,8 +1039,9 @@ body.with-header .back-button-top {
 }
 
 .search-input:focus {
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 3px rgba(126, 217, 87, 0.1);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(47, 93, 63, 0.2);
 }
 
 .search-input::placeholder {
@@ -970,12 +1049,13 @@ body.with-header .back-button-top {
 }
 
 .search-button {
-    padding: 12px 20px;
+    padding: 10px 16px;
+    font-size: 14px;
+    white-space: nowrap;
     background: linear-gradient(135deg, var(--main-green) 0%, var(--sub-green) 100%);
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 14px;
     font-weight: 600;
     font-family: var(--font-family);
     cursor: pointer;
@@ -983,7 +1063,6 @@ body.with-header .back-button-top {
     display: flex;
     align-items: center;
     gap: 6px;
-    white-space: nowrap;
 }
 
 .search-button:hover {
@@ -996,73 +1075,149 @@ body.with-header .back-button-top {
     outline-offset: 2px;
 }
 
+/* 統計コンテナ */
 .statistics-container {
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-.no-data-message {
-    text-align: center;
-    padding: 60px 20px;
-    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    border: 2px dashed var(--sub-green);
-}
-
-.no-data-message i {
-    font-size: 48px;
-    margin-bottom: 16px;
-    display: block;
-}
-
-.no-data-message p {
-    font-size: 18px;
-    color: var(--main-green);
-    margin-bottom: 8px;
-    font-weight: 600;
-}
-
-.sub-message {
-    font-size: 14px !important;
-    color: var(--sub-green) !important;
-    font-weight: 400 !important;
-}
-
-.table-wrapper {
-    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
-    margin-bottom: 24px;
+    min-height: 0;
 }
 
-.statistics-table {
+/* テーブルコンテナ */
+.enhanced-table-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin-bottom: 15px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(47, 93, 63, 0.15);
+    border: 2px solid rgba(126, 217, 87, 0.2);
+}
+
+/* テーブルスタイル */
+.enhanced-statistics-table {
     width: 100%;
     border-collapse: collapse;
     font-family: var(--font-family);
 }
 
-.statistics-table thead {
+.enhanced-statistics-table thead {
+    flex-shrink: 0;
     background: linear-gradient(135deg, var(--main-green) 0%, var(--sub-green) 100%);
 }
 
-.statistics-table th {
-    padding: 16px 12px;
+.enhanced-statistics-table tbody {
+    display: block;
+    overflow-y: auto;
+    flex: 1;
+    width: 100%;
+}
+
+.enhanced-statistics-table thead tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.enhanced-statistics-table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+/* 列幅の固定設定 */
+.enhanced-statistics-table th:nth-child(1),
+.enhanced-statistics-table td:nth-child(1) {
+    width: 25%;
+}
+
+.enhanced-statistics-table th:nth-child(2),
+.enhanced-statistics-table td:nth-child(2) {
+    width: 20%;
+}
+
+.enhanced-statistics-table th:nth-child(3),
+.enhanced-statistics-table td:nth-child(3) {
+    width: 25%;
+}
+
+.enhanced-statistics-table th:nth-child(4),
+.enhanced-statistics-table td:nth-child(4) {
+    width: 15%;
+}
+
+.enhanced-statistics-table th:nth-child(5),
+.enhanced-statistics-table td:nth-child(5) {
+    width: 15%;
+}
+
+.enhanced-statistics-table th {
+    padding: 18px 15px;
     text-align: left;
     color: white;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 14px;
     position: relative;
 }
 
-.statistics-table th span {
-    display: block;
-    margin-bottom: 4px;
+.enhanced-statistics-table td {
+    padding: 16px 15px;
+    border-bottom: 1px solid rgba(47, 93, 63, 0.1);
+    color: var(--font-color);
+    transition: background-color 0.2s ease;
+    vertical-align: middle;
+    text-align: left;
 }
 
+/* 売上列は右寄せ */
+.enhanced-statistics-table td:nth-child(2) {
+    text-align: right;
+}
+
+/* 配達回数とグラフボタンは中央寄せ */
+.enhanced-statistics-table td:nth-child(4),
+.enhanced-statistics-table td:nth-child(5) {
+    text-align: center;
+}
+
+/* テーブル行のスタイル */
+.enhanced-table-row {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.enhanced-table-row::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    background: linear-gradient(90deg, var(--accent-green), transparent);
+    transition: width 0.3s ease;
+    z-index: 1;
+}
+
+.enhanced-table-row:hover::before {
+    width: 4px;
+}
+
+.enhanced-table-row:hover {
+    background: rgba(126, 217, 87, 0.08);
+}
+
+.enhanced-table-row:nth-child(even) {
+    background-color: rgba(248, 250, 249, 0.5);
+}
+
+.enhanced-table-row:nth-child(even):hover {
+    background: rgba(126, 217, 87, 0.08);
+}
+
+/* ソートボタン */
 .sort-buttons {
     display: flex;
     gap: 4px;
@@ -1104,33 +1259,7 @@ body.with-header .back-button-top {
     box-shadow: 0 2px 4px rgba(126, 217, 87, 0.3);
 }
 
-.statistics-table td {
-    padding: 16px 12px;
-    border-bottom: 1px solid rgba(47, 93, 63, 0.1);
-    color: var(--font-color);
-    transition: background-color 0.2s ease;
-}
-
-.table-row:hover {
-    background: rgba(126, 217, 87, 0.05);
-}
-
-.customer-name-col {
-    width: 30%;
-}
-
-.sales-col {
-    width: 23%;
-}
-
-.lead-time-col {
-    width: 27%;
-}
-
-.delivery-col {
-    width: 20%;
-}
-
+/* データ表示のスタイル */
 .amount-value {
     font-weight: 700;
     color: var(--main-green);
@@ -1164,22 +1293,121 @@ body.with-header .back-button-top {
     font-size: 14px;
 }
 
-.pagination-nav {
-    margin-top: 32px;
+/* グラフボタン */
+.graph-btn {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+    position: relative;
+    overflow: hidden;
 }
 
+.graph-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.6s ease;
+}
+
+.graph-btn:hover::before {
+    left: 100%;
+}
+
+.graph-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+    background: linear-gradient(135deg, #45a049, #4CAF50);
+}
+
+.graph-btn:focus-visible {
+    outline: 2px solid var(--accent-green);
+    outline-offset: 2px;
+}
+
+/* データなしメッセージ */
+.enhanced-no-data {
+    text-align: center;
+    padding: 80px 20px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(47, 93, 63, 0.15);
+    border: 2px dashed var(--sub-green);
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.enhanced-no-data::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(126, 217, 87, 0.1), transparent);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 100%;
+    }
+}
+
+.enhanced-no-data .icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    display: block;
+    filter: grayscale(0.3);
+}
+
+.enhanced-no-data p {
+    font-size: 18px;
+    color: var(--main-green);
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.enhanced-no-data .sub-message {
+    font-size: 14px !important;
+    color: var(--sub-green) !important;
+    font-weight: 400 !important;
+}
+
+/* ページネーション */
 .pagination-container {
+    padding: 10px 15px;
+    flex-shrink: 0;
+    position: static;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 16px;
     background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
-    padding: 16px 24px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    position: sticky;
-    bottom: 20px;
-    z-index: 10;
 }
 
 .pagination-btn {
@@ -1234,179 +1462,6 @@ body.with-header .back-button-top {
     font-size: 16px;
 }
 
-/* ========== 統計情報ページ 拡張スタイル ========== */
-
-/* 拡張コントロールパネル */
-.enhanced-controls {
-    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
-    padding: 25px;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(47, 93, 63, 0.15);
-    margin-bottom: 30px;
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    align-items: center;
-    border: 2px solid rgba(126, 217, 87, 0.2);
-}
-
-/* 拡張テーブルコンテナ */
-.enhanced-table-container {
-    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(47, 93, 63, 0.15);
-    overflow: hidden;
-    margin-bottom: 24px;
-    border: 2px solid rgba(126, 217, 87, 0.2);
-}
-
-.enhanced-statistics-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: var(--font-family);
-}
-
-.enhanced-statistics-table thead {
-    background: linear-gradient(135deg, var(--main-green) 0%, var(--sub-green) 100%);
-}
-
-.enhanced-statistics-table th {
-    padding: 18px 15px;
-    text-align: left;
-    color: white;
-    font-weight: 700;
-    font-size: 14px;
-    position: relative;
-}
-
-.enhanced-statistics-table td {
-    padding: 16px 15px;
-    border-bottom: 1px solid rgba(47, 93, 63, 0.1);
-    color: var(--font-color);
-    transition: background-color 0.2s ease;
-}
-
-.enhanced-table-row {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-}
-
-.enhanced-table-row::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 0;
-    background: linear-gradient(90deg, var(--accent-green), transparent);
-    transition: width 0.3s ease;
-    z-index: 1;
-}
-
-.enhanced-table-row:hover::before {
-    width: 4px;
-}
-
-.enhanced-table-row:hover {
-    background: rgba(126, 217, 87, 0.08);
-}
-
-.enhanced-table-row:nth-child(even) {
-    background-color: rgba(248, 250, 249, 0.5);
-}
-
-.enhanced-table-row:nth-child(even):hover {
-    background: rgba(126, 217, 87, 0.08);
-}
-
-/* グラフボタン */
-.graph-btn {
-    background: linear-gradient(135deg, #4CAF50, #45a049);
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
-    position: relative;
-    overflow: hidden;
-}
-
-.graph-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    transition: left 0.6s ease;
-}
-
-.graph-btn:hover::before {
-    left: 100%;
-}
-
-.graph-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
-    background: linear-gradient(135deg, #45a049, #4CAF50);
-}
-
-.graph-btn:focus-visible {
-    outline: 2px solid var(--accent-green);
-    outline-offset: 2px;
-}
-
-/* サンプルデータボタン */
-.sample-data-btn {
-    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-    position: relative;
-    overflow: hidden;
-}
-
-.sample-data-btn::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: all 0.6s ease;
-}
-
-.sample-data-btn:hover::after {
-    width: 300px;
-    height: 300px;
-}
-
-.sample-data-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
-    background: linear-gradient(135deg, #ee5a52, #ff6b6b);
-}
-
 /* モーダルスタイル */
 .modal {
     display: none;
@@ -1437,8 +1492,10 @@ body.with-header .back-button-top {
     margin: 3% auto;
     padding: 30px;
     border-radius: 16px;
-    width: 90%;
-    max-width: 900px;
+    width: 80%;
+    max-width: 700px;
+    max-height: 80vh;
+    overflow-y: auto;
     position: relative;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1508,12 +1565,12 @@ body.with-header .back-button-top {
 }
 
 .chart-container {
+    height: 300px;
+    padding: 15px;
     margin: 20px 0;
-    height: 400px;
     position: relative;
     background: rgba(248, 250, 249, 0.5);
     border-radius: 12px;
-    padding: 20px;
     border: 1px solid rgba(126, 217, 87, 0.2);
 }
 
@@ -1529,57 +1586,198 @@ body.with-header .back-button-top {
     pointer-events: none;
 }
 
-/* データなしメッセージの改良 */
-.enhanced-no-data {
-    text-align: center;
-    padding: 80px 20px;
-    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(47, 93, 63, 0.15);
-    border: 2px dashed var(--sub-green);
-    position: relative;
-    overflow: hidden;
+/* スクロールバーのカスタマイズ */
+.enhanced-statistics-table tbody::-webkit-scrollbar {
+    width: 8px;
 }
 
-.enhanced-no-data::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
+.enhanced-statistics-table tbody::-webkit-scrollbar-track {
+    background: rgba(47, 93, 63, 0.1);
+    border-radius: 4px;
+}
+
+.enhanced-statistics-table tbody::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, var(--main-green), var(--sub-green));
+    border-radius: 4px;
+}
+
+.enhanced-statistics-table tbody::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, var(--sub-green), var(--accent-green));
+}
+
+/* Firefox用スクロールバー */
+.enhanced-statistics-table tbody {
+    scrollbar-width: thin;
+    scrollbar-color: var(--main-green) rgba(47, 93, 63, 0.1);
+}
+
+/* ========== 通常の統計情報ページスタイル（既存との互換性） ========== */
+.search-container {
+    max-width: 600px;
+    margin: 0 auto 40px auto;
+    padding: 0 20px;
+}
+
+.search-form {
     width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(126, 217, 87, 0.1), transparent);
-    animation: shimmer 3s infinite;
 }
 
-@keyframes shimmer {
-    0% {
-        left: -100%;
-    }
-
-    100% {
-        left: 100%;
-    }
+.search-input-container {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
+    border-radius: var(--radius);
+    padding: 8px;
+    box-shadow: var(--shadow);
+    border: 2px solid transparent;
+    transition: all var(--transition);
 }
 
-.enhanced-no-data .icon {
-    font-size: 64px;
-    margin-bottom: 20px;
+.search-input-container:focus-within {
+    border-color: var(--accent-green);
+    box-shadow: var(--shadow-hover);
+}
+
+.statistics-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.no-data-message {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 2px dashed var(--sub-green);
+}
+
+.no-data-message i {
+    font-size: 48px;
+    margin-bottom: 16px;
     display: block;
-    filter: grayscale(0.3);
 }
 
-.enhanced-no-data p {
+.no-data-message p {
     font-size: 18px;
     color: var(--main-green);
     margin-bottom: 8px;
     font-weight: 600;
 }
 
-.enhanced-no-data .sub-message {
+.sub-message {
     font-size: 14px !important;
     color: var(--sub-green) !important;
     font-weight: 400 !important;
+}
+
+.table-wrapper {
+    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.statistics-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-family);
+}
+
+.statistics-table thead {
+    background: linear-gradient(135deg, var(--main-green) 0%, var(--sub-green) 100%);
+}
+
+.statistics-table th {
+    padding: 16px 12px;
+    text-align: left;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    position: relative;
+}
+
+.statistics-table th span {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.statistics-table td {
+    padding: 16px 12px;
+    border-bottom: 1px solid rgba(47, 93, 63, 0.1);
+    color: var(--font-color);
+    transition: background-color 0.2s ease;
+}
+
+.table-row:hover {
+    background: rgba(126, 217, 87, 0.05);
+}
+
+.customer-name-col {
+    width: 30%;
+}
+
+.sales-col {
+    width: 23%;
+}
+
+.lead-time-col {
+    width: 27%;
+}
+
+.delivery-col {
+    width: 20%;
+}
+
+.pagination-nav {
+    margin-top: 32px;
+}
+
+/* サンプルデータボタン */
+.sample-data-btn {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.sample-data-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.6s ease;
+}
+
+.sample-data-btn:hover::after {
+    width: 300px;
+    height: 300px;
+}
+
+.sample-data-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+    background: linear-gradient(135deg, #ee5a52, #ff6b6b);
 }
 
 /* ========== 動的アニメーション ========== */
@@ -1801,37 +1999,78 @@ body.with-header .back-button-top {
     }
 
     /* 統計情報ページ */
+    body.with-header.statistics-page .container {
+        padding: 20px 16px 10px 16px;
+    }
+
+    .statistics-page .page-title {
+        font-size: 24px;
+        margin-bottom: 20px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
     .enhanced-controls {
         flex-direction: column;
         align-items: stretch;
-        padding: 20px;
-    }
-
-    .enhanced-controls select,
-    .enhanced-controls input[type="text"],
-    .enhanced-controls button {
-        width: 100%;
+        padding: 10px;
         margin-bottom: 10px;
     }
 
-    .enhanced-statistics-table {
-        font-size: 14px;
+    .search-form-container {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .search-input {
+        max-width: none !important;
     }
 
     .enhanced-statistics-table th,
     .enhanced-statistics-table td {
-        padding: 12px 8px;
+        padding: 8px 6px;
+        font-size: 13px;
+    }
+
+    /* モバイルでも列幅を保持 */
+    .enhanced-statistics-table th:nth-child(1),
+    .enhanced-statistics-table td:nth-child(1) {
+        width: 30%;
+    }
+
+    .enhanced-statistics-table th:nth-child(2),
+    .enhanced-statistics-table td:nth-child(2) {
+        width: 25%;
+    }
+
+    .enhanced-statistics-table th:nth-child(3),
+    .enhanced-statistics-table td:nth-child(3) {
+        width: 25%;
+    }
+
+    .enhanced-statistics-table th:nth-child(4),
+    .enhanced-statistics-table td:nth-child(4) {
+        width: 10%;
+    }
+
+    .enhanced-statistics-table th:nth-child(5),
+    .enhanced-statistics-table td:nth-child(5) {
+        width: 10%;
+    }
+
+    .graph-btn {
+        padding: 4px 8px;
+        font-size: 11px;
     }
 
     .modal-content {
         width: 95%;
-        margin: 5% auto;
-        padding: 20px;
+        max-height: 90vh;
     }
 
     .chart-container {
-        height: 300px;
-        padding: 15px;
+        height: 250px;
+        padding: 10px;
     }
 
     .search-input-container {
@@ -1884,11 +2123,6 @@ body.with-header .back-button-top {
         padding: 2px 4px;
         min-width: 16px;
         height: 16px;
-    }
-
-    .graph-btn {
-        padding: 6px 12px;
-        font-size: 12px;
     }
 
     .count-value {
@@ -1985,12 +2219,19 @@ body.with-header .back-button-top {
         padding-top: calc(var(--header-height) + 32px);
     }
 
-    /* モバイル対応でのアクティブ状態 */
-    .nav-item.active {
-        background: rgba(126, 217, 87, 0.3);
-        border-left: 4px solid var(--accent-green);
-        border-bottom: none;
-        transform: translateX(8px);
+    /* 統計ページ */
+    body.with-header.statistics-page .container {
+        padding: 16px 12px 10px 12px;
+    }
+
+    .statistics-page .page-title {
+        font-size: 18px;
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .enhanced-controls {
+        padding: 8px;
     }
 
     .statistics-container {
@@ -2026,6 +2267,32 @@ body.with-header .back-button-top {
     .chart-container {
         padding: 15px;
         height: 250px;
+    }
+
+    /* 極小画面でも列の整列を保持 */
+    .enhanced-statistics-table th:nth-child(1),
+    .enhanced-statistics-table td:nth-child(1) {
+        width: 25%;
+    }
+
+    .enhanced-statistics-table th:nth-child(2),
+    .enhanced-statistics-table td:nth-child(2) {
+        width: 22%;
+    }
+
+    .enhanced-statistics-table th:nth-child(3),
+    .enhanced-statistics-table td:nth-child(3) {
+        width: 25%;
+    }
+
+    .enhanced-statistics-table th:nth-child(4),
+    .enhanced-statistics-table td:nth-child(4) {
+        width: 13%;
+    }
+
+    .enhanced-statistics-table th:nth-child(5),
+    .enhanced-statistics-table td:nth-child(5) {
+        width: 15%;
     }
 
     /* メインページのストアタイトル */
