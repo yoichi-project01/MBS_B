@@ -1,5 +1,5 @@
 // ========== 統合されたJavaScriptファイル ==========
-// MBS_B システム用統合JavaScript（統計情報機能を含む）
+// MBS_B システム用統合JavaScript（統計情報機能、ヘッダー管理機能を含む）
 
 (function() {
     'use strict';
@@ -8,6 +8,17 @@
     let currentChart = null;
     let sampleDataGenerated = false;
     let customerData = [];
+
+    // ページ設定（PHP側と同期）
+    const PAGE_CONFIG = {
+        '/customer_information/': { name: '顧客情報', icon: '👥' },
+        '/statistics/': { name: '統計情報', icon: '📊' },
+        '/order_list/': { name: '注文書', icon: '📋' },
+        '/delivery_list/': { name: '納品書', icon: '🚚' },
+        // ファイル名ベース
+        'index.php': { name: '顧客情報CSVアップロード', icon: '👥' },
+        'upload.php': { name: '顧客情報CSVアップロード', icon: '👥' }
+    };
 
     // ========== ユーティリティ関数 ==========
     function debounce(func, wait) {
@@ -73,6 +84,176 @@
             });
         } else {
             alert(title + ': ' + message);
+        }
+    }
+
+    // ========== ヘッダー管理機能 ==========
+
+    /**
+     * 現在のページ情報を取得
+     */
+    function getCurrentPageInfo() {
+        const currentPath = window.location.pathname;
+        const currentFile = currentPath.split('/').pop();
+        
+        // ディレクトリベースでの判定（優先）
+        for (const [path, config] of Object.entries(PAGE_CONFIG)) {
+            if (path.startsWith('/') && currentPath.includes(path)) {
+                return config;
+            }
+        }
+        
+        // ファイル名ベースでの判定
+        if (PAGE_CONFIG[currentFile]) {
+            return PAGE_CONFIG[currentFile];
+        }
+        
+        // デフォルト
+        return { name: '受注管理', icon: '📋' };
+    }
+
+    /**
+     * ヘッダータイトルを更新
+     */
+    function updateHeaderTitle(customPageInfo = null) {
+        const titleElement = document.querySelector('.site-header .store-title .page-text');
+        const iconElement = document.querySelector('.site-header .store-title .page-icon');
+        
+        if (!titleElement || !iconElement) return;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const storeName = urlParams.get('store') || 
+                         document.documentElement.getAttribute('data-store-name') || '';
+        
+        const pageInfo = customPageInfo || getCurrentPageInfo();
+        
+        // アイコンを更新
+        iconElement.textContent = pageInfo.icon;
+        
+        // タイトルを更新
+        if (storeName) {
+            titleElement.textContent = `${storeName} - ${pageInfo.name}`;
+            document.title = `${pageInfo.name} - ${storeName} - 受注管理システム`;
+        } else {
+            titleElement.textContent = pageInfo.name;
+            document.title = `${pageInfo.name} - 受注管理システム`;
+        }
+
+        // アクティブなナビゲーションアイテムを更新
+        updateActiveNavItem();
+        
+        // カスタムイベントを発火
+        window.dispatchEvent(new CustomEvent('headerTitleUpdated', {
+            detail: { pageInfo, storeName }
+        }));
+    }
+
+    /**
+     * アクティブなナビゲーションアイテムを更新
+     */
+    function updateActiveNavItem() {
+        const currentPath = window.location.pathname;
+        
+        // 全てのナビアイテムからactiveクラスを削除
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+
+        // 現在のページに対応するナビアイテムにactiveクラスを追加
+        const navMappings = {
+            '/customer_information/': 0,
+            '/statistics/': 1,
+            '/order_list/': 2,
+            '/delivery_list/': 3
+        };
+
+        for (const [path, index] of Object.entries(navMappings)) {
+            if (currentPath.includes(path)) {
+                const navItems = document.querySelectorAll('.nav-item');
+                if (navItems[index]) {
+                    navItems[index].classList.add('active');
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * ページ遷移時のアニメーション効果
+     */
+    function addPageTransitionEffect() {
+        const titleElement = document.querySelector('.site-header .store-title');
+        if (!titleElement) return;
+
+        titleElement.style.opacity = '0';
+        titleElement.style.transform = 'translateY(-10px)';
+        
+        requestAnimationFrame(() => {
+            titleElement.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+            titleElement.style.opacity = '1';
+            titleElement.style.transform = 'translateY(0)';
+        });
+    }
+
+    /**
+     * 店舗名を動的に設定
+     */
+    function setStoreName(storeName) {
+        if (!storeName) return;
+        
+        // URLパラメータを更新（履歴は変更しない）
+        const url = new URL(window.location);
+        url.searchParams.set('store', storeName);
+        window.history.replaceState({}, '', url);
+        
+        // データ属性を更新
+        document.documentElement.setAttribute('data-store-name', storeName);
+        
+        // ヘッダータイトルを更新
+        updateHeaderTitle();
+    }
+
+    /**
+     * カスタムページ情報を設定
+     */
+    function setCustomPageInfo(name, icon) {
+        const customPageInfo = { name, icon };
+        updateHeaderTitle(customPageInfo);
+    }
+
+    /**
+     * ブレッドクラム風の表示を追加（オプション）
+     */
+    function createBreadcrumb() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const storeName = urlParams.get('store');
+        
+        if (!storeName) return;
+
+        const breadcrumbContainer = document.createElement('div');
+        breadcrumbContainer.className = 'breadcrumb-nav';
+        breadcrumbContainer.innerHTML = `
+            <span class="breadcrumb-item">
+                <a href="/MBS_B/menu.php?store=${encodeURIComponent(storeName)}" class="breadcrumb-link">
+                    🏠 ${storeName}
+                </a>
+            </span>
+            <span class="breadcrumb-separator">›</span>
+            <span class="breadcrumb-current"></span>
+        `;
+
+        // 現在のページ名を設定
+        const currentPageSpan = breadcrumbContainer.querySelector('.breadcrumb-current');
+        const pageInfo = getCurrentPageInfo();
+        
+        if (currentPageSpan) {
+            currentPageSpan.textContent = `${pageInfo.icon} ${pageInfo.name}`;
+        }
+
+        // ヘッダーの下に挿入
+        const header = document.querySelector('.site-header');
+        if (header && !document.querySelector('.breadcrumb-nav')) {
+            header.parentNode.insertBefore(breadcrumbContainer, header.nextSibling);
         }
     }
 
@@ -156,138 +337,6 @@
             menuToggle.setAttribute('aria-expanded', 'false');
             menuToggle.setAttribute('aria-label', 'メニューを開く');
             document.body.style.overflow = '';
-        }
-    }
-
-    // ========== ヘッダーのページタイトル管理機能 ==========
-    
-    /**
-     * 現在のページに基づいてヘッダータイトルを更新
-     */
-    function updateHeaderTitle() {
-        const pageConfig = {
-            '/customer_information/': { name: '顧客情報', icon: '👥' },
-            '/statistics/': { name: '統計情報', icon: '📊' },
-            '/order_list/': { name: '注文書', icon: '📋' },
-            '/delivery_list/': { name: '納品書', icon: '🚚' }
-        };
-
-        const currentPath = window.location.pathname;
-        const urlParams = new URLSearchParams(window.location.search);
-        const storeName = urlParams.get('store');
-
-        let pageInfo = null;
-        
-        // 現在のパスからページ情報を取得
-        for (const [path, info] of Object.entries(pageConfig)) {
-            if (currentPath.includes(path)) {
-                pageInfo = info;
-                break;
-            }
-        }
-
-        // ヘッダータイトル要素を取得
-        const titleElement = document.querySelector('.site-header .store-title .page-text');
-        const iconElement = document.querySelector('.site-header .store-title .page-icon');
-
-        if (titleElement && iconElement && pageInfo) {
-            // アイコンを更新
-            iconElement.textContent = pageInfo.icon;
-            
-            // タイトルを更新
-            if (storeName) {
-                titleElement.textContent = `${storeName} - ${pageInfo.name}`;
-                // ページタイトルも更新
-                document.title = `${pageInfo.name} - ${storeName} 受注管理システム`;
-            } else {
-                titleElement.textContent = pageInfo.name;
-                document.title = `${pageInfo.name} - 受注管理システム`;
-            }
-
-            // アクティブなナビゲーションアイテムを設定
-            updateActiveNavItem(currentPath);
-        }
-    }
-
-    /**
-     * アクティブなナビゲーションアイテムを更新
-     */
-    function updateActiveNavItem(currentPath) {
-        // 全てのナビアイテムからactiveクラスを削除
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.classList.remove('active');
-        });
-
-        // 現在のページに対応するナビアイテムにactiveクラスを追加
-        const navMappings = {
-            '/customer_information/': 0,
-            '/statistics/': 1,
-            '/order_list/': 2,
-            '/delivery_list/': 3
-        };
-
-        for (const [path, index] of Object.entries(navMappings)) {
-            if (currentPath.includes(path)) {
-                const navItems = document.querySelectorAll('.nav-item');
-                if (navItems[index]) {
-                    navItems[index].classList.add('active');
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * ページ遷移時のアニメーション効果
-     */
-    function addPageTransitionEffect() {
-        const titleElement = document.querySelector('.site-header .store-title');
-        if (titleElement) {
-            titleElement.style.opacity = '0';
-            titleElement.style.transform = 'translateY(-10px)';
-            
-            setTimeout(() => {
-                titleElement.style.transition = 'all 0.4s ease';
-                titleElement.style.opacity = '1';
-                titleElement.style.transform = 'translateY(0)';
-            }, 100);
-        }
-    }
-
-    /**
-     * ブレッドクラム風の表示を追加（オプション）
-     */
-    function createBreadcrumb() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const storeName = urlParams.get('store');
-        
-        if (!storeName) return;
-
-        const breadcrumbContainer = document.createElement('div');
-        breadcrumbContainer.className = 'breadcrumb-nav';
-        breadcrumbContainer.innerHTML = `
-            <span class="breadcrumb-item">
-                <a href="/MBS_B/menu.php?store=${encodeURIComponent(storeName)}" class="breadcrumb-link">
-                    🏠 ${storeName}
-                </a>
-            </span>
-            <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-current"></span>
-        `;
-
-        // 現在のページ名を設定
-        const currentPageSpan = breadcrumbContainer.querySelector('.breadcrumb-current');
-        const pageIcon = document.querySelector('.site-header .page-icon')?.textContent || '';
-        const pageText = document.querySelector('.site-header .page-text')?.textContent?.split(' - ').pop() || '';
-        
-        if (currentPageSpan) {
-            currentPageSpan.textContent = `${pageIcon} ${pageText}`;
-        }
-
-        // ヘッダーの下に挿入
-        const header = document.querySelector('.site-header');
-        if (header && !document.querySelector('.breadcrumb-nav')) {
-            header.parentNode.insertBefore(breadcrumbContainer, header.nextSibling);
         }
     }
 
@@ -801,17 +850,22 @@
      * 検索入力の処理
      */
     function handleSearchInput(event) {
-        const searchTerm = event.target.value.toLowerCase();
-        const rows = document.querySelectorAll('.enhanced-table-row, .table-row');
+        const searchTerm = event.target.value.toLowerCase().trim();
+        const tbody = document.getElementById('customerTableBody') || 
+                     document.querySelector('.enhanced-statistics-table tbody') ||
+                     document.querySelector('.statistics-table tbody');
 
+        if (!tbody) return;
+
+        const rows = tbody.querySelectorAll('.enhanced-table-row, .table-row, tr');
         let visibleCount = 0;
 
         rows.forEach(function(row) {
-            const customerNameEl = row.querySelector('[data-column="customer_name"]');
-            if (!customerNameEl) return;
+            const customerNameCell = row.querySelector('[data-column="customer_name"]');
+            if (!customerNameCell) return;
 
-            const customerName = customerNameEl.textContent.toLowerCase();
-            const isVisible = customerName.includes(searchTerm);
+            const customerName = customerNameCell.textContent.toLowerCase();
+            const isVisible = searchTerm === '' || customerName.includes(searchTerm);
 
             if (isVisible) {
                 row.style.display = '';
@@ -822,168 +876,239 @@
         });
 
         // 検索結果の通知
-        if (searchTerm) {
-            announceToScreenReader(`${visibleCount}件の顧客が見つかりました`);
-        }
+        const message = searchTerm ? `${visibleCount}件の顧客が見つかりました` : '全ての顧客を表示しています';
+        announceToScreenReader(message);
     }
 
     /**
-     * サンプルデータ生成
+     * グラフ描画機能
      */
-    function generateSampleData() {
-        if (sampleDataGenerated) {
-            showInfoMessage('サンプルデータについて', 'サンプルデータは既に生成されています。リアルなデータとして売上推移グラフをご確認ください。');
-            return;
-        }
-
-        showSuccessMessage(
-            'サンプルデータ生成完了',
-            `<p>サンプルデータを生成しました！</p>
-             <p>各顧客の「📊 グラフ」ボタンをクリックして、過去6ヶ月の売上推移をご確認ください。</p>
-             <br>
-             <small style="color: #666;">※ 実際のデータではなく、デモンストレーション用のサンプルデータです。</small>`
-        );
-
-        sampleDataGenerated = true;
-    }
-
-    /**
-     * 売上グラフの表示
-     */
-    function showSalesGraph(customerNo, customerName) {
-        const salesHistory = generateSalesHistory(customerNo);
-
-        document.getElementById('modalTitle').textContent = `${customerName} - 売上推移グラフ（過去6ヶ月）`;
-        createChart(salesHistory);
-        
+    function openModal(graphType) {
         const modal = document.getElementById('graphModal');
-        if (modal) {
-            modal.style.display = 'block';
-            
-            // フォーカス管理
-            setTimeout(function() {
-                const closeButton = modal.querySelector('.close');
-                if (closeButton) {
-                    closeButton.focus();
-                }
-            }, 100);
-        }
+        const modalTitle = document.getElementById('modalTitle');
+        const modalCanvas = document.getElementById('modalCanvas');
 
-        // アクセシビリティ通知
-        announceToScreenReader(`${customerName}の売上推移グラフを表示しました`);
-    }
+        if (!modal || !modalTitle || !modalCanvas) return;
 
-    /**
-     * 売上履歴データの生成（実際のデータに基づいてより現実的に）
-     */
-    function generateSalesHistory(customerNo) {
-        const months = ['7月', '8月', '9月', '10月', '11月', '12月'];
-        const history = [];
+        const graphTitles = {
+            'sales': '顧客別売上グラフ',
+            'delivery': '顧客別配達回数グラフ',
+            'leadtime': '顧客別リードタイムグラフ'
+        };
 
-        // 顧客番号に基づいてシード値を設定（一貫性のあるデータ生成）
-        const seed = customerNo || 1;
-        
-        months.forEach(function(month, index) {
-            // より現実的な売上データを生成
-            const baseAmount = 100000 + (seed * 1000);
-            const seasonalFactor = 1 + Math.sin((index / 12) * Math.PI * 2) * 0.3;
-            const randomFactor = 0.7 + (Math.sin(seed + index) + 1) * 0.3;
-            
-            const sales = Math.floor(baseAmount * seasonalFactor * randomFactor);
-            
-            history.push({
-                month: month,
-                sales: Math.max(sales, 50000) // 最低売上を保証
-            });
-        });
+        modalTitle.textContent = graphTitles[graphType] || 'グラフ';
+        modal.style.display = 'block';
+        modal.setAttribute('aria-hidden', 'false');
 
-        return history;
-    }
+        // モーダルにフォーカスを移動
+        modal.focus();
 
-    /**
-     * Chart.jsを使用したグラフ作成
-     */
-    function createChart(salesHistory) {
-        const ctx = document.getElementById('salesChart');
-        if (!ctx) return;
-
-        const context = ctx.getContext('2d');
-
-        // 既存のチャートがあれば破棄
+        // 現在のチャートを破棄
         if (currentChart) {
             currentChart.destroy();
+            currentChart = null;
         }
 
-        const labels = salesHistory.map(item => item.month);
-        const data = salesHistory.map(item => item.sales);
+        // キャンバスのコンテキストを取得
+        const ctx = modalCanvas.getContext('2d');
 
-        // Chart.jsが利用可能かチェック
-        if (typeof Chart === 'undefined') {
-            console.warn('Chart.js が読み込まれていません');
-            return;
+        // データの準備
+        let data, config;
+        
+        switch(graphType) {
+            case 'sales':
+                data = prepareSalesData();
+                config = createSalesChartConfig(data);
+                break;
+            case 'delivery':
+                data = prepareDeliveryData();
+                config = createDeliveryChartConfig(data);
+                break;
+            case 'leadtime':
+                data = prepareLeadTimeData();
+                config = createLeadTimeChartConfig(data);
+                break;
+            default:
+                console.error('Unknown graph type:', graphType);
+                return;
         }
 
-        currentChart = new Chart(context, {
-            type: 'line',
+        // Chart.jsでグラフを描画
+        if (typeof Chart !== 'undefined') {
+            currentChart = new Chart(ctx, config);
+        } else {
+            // Chart.jsが利用できない場合の代替処理
+            modalCanvas.style.display = 'none';
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'chart-error';
+            errorMessage.innerHTML = `
+                <p>グラフライブラリが読み込まれていません。</p>
+                <p>Chart.jsが必要です。</p>
+            `;
+            modalCanvas.parentNode.appendChild(errorMessage);
+        }
+    }
+
+    /**
+     * モーダルを閉じる
+     */
+    function closeModal() {
+        const modal = document.getElementById('graphModal');
+        if (modal) {
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+
+            // チャートを破棄
+            if (currentChart) {
+                currentChart.destroy();
+                currentChart = null;
+            }
+
+            // エラーメッセージを削除
+            const errorMessage = modal.querySelector('.chart-error');
+            if (errorMessage) {
+                errorMessage.remove();
+            }
+
+            // キャンバスを再表示
+            const modalCanvas = document.getElementById('modalCanvas');
+            if (modalCanvas) {
+                modalCanvas.style.display = 'block';
+            }
+        }
+    }
+
+    // グローバルに公開（HTML側から呼び出すため）
+    window.openModal = openModal;
+    window.closeModal = closeModal;
+
+    /**
+     * 売上データの準備
+     */
+    function prepareSalesData() {
+        if (customerData.length === 0) {
+            generateSampleData();
+        }
+
+        const sortedData = customerData
+            .filter(function(customer) {
+                return customer.sales_by_customer > 0;
+            })
+            .sort(function(a, b) {
+                return b.sales_by_customer - a.sales_by_customer;
+            })
+            .slice(0, 10); // 上位10件
+
+        return {
+            labels: sortedData.map(function(customer) {
+                return customer.customer_name;
+            }),
+            values: sortedData.map(function(customer) {
+                return customer.sales_by_customer;
+            })
+        };
+    }
+
+    /**
+     * 配達回数データの準備
+     */
+    function prepareDeliveryData() {
+        if (customerData.length === 0) {
+            generateSampleData();
+        }
+
+        const sortedData = customerData
+            .filter(function(customer) {
+                return customer.delivery_amount > 0;
+            })
+            .sort(function(a, b) {
+                return b.delivery_amount - a.delivery_amount;
+            })
+            .slice(0, 10); // 上位10件
+
+        return {
+            labels: sortedData.map(function(customer) {
+                return customer.customer_name;
+            }),
+            values: sortedData.map(function(customer) {
+                return customer.delivery_amount;
+            })
+        };
+    }
+
+    /**
+     * リードタイムデータの準備
+     */
+    function prepareLeadTimeData() {
+        if (customerData.length === 0) {
+            generateSampleData();
+        }
+
+        // リードタイムを秒数に変換してソート
+        const dataWithSeconds = customerData.map(function(customer) {
+            return {
+                ...customer,
+                lead_time_seconds: parseLeadTimeToSeconds(customer.lead_time)
+            };
+        });
+
+        const sortedData = dataWithSeconds
+            .filter(function(customer) {
+                return customer.lead_time_seconds > 0;
+            })
+            .sort(function(a, b) {
+                return b.lead_time_seconds - a.lead_time_seconds;
+            })
+            .slice(0, 10); // 上位10件
+
+        return {
+            labels: sortedData.map(function(customer) {
+                return customer.customer_name;
+            }),
+            values: sortedData.map(function(customer) {
+                return customer.lead_time_seconds / 3600; // 時間単位に変換
+            }),
+            originalValues: sortedData.map(function(customer) {
+                return customer.lead_time;
+            })
+        };
+    }
+
+    /**
+     * 売上チャート設定
+     */
+    function createSalesChartConfig(data) {
+        return {
+            type: 'bar',
             data: {
-                labels: labels,
+                labels: data.labels,
                 datasets: [{
                     label: '売上（円）',
-                    data: data,
-                    borderColor: '#2f5d3f',
-                    backgroundColor: 'rgba(47, 93, 63, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#2f5d3f',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 6,
-                    pointHoverRadius: 8,
-                    pointHoverBackgroundColor: '#7ed957',
-                    pointHoverBorderColor: '#fff',
-                    pointHoverBorderWidth: 3
+                    data: data.values,
+                    backgroundColor: 'rgba(47, 93, 63, 0.8)',
+                    borderColor: 'rgba(47, 93, 63, 1)',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
+                    title: {
                         display: true,
-                        position: 'top',
-                        labels: {
-                            font: {
-                                size: 14,
-                                family: "'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', sans-serif",
-                                weight: '600'
-                            },
-                            color: '#2f5d3f',
-                            usePointStyle: true,
-                            pointStyle: 'circle'
-                        }
+                        text: '顧客別売上ランキング（上位10位）',
+                        font: { size: 16, weight: 'bold' },
+                        color: '#2f5d3f'
+                    },
+                    legend: {
+                        display: false
                     },
                     tooltip: {
-                        backgroundColor: 'rgba(47, 93, 63, 0.95)',
-                        titleColor: '#fff',
-                        bodyColor: '#fff',
-                        borderColor: '#7ed957',
-                        borderWidth: 2,
-                        cornerRadius: 8,
-                        displayColors: false,
-                        titleFont: {
-                            size: 14,
-                            weight: '600'
-                        },
-                        bodyFont: {
-                            size: 13
-                        },
                         callbacks: {
-                            title: function(context) {
-                                return context[0].label + 'の売上';
-                            },
                             label: function(context) {
-                                return '¥' + context.parsed.y.toLocaleString();
+                                return '売上: ¥' + context.parsed.y.toLocaleString();
                             }
                         }
                     }
@@ -994,628 +1119,422 @@
                         ticks: {
                             callback: function(value) {
                                 return '¥' + value.toLocaleString();
-                            },
-                            font: {
-                                size: 12,
-                                family: "'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', sans-serif"
-                            },
-                            color: '#4b7a5c'
-                        },
-                        grid: {
-                            color: 'rgba(75, 122, 92, 0.1)',
-                            drawBorder: false
+                            }
                         },
                         title: {
                             display: true,
-                            text: '売上金額（円）',
-                            color: '#2f5d3f',
-                            font: {
-                                size: 14,
-                                weight: '600'
+                            text: '売上（円）'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: '顧客名'
+                        },
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    /**
+     * 配達回数チャート設定
+     */
+    function createDeliveryChartConfig(data) {
+        return {
+            type: 'doughnut',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: '配達回数',
+                    data: data.values,
+                    backgroundColor: [
+                        'rgba(47, 93, 63, 0.8)',
+                        'rgba(126, 217, 87, 0.8)',
+                        'rgba(76, 175, 80, 0.8)',
+                        'rgba(139, 195, 74, 0.8)',
+                        'rgba(156, 204, 101, 0.8)',
+                        'rgba(174, 213, 129, 0.8)',
+                        'rgba(191, 223, 156, 0.8)',
+                        'rgba(209, 233, 184, 0.8)',
+                        'rgba(226, 242, 211, 0.8)',
+                        'rgba(244, 252, 239, 0.8)'
+                    ],
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '顧客別配達回数（上位10位）',
+                        font: { size: 16, weight: 'bold' },
+                        color: '#2f5d3f'
+                    },
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce(function(a, b) { return a + b; }, 0);
+                                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                return context.label + ': ' + context.parsed + '回 (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    /**
+     * リードタイムチャート設定
+     */
+    function createLeadTimeChartConfig(data) {
+        return {
+            type: 'line',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: 'リードタイム（時間）',
+                    data: data.values,
+                    borderColor: 'rgba(47, 93, 63, 1)',
+                    backgroundColor: 'rgba(47, 93, 63, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: 'rgba(47, 93, 63, 1)',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '顧客別リードタイム（上位10位）',
+                        font: { size: 16, weight: 'bold' },
+                        color: '#2f5d3f'
+                    },
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const index = context.dataIndex;
+                                return data.originalValues[index];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'リードタイム（時間）'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value.toFixed(1) + 'h';
                             }
                         }
                     },
                     x: {
-                        ticks: {
-                            font: {
-                                size: 12,
-                                family: "'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', sans-serif"
-                            },
-                            color: '#4b7a5c'
-                        },
-                        grid: {
-                            color: 'rgba(75, 122, 92, 0.1)',
-                            drawBorder: false
-                        },
                         title: {
                             display: true,
-                            text: '月',
-                            color: '#2f5d3f',
-                            font: {
-                                size: 14,
-                                weight: '600'
-                            }
-                        }
-                    }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index'
-                },
-                animation: {
-                    duration: 1000,
-                    easing: 'easeInOutQuart'
-                }
-            }
-        });
-    }
-
-    /**
-     * モーダルを閉じる
-     */
-    function closeModal() {
-        const modal = document.getElementById('graphModal');
-        if (modal) {
-            modal.style.display = 'none';
-        }
-
-        if (currentChart) {
-            currentChart.destroy();
-            currentChart = null;
-        }
-
-        // フォーカスを元の場所に戻す
-        announceToScreenReader('グラフを閉じました');
-    }
-
-    /**
-     * テーブルデータのエクスポート機能（CSV）
-     */
-    function exportTableToCSV() {
-        const table = document.querySelector('.enhanced-statistics-table, .statistics-table');
-        if (!table) return;
-
-        const rows = Array.from(table.querySelectorAll('tr'));
-        const csvContent = rows.map(row => {
-            const cells = Array.from(row.querySelectorAll('th, td'));
-            return cells.map(cell => {
-                const text = cell.textContent.trim();
-                // CSVエスケープ処理
-                if (text.includes(',') || text.includes('"') || text.includes('\n')) {
-                    return '"' + text.replace(/"/g, '""') + '"';
-                }
-                return text;
-            }).join(',');
-        }).join('\n');
-
-        // BOMを追加してExcelで正しく開けるようにする
-        const BOM = '\uFEFF';
-        const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
-
-        // ダウンロード実行
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', '統計情報_' + new Date().toISOString().slice(0, 10) + '.csv');
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        showSuccessMessage('エクスポート完了', 'CSVファイルのダウンロードが開始されました。');
-    }
-
-    /**
-     * キーボードナビゲーションの改善
-     */
-    function enhanceKeyboardNavigation() {
-        // テーブル内のキーボードナビゲーション
-        const tables = document.querySelectorAll('.enhanced-statistics-table, .statistics-table');
-        tables.forEach(function(table) {
-            table.addEventListener('keydown', function(event) {
-                const focusedElement = document.activeElement;
-                
-                if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-                    event.preventDefault();
-                    
-                    const currentRow = focusedElement.closest('tr');
-                    if (currentRow) {
-                        const nextRow = event.key === 'ArrowDown' 
-                            ? currentRow.nextElementSibling 
-                            : currentRow.previousElementSibling;
-                        
-                        if (nextRow) {
-                            const focusableElement = nextRow.querySelector('button, a, [tabindex]');
-                            if (focusableElement) {
-                                focusableElement.focus();
-                            }
+                            text: '顧客名'
+                        },
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
                         }
                     }
                 }
-            });
-        });
-    }
-
-    /**
-     * ローカルストレージを使用した設定の保存
-     */
-    function saveUserPreferences() {
-        try {
-            const preferences = {
-                lastSortColumn: null,
-                lastSortOrder: null,
-                lastSearchTerm: ''
-            };
-
-            // ソート状態の保存
-            const activeSort = document.querySelector('.sort-btn.active');
-            if (activeSort) {
-                preferences.lastSortColumn = activeSort.getAttribute('data-column');
-                preferences.lastSortOrder = activeSort.getAttribute('data-order');
             }
-
-            // 検索状態の保存
-            const searchInput = document.querySelector('input[name="search"]');
-            if (searchInput) {
-                preferences.lastSearchTerm = searchInput.value;
-            }
-
-            localStorage.setItem('statistics-preferences', JSON.stringify(preferences));
-        } catch (e) {
-            // ローカルストレージが利用できない場合は何もしない
-            console.info('ローカルストレージが利用できません');
-        }
-    }
-
-    /**
-     * 保存された設定の読み込み
-     */
-    function loadUserPreferences() {
-        try {
-            const saved = localStorage.getItem('statistics-preferences');
-            if (saved) {
-                const preferences = JSON.parse(saved);
-                
-                // ソート状態の復元
-                if (preferences.lastSortColumn && preferences.lastSortOrder) {
-                    const sortButton = document.querySelector(
-                        `.sort-btn[data-column="${preferences.lastSortColumn}"][data-order="${preferences.lastSortOrder}"]`
-                    );
-                    if (sortButton) {
-                        setTimeout(function() {
-                            sortButton.click();
-                        }, 100);
-                    }
-                }
-
-                // 検索状態の復元
-                if (preferences.lastSearchTerm) {
-                    const searchInput = document.querySelector('input[name="search"]');
-                    if (searchInput && !searchInput.value) {
-                        searchInput.value = preferences.lastSearchTerm;
-                        handleSearchInput({ target: searchInput });
-                    }
-                }
-            }
-        } catch (e) {
-            console.info('保存された設定の読み込みに失敗しました');
-        }
-    }
-
-    /**
-     * ページ離脱時の処理
-     */
-    function handlePageUnload() {
-        saveUserPreferences();
-        
-        if (currentChart) {
-            currentChart.destroy();
-        }
-    }
-
-    // ========== フォーカス管理 ==========
-    function setupFocusManagement() {
-        const focusableElements = document.querySelectorAll(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        
-        focusableElements.forEach(function(element) {
-            element.addEventListener('focus', function() {
-                this.style.outline = '2px solid var(--accent-green)';
-                this.style.outlineOffset = '2px';
-            });
-            
-            element.addEventListener('blur', function() {
-                this.style.outline = '';
-                this.style.outlineOffset = '';
-            });
-        });
-    }
-
-    // ========== 店舗情報の初期化 ==========
-    function initializeStoreSelection() {
-        // URLパラメータから店舗情報を取得
-        const params = new URLSearchParams(window.location.search);
-        const store = params.get('store');
-
-        // URLにstoreパラメータがあればセッション変数に保存
-        if (store) {
-            selectedStoreData = store;
-        }
-
-        // セッション変数またはCookieから取得してタイトルを変更
-        let storedStore = selectedStoreData;
-        
-        // Cookieからも取得を試行
-        if (!storedStore) {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                const parts = cookie.split('=');
-                if (parts[0] === 'selectedStore' && parts[1]) {
-                    try {
-                        storedStore = decodeURIComponent(parts[1]);
-                        selectedStoreData = storedStore;
-                        break;
-                    } catch (e) {
-                        console.warn('Cookie decode error:', e);
-                    }
-                }
-            }
-        }
-        
-        if (storedStore) {
-            const titleElement = document.querySelector('.store-title');
-            if (titleElement) {
-                titleElement.innerHTML = sanitizeInput(storedStore) + '<br>受注管理システム';
-            }
-            
-            // ページタイトルも更新
-            document.title = sanitizeInput(storedStore) + ' - 受注管理システム';
-        }
-
-        // メニューボタンの設定
-        const menuButtons = document.querySelectorAll('.menu-button');
-        if (menuButtons.length && storedStore) {
-            menuButtons.forEach(function(button) {
-                const path = button.dataset.path;
-                if (path) {
-                    button.addEventListener('click', function() {
-                        showLoadingAnimation();
-                        setTimeout(function() {
-                            window.location.href = path + '?store=' + encodeURIComponent(storedStore);
-                        }, 500);
-                    });
-                }
-            });
-        }
-    }
-
-    // ========== アニメーション用のIntersection Observer ==========
-    function initializeObservers() {
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
         };
-
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry) {
-                if (entry.isIntersecting) {
-                    entry.target.style.animation = 'fadeInUp 0.6s ease-out forwards';
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
-
-        // 要素が後から追加される場合のために、MutationObserverでも監視
-        const mutationObserver = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                mutation.addedNodes.forEach(function(node) {
-                    if (node.nodeType === 1 && node.classList && node.classList.contains('menu-button')) {
-                        observer.observe(node);
-                    }
-                });
-            });
-        });
-
-        // 監視開始
-        mutationObserver.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
     }
 
-    // ========== スタイル動的追加 ==========
-    function addDynamicStyles() {
-        const style = document.createElement('style');
-        style.textContent = `
-            /* ローディングアニメーション */
-            .loading-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(47, 93, 63, 0.9);
-                backdrop-filter: blur(8px);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 9999;
-                animation: fadeIn 0.3s ease-out;
-            }
-            
-            .loading-spinner {
-                text-align: center;
-                color: white;
-            }
-            
-            .spinner {
-                width: 50px;
-                height: 50px;
-                border: 4px solid rgba(126, 217, 87, 0.3);
-                border-top: 4px solid #7ed957;
-                border-radius: 50%;
-                animation: spin 1s linear infinite;
-                margin: 0 auto 20px;
-            }
-            
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-            
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-            }
+    /**
+     * サンプルデータの生成（デモ用）
+     */
+    function generateSampleData() {
+        if (sampleDataGenerated) return;
 
-            @keyframes fadeInUp {
-                from {
-                    opacity: 0;
-                    transform: translateY(30px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
+        const sampleCustomers = [
+            '大阪商事株式会社', 'スーパーマーケット田中', '食品卸売り鈴木',
+            '飲食店チェーン佐藤', 'コンビニエンスストア高橋', '百貨店伊藤',
+            'レストラン山田', 'カフェ渡辺', 'ファミリーレストラン中村',
+            '居酒屋小林', '弁当屋加藤', 'パン屋吉田', '肉屋山本', '魚屋松本',
+            '八百屋井上', 'ケーキ屋木村', 'アイスクリーム店林', '和菓子店清水',
+            'ピザ店森', 'ラーメン店池田'
+        ];
 
-            /* リップル効果 */
-            @keyframes ripple {
-                to {
-                    transform: scale(2);
-                    opacity: 0;
-                }
-            }
-
-            /* ファイル要件表示 */
-            .file-requirements {
-                margin-top: 8px;
-                color: var(--sub-green);
-                font-size: 12px;
-                line-height: 1.4;
-            }
-
-            /* パルス効果 */
-            .pulse-effect {
-                animation: pulse 2s ease-in-out;
-            }
-
-            @keyframes pulse {
-                0%, 100% { transform: scale(1); }
-                50% { transform: scale(1.05); }
-            }
-
-            /* アクセシビリティ改善 */
-            .sr-only {
-                position: absolute;
-                width: 1px;
-                height: 1px;
-                padding: 0;
-                margin: -1px;
-                overflow: hidden;
-                clip: rect(0, 0, 0, 0);
-                white-space: nowrap;
-                border: 0;
-            }
-
-            /* フォーカス表示の改善 */
-            *:focus-visible {
-                outline: 2px solid var(--accent-green);
-                outline-offset: 2px;
-            }
-
-            .menu-button:focus-visible,
-            .upload-button:focus-visible {
-                outline: 3px solid var(--accent-green);
-                outline-offset: 3px;
-            }
-
-            /* エラートースト */
-            .error-toast {
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background: #ff6b6b;
-                color: white;
-                padding: 12px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                z-index: 10000;
-                animation: slideInUp 0.3s ease-out;
-            }
-
-            @keyframes slideInUp {
-                from {
-                    opacity: 0;
-                    transform: translateY(20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    // ========== エラーハンドリング ==========
-    function initializeErrorHandling() {
-        window.addEventListener('error', function(e) {
-            console.error('JavaScript Error:', e.error);
-            
-            // ユーザーに優しいエラーメッセージを表示
-            const errorToast = document.createElement('div');
-            errorToast.className = 'error-toast';
-            errorToast.textContent = 'エラーが発生しました。ページを再読み込みしてください。';
-            errorToast.setAttribute('role', 'alert');
-            errorToast.setAttribute('aria-live', 'assertive');
-            
-            document.body.appendChild(errorToast);
-            
-            setTimeout(function() {
-                if (errorToast.parentNode) {
-                    errorToast.remove();
-                }
-            }, 5000);
+        customerData = sampleCustomers.map(function(name, index) {
+            return {
+                customer_no: index + 1,
+                customer_name: name,
+                sales_by_customer: Math.floor(Math.random() * 2000000) + 100000,
+                lead_time: generateRandomLeadTime(),
+                delivery_amount: Math.floor(Math.random() * 50) + 1
+            };
         });
 
-        // Promise rejection handling
-        window.addEventListener('unhandledrejection', function(e) {
-            console.error('Unhandled Promise Rejection:', e.reason);
-            e.preventDefault(); // Prevent default browser behavior
-        });
+        sampleDataGenerated = true;
     }
 
-    // ========== パフォーマンス監視 ==========
-    function initializePerformanceMonitoring() {
-        window.addEventListener('load', function() {
-            // ページ読み込み時間を測定
-            if (window.performance && window.performance.now) {
-                const loadTime = performance.now();
-                if (loadTime > 3000) {
-                    console.warn('ページの読み込みが遅い可能性があります:', loadTime + 'ms');
-                }
+    /**
+     * ランダムなリードタイムの生成
+     */
+    function generateRandomLeadTime() {
+        const types = [
+            function() { return Math.floor(Math.random() * 10) + 1 + '日'; },
+            function() { return Math.floor(Math.random() * 23) + 1 + '時間'; },
+            function() { return Math.floor(Math.random() * 59) + 1 + '分'; },
+            function() { 
+                const days = Math.floor(Math.random() * 3) + 1;
+                const hours = Math.floor(Math.random() * 23) + 1;
+                return days + '日' + hours + '時間';
             }
-        });
+        ];
+
+        const randomType = types[Math.floor(Math.random() * types.length)];
+        return randomType();
     }
 
-    // ========== ヘッダー機能の初期化 ==========
-    function initializeHeaderFeatures() {
+    // ========== ヘッダー管理機能の初期化 ==========
+
+    /**
+     * ヘッダー管理機能の初期化
+     */
+    function initializeHeaderManager() {
+        // 初期タイトル設定
         updateHeaderTitle();
         addPageTransitionEffect();
-        // createBreadcrumb(); // 必要に応じてコメントアウト解除
-    }
-
-    // ========== 初期化処理 ==========
-    function initializeApp() {
-        // 動的スタイルの追加
-        addDynamicStyles();
         
-        // 各種機能の初期化
-        initializeMenu();
-        initializeScrollEffects();
-        initializeStoreSelection();
-        enhanceMenuButtons();
-        setupFocusManagement();
-        initializeCustomerUpload();
-        initializeObservers();
-        initializeErrorHandling();
-        initializePerformanceMonitoring();
+        // popstate イベント（ブラウザの戻る/進むボタン）に対応
+        window.addEventListener('popstate', function() {
+            setTimeout(() => {
+                updateHeaderTitle();
+                addPageTransitionEffect();
+            }, 50);
+        });
 
-        // ヘッダー機能の初期化
-        initializeHeaderFeatures();
-
-        // 統計情報ページの機能を初期化（該当要素がある場合のみ）
-        if (document.querySelector('.sort-btn') || document.querySelector('#graphModal')) {
-            initializeStatisticsPage();
-            enhanceKeyboardNavigation();
-            loadUserPreferences();
-            
-            // ページ離脱時の処理
-            window.addEventListener('beforeunload', handlePageUnload);
+        // ページ読み込み完了後の処理
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', updateHeaderTitle);
         }
-        
-        // ページ読み込み完了のアニメーション
-        document.body.style.opacity = '0';
-        setTimeout(function() {
-            document.body.style.transition = 'opacity 0.5s ease-in-out';
-            document.body.style.opacity = '1';
-        }, 100);
+
+        // ブレッドクラムの作成（オプション）
+        createBreadcrumb();
     }
 
-    // ========== DOMContentLoaded後の初期化 ==========
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeApp);
-    } else {
-        // Already loaded
-        initializeApp();
-    }
-
-    // popstate イベント（ブラウザの戻る/進むボタン）に対応
-    window.addEventListener('popstate', function() {
-        setTimeout(initializeHeaderFeatures, 50);
-    });
-
-    // ========== 公開API（後方互換性のため） ==========
-    window.MBS = {
-        selectedStore: selectedStore,
-        showErrorMessage: showErrorMessage,
-        showSuccessMessage: showSuccessMessage,
-        showInfoMessage: showInfoMessage,
-        showLoadingAnimation: showLoadingAnimation,
-        toggleMenu: toggleMenu,
-        closeMenu: closeMenu
-    };
-
-    // ========== ヘッダー管理用グローバルAPI ==========
+    // ========== 公開API（HeaderManager） ==========
     window.HeaderManager = {
         updateTitle: updateHeaderTitle,
         updateActiveNav: updateActiveNavItem,
         addTransitionEffect: addPageTransitionEffect,
-        createBreadcrumb: createBreadcrumb
-    };
-
-    // ========== 統計情報ページ用のグローバル関数 ==========
-    window.sortTable = handleSort;
-    window.showSalesGraph = showSalesGraph;
-    window.closeModal = closeModal;
-    window.generateSampleData = generateSampleData;
-    window.exportTableToCSV = exportTableToCSV;
-
-    /**
-     * 統計情報ページ用公開API
-     */
-    window.StatisticsPage = {
-        // 主要機能
-        showSalesGraph: showSalesGraph,
-        generateSampleData: generateSampleData,
-        exportTableToCSV: exportTableToCSV,
-        closeModal: closeModal,
+        setStoreName: setStoreName,
+        setCustomPageInfo: setCustomPageInfo,
+        getCurrentPageInfo: getCurrentPageInfo,
         
         // ユーティリティ
-        showSuccessMessage: showSuccessMessage,
-        showErrorMessage: showErrorMessage,
-        showInfoMessage: showInfoMessage,
+        getStoreName: () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('store') || 
+                   document.documentElement.getAttribute('data-store-name') || '';
+        },
         
-        // データ管理
-        getCustomerData: function() { return customerData; },
-        getCurrentChart: function() { return currentChart; },
-        
-        // 設定管理
-        saveUserPreferences: saveUserPreferences,
-        loadUserPreferences: loadUserPreferences,
-
-        // ソート機能
-        handleSort: handleSort,
-        parseLeadTimeToSeconds: parseLeadTimeToSeconds,
-        
-        // 検索機能
-        handleSearchInput: handleSearchInput,
-
-        // アクセシビリティ
-        announceToScreenReader: announceToScreenReader
+        // イベントリスナー
+        onTitleUpdate: (callback) => {
+            window.addEventListener('headerTitleUpdated', callback);
+        }
     };
+
+    // ========== パフォーマンス最適化 ==========
+
+    /**
+     * 画像の遅延読み込み
+     */
+    function initializeLazyLoading() {
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        if (img.dataset.src) {
+                            img.src = img.dataset.src;
+                            img.classList.remove('lazy');
+                            imageObserver.unobserve(img);
+                        }
+                    }
+                });
+            });
+
+            document.querySelectorAll('img[data-src]').forEach(function(img) {
+                imageObserver.observe(img);
+            });
+        }
+    }
+
+    /**
+     * CSSアニメーションの最適化
+     */
+    function optimizeAnimations() {
+        // アニメーションの preference を確認
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.documentElement.classList.add('reduced-motion');
+        }
+
+        // パフォーマンス監視
+        if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(function() {
+                // アイドル時間に非重要なアニメーションを設定
+                document.querySelectorAll('.animate-on-idle').forEach(function(element) {
+                    element.classList.add('animate');
+                });
+            });
+        }
+    }
+
+    // ========== エラーハンドリング ==========
+
+    /**
+     * グローバルエラーハンドラー
+     */
+    function setupErrorHandling() {
+        window.addEventListener('error', function(event) {
+            console.error('JavaScript Error:', event.error);
+            
+            // ユーザーに表示するかどうかは環境に応じて判断
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                console.warn('Development mode: Error details logged to console');
+            }
+        });
+
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled Promise Rejection:', event.reason);
+            
+            // 重要なエラーの場合はユーザーに通知
+            if (event.reason && event.reason.message && event.reason.message.includes('fetch')) {
+                showErrorMessage('ネットワークエラーが発生しました。しばらく経ってから再度お試しください。');
+            }
+        });
+    }
+
+    // ========== メイン初期化関数 ==========
+
+    /**
+     * アプリケーション全体の初期化
+     */
+    function initializeApp() {
+        try {
+            // エラーハンドリングの設定
+            setupErrorHandling();
+
+            // ヘッダー管理機能の初期化
+            initializeHeaderManager();
+
+            // メニューの初期化
+            initializeMenu();
+
+            // スクロール効果の初期化
+            initializeScrollEffects();
+
+            // 顧客アップロード機能の初期化（該当ページのみ）
+            if (document.getElementById('fileUploadArea')) {
+                initializeCustomerUpload();
+            }
+
+            // 統計情報ページの初期化（該当ページのみ）
+            if (document.querySelector('.statistics-table, .enhanced-statistics-table')) {
+                initializeStatisticsPage();
+            }
+
+            // メニューボタンの効果（メニューページのみ）
+            if (document.querySelector('.menu-button')) {
+                enhanceMenuButtons();
+            }
+
+            // パフォーマンス最適化
+            initializeLazyLoading();
+            optimizeAnimations();
+
+            // 初期化完了の通知
+            console.log('MBS_B System: All modules initialized successfully');
+
+            // カスタムイベントの発火
+            window.dispatchEvent(new CustomEvent('appInitialized', {
+                detail: { timestamp: new Date().toISOString() }
+            }));
+
+        } catch (error) {
+            console.error('Initialization error:', error);
+            showErrorMessage('アプリケーションの初期化中にエラーが発生しました。ページを再読み込みしてください。');
+        }
+    }
+
+    // ========== イベントリスナーの設定 ==========
+
+    // DOM読み込み完了時の初期化
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    } else {
+        // 既に読み込み完了している場合は即座に実行
+        initializeApp();
+    }
+
+    // ページ表示時の処理（Back Forward Cache対応）
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            // キャッシュから復元された場合の処理
+            updateHeaderTitle();
+            updateActiveNavItem();
+        }
+    });
+
+    // ========== デバッグ用機能（開発環境のみ） ==========
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // 開発者向けのヘルプメッセージ
+        console.log('%cMBS_B Development Mode', 'color: #2f5d3f; font-size: 16px; font-weight: bold;');
+        console.log('Available functions:');
+        console.log('- HeaderManager.updateTitle() - ヘッダータイトルを更新');
+        console.log('- HeaderManager.setStoreName("店舗名") - 店舗名を設定');
+        console.log('- HeaderManager.setCustomPageInfo("ページ名", "🔧") - カスタムページ情報を設定');
+        console.log('- selectedStore("店舗名") - 店舗を選択');
+        console.log('- openModal("sales|delivery|leadtime") - 統計グラフモーダルを開く');
+        console.log('- closeModal() - モーダルを閉じる');
+
+        // パフォーマンス監視
+        if ('performance' in window) {
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    const perfData = performance.getEntriesByType('navigation')[0];
+                    console.log('Page load performance:', {
+                        'DOM Content Loaded': Math.round(perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart) + 'ms',
+                        'Load Complete': Math.round(perfData.loadEventEnd - perfData.loadEventStart) + 'ms',
+                        'Total Load Time': Math.round(perfData.loadEventEnd - perfData.fetchStart) + 'ms'
+                    });
+                }, 1000);
+            });
+        }
+    }
 
 })();
