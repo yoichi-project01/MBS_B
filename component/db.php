@@ -44,7 +44,6 @@ try {
 
     // セッション変数の設定（セキュリティ向上）
     $pdo->exec("SET SESSION sql_safe_updates = 1");
-    $pdo->exec("SET SESSION max_execution_time = 30000"); // 30秒でタイムアウト
 
 } catch (PDOException $e) {
     // エラーログの記録

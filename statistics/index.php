@@ -244,11 +244,6 @@ try {
 
 <body class="with-header statistics-page">
     <div class="container">
-        <!-- ページタイトル -->
-        <h1 class="page-title">
-            統計情報
-        </h1>
-
         <!-- 検索コントロール -->
         <div class="enhanced-controls">
             <form method="GET" action="" class="search-form-container">
