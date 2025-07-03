@@ -231,7 +231,6 @@ textarea:focus-visible {
 /* アクティブなナビゲーションアイテムのスタイル */
 .nav-item.active {
     background: rgba(126, 217, 87, 0.25);
-    border-bottom: 2px solid var(--accent-green);
     color: #fff;
     font-weight: 700;
 }
