@@ -11,6 +11,7 @@
     --shadow: 0 8px 40px rgba(47, 93, 63, 0.12);
     --shadow-hover: 0 16px 64px rgba(47, 93, 63, 0.20);
     --header-height: 68px;
+    --tab-height: 56px;
     color-scheme: light;
 }
 
@@ -59,6 +60,11 @@ body.with-header.statistics-page .container {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
+}
+
+/* 統計情報タブページ用スタイル */
+body.statistics-tab-page {
+    padding-top: calc(var(--header-height) + var(--tab-height));
 }
 
 /* ========== セキュリティ関連のCSS ========== */
@@ -123,6 +129,7 @@ textarea:focus-visible {
     box-shadow: 0 8px 32px rgba(47, 93, 63, 0.15);
     z-index: 1000;
     transition: all var(--transition);
+    height: var(--header-height);
 }
 
 .site-header::before {
@@ -307,6 +314,538 @@ textarea:focus-visible {
 .menu-overlay.active {
     opacity: 1;
     visibility: visible;
+}
+
+/* ========== 統計情報タブナビゲーション ========== */
+/* タブナビゲーション */
+.tab-navigation {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    width: 100%;
+    background: white;
+    border-bottom: 1px solid rgba(47, 93, 63, 0.1);
+    z-index: 999;
+    height: var(--tab-height);
+}
+
+.tab-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    height: 100%;
+}
+
+.tab-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 16px 20px;
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--sub-green);
+    cursor: pointer;
+    transition: all var(--transition);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-bottom: 3px solid transparent;
+}
+
+.tab-btn.active {
+    color: var(--main-green);
+    border-bottom-color: var(--accent-green);
+    background: linear-gradient(to bottom, rgba(126, 217, 87, 0.05), transparent);
+}
+
+.tab-btn:hover:not(.active) {
+    color: var(--main-green);
+    background: rgba(126, 217, 87, 0.03);
+}
+
+.tab-icon {
+    font-size: 16px;
+}
+
+/* メインコンテンツ（タブページ用） */
+.main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    min-height: calc(100vh - var(--header-height) - var(--tab-height));
+}
+
+/* タブコンテンツ */
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =============== ダッシュボードタブ =============== */
+.dashboard-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.metric-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(126, 217, 87, 0.1);
+    transition: all var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-green), var(--main-green));
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.metric-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.metric-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: white;
+    background: linear-gradient(135deg, var(--accent-green), var(--main-green));
+}
+
+.metric-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--sub-green);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.metric-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--main-green);
+    margin-bottom: 8px;
+}
+
+.metric-trend {
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.trend-up {
+    color: #22c55e;
+}
+
+.trend-down {
+    color: #ef4444;
+}
+
+/* =============== 顧客一覧タブ =============== */
+.customer-search {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(126, 217, 87, 0.1);
+}
+
+.search-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.search-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--main-green);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.view-toggle {
+    display: flex;
+    background: var(--light-green);
+    border-radius: 8px;
+    padding: 2px;
+}
+
+.view-btn {
+    padding: 6px 12px;
+    border: none;
+    background: transparent;
+    color: var(--sub-green);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.view-btn.active {
+    background: white;
+    color: var(--main-green);
+    box-shadow: 0 1px 4px rgba(47, 93, 63, 0.1);
+}
+
+.search-box {
+    position: relative;
+    max-width: 400px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 16px 12px 44px;
+    border: 2px solid rgba(126, 217, 87, 0.2);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: var(--font-family);
+    background: white;
+    transition: all var(--transition);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 3px rgba(126, 217, 87, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--sub-green);
+    font-size: 16px;
+}
+
+/* テーブルビュー */
+.table-view {
+    background: white;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(126, 217, 87, 0.1);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    background: linear-gradient(135deg, var(--main-green), var(--sub-green));
+    color: white;
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    position: sticky;
+    top: 0;
+}
+
+.data-table td {
+    padding: 16px;
+    border-bottom: 1px solid rgba(47, 93, 63, 0.08);
+    font-size: 14px;
+}
+
+.data-table tr:hover td {
+    background: rgba(126, 217, 87, 0.03);
+}
+
+.sort-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    margin-left: 8px;
+    opacity: 0.7;
+    transition: opacity var(--transition);
+}
+
+.sort-btn:hover {
+    opacity: 1;
+}
+
+.action-btn {
+    padding: 6px 12px;
+    background: var(--accent-green);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.action-btn:hover {
+    background: var(--main-green);
+    transform: translateY(-1px);
+}
+
+/* カードビュー */
+.card-view {
+    display: none;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+}
+
+.customer-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(126, 217, 87, 0.1);
+    transition: all var(--transition);
+}
+
+.customer-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 16px;
+}
+
+.customer-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--main-green);
+    margin-bottom: 4px;
+}
+
+.customer-id {
+    font-size: 11px;
+    color: var(--sub-green);
+    background: var(--light-green);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.card-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.card-stat {
+    text-align: center;
+    padding: 8px;
+    background: rgba(126, 217, 87, 0.05);
+    border-radius: 6px;
+}
+
+.card-stat-label {
+    font-size: 11px;
+    color: var(--sub-green);
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.card-stat-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--main-green);
+}
+
+.card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.card-btn {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.card-btn.primary {
+    background: var(--accent-green);
+    color: white;
+}
+
+.card-btn.secondary {
+    background: var(--light-green);
+    color: var(--main-green);
+}
+
+.card-btn:hover {
+    transform: translateY(-1px);
+}
+
+/* =============== グラフタブ =============== */
+.chart-selector {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(126, 217, 87, 0.1);
+}
+
+.chart-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.chart-option {
+    padding: 16px;
+    border: 2px solid rgba(126, 217, 87, 0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all var(--transition);
+    text-align: center;
+    background: white;
+}
+
+.chart-option:hover,
+.chart-option.active {
+    border-color: var(--accent-green);
+    background: rgba(126, 217, 87, 0.05);
+}
+
+.chart-option-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.chart-option-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--main-green);
+}
+
+.chart-container {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(126, 217, 87, 0.1);
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--sub-green);
+}
+
+/* =============== エクスポートタブ =============== */
+.export-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.export-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(126, 217, 87, 0.1);
+    text-align: center;
+}
+
+.export-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: var(--accent-green);
+}
+
+.export-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--main-green);
+    margin-bottom: 8px;
+}
+
+.export-description {
+    font-size: 14px;
+    color: var(--sub-green);
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.export-btn {
+    width: 100%;
+    padding: 12px 24px;
+    background: var(--accent-green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.export-btn:hover {
+    background: var(--main-green);
+    transform: translateY(-2px);
 }
 
 /* ブレッドクラムナビゲーション（オプション機能） */
@@ -1983,6 +2522,73 @@ body.with-header .back-button-top {
         transform: translateX(8px);
     }
 
+    /* タブナビゲーション */
+    .tab-navigation {
+        height: auto;
+    }
+
+    .tab-container {
+        flex-wrap: wrap;
+    }
+
+    .tab-btn {
+        flex: 1 1 50%;
+        min-width: 50%;
+        padding: 12px 8px;
+        font-size: 12px;
+    }
+
+    .tab-icon {
+        font-size: 14px;
+    }
+
+    .main-content {
+        padding: 20px 16px;
+    }
+
+    /* ダッシュボード */
+    .dashboard-overview {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    /* 顧客一覧 */
+    .search-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-box {
+        max-width: none;
+    }
+
+    .table-view {
+        overflow-x: auto;
+    }
+
+    .data-table {
+        min-width: 600px;
+    }
+
+    .card-view {
+        grid-template-columns: 1fr;
+    }
+
+    /* グラフ */
+    .chart-options {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-container {
+        height: 250px;
+        padding: 10px;
+    }
+
+    /* エクスポート */
+    .export-options {
+        grid-template-columns: 1fr;
+    }
+
     /* ブレッドクラム */
     .breadcrumb-nav {
         padding: 6px 16px;
@@ -2000,6 +2606,10 @@ body.with-header .back-button-top {
     /* 統計情報ページ */
     body.with-header.statistics-page .container {
         padding: 20px 16px 10px 16px;
+    }
+
+    body.statistics-tab-page {
+        padding-top: calc(var(--header-height) + 100px);
     }
 
     .statistics-page .page-title {
@@ -2065,11 +2675,6 @@ body.with-header .back-button-top {
     .modal-content {
         width: 95%;
         max-height: 90vh;
-    }
-
-    .chart-container {
-        height: 250px;
-        padding: 10px;
     }
 
     .search-input-container {
@@ -2198,6 +2803,18 @@ body.with-header .back-button-top {
 
     .page-icon {
         font-size: 24px;
+    }
+
+    /* タブナビゲーション */
+    body.statistics-tab-page {
+        padding-top: calc(var(--header-height) + 120px);
+    }
+
+    .tab-btn {
+        flex: 1 1 50%;
+        min-width: 50%;
+        padding: 10px 6px;
+        font-size: 11px;
     }
 
     /* ブレッドクラム */
@@ -2494,7 +3111,8 @@ body.with-header .back-button-top {
     .enhanced-controls,
     .graph-btn,
     .sample-data-btn,
-    .sort-buttons {
+    .sort-buttons,
+    .tab-navigation {
         display: none;
     }
 
