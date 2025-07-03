@@ -1,12 +1,102 @@
 <?php
 // 最初にオートローダーを読み込み
 require_once(__DIR__ . '/../component/autoloader.php');
+// DB接続
+require_once(__DIR__ . '/../component/db.php');
 
 // その後にヘッダーを読み込み
 include(__DIR__ . '/../component/header.php');
 
 // セッション開始
 SessionManager::start();
+
+// 初期化
+$totalCustomers = 0;
+$monthlySales = 0;
+$salesTrend = 0;
+$totalDeliveries = 0;
+$avgLeadTime = 0;
+$customerList = [];
+
+try {
+    // 1. ダッシュボードのメトリクス
+    // 総顧客数
+    $totalCustomersStmt = $pdo->query("SELECT COUNT(*) FROM customers");
+    $totalCustomers = $totalCustomersStmt->fetchColumn();
+
+    // customer_summary ビューから基本統計を取得
+    $dashboardQuery = "
+        SELECT 
+            SUM(total_sales) as total_sales, 
+            SUM(delivery_count) as total_deliveries, 
+            AVG(avg_lead_time) as avg_lead_time 
+        FROM customer_summary
+    ";
+    $dashboardMetricsStmt = $pdo->query($dashboardQuery);
+    $dashboardMetrics = $dashboardMetricsStmt->fetch(PDO::FETCH_ASSOC);
+
+    $totalDeliveries = $dashboardMetrics['total_deliveries'] ?? 0;
+    $avgLeadTime = $dashboardMetrics['avg_lead_time'] ?? 0;
+
+    // 正確な月間売上と前月比を計算
+    // 当月の売上
+    $currentMonthQuery = "
+        SELECT SUM(di.amount) 
+        FROM deliveries d
+        JOIN delivery_items di ON d.delivery_no = di.delivery_no
+        WHERE YEAR(d.delivery_record) = YEAR(CURDATE()) 
+          AND MONTH(d.delivery_record) = MONTH(CURDATE())
+    ";
+    $monthlySalesStmt = $pdo->query($currentMonthQuery);
+    $monthlySales = $monthlySalesStmt->fetchColumn() ?? 0;
+
+    // 前月の売上
+    $previousMonthQuery = "
+        SELECT SUM(di.amount) 
+        FROM deliveries d
+        JOIN delivery_items di ON d.delivery_no = di.delivery_no
+        WHERE YEAR(d.delivery_record) = YEAR(CURDATE() - INTERVAL 1 MONTH) 
+          AND MONTH(d.delivery_record) = MONTH(CURDATE() - INTERVAL 1 MONTH)
+    ";
+    $previousMonthSalesStmt = $pdo->query($previousMonthQuery);
+    $previousMonthSales = $previousMonthSalesStmt->fetchColumn() ?? 0;
+
+    // 前月比の計算
+    if ($previousMonthSales > 0) {
+        $salesTrend = (($monthlySales - $previousMonthSales) / $previousMonthSales) * 100;
+    } elseif ($monthlySales > 0) {
+        $salesTrend = 100; // 前月売上0で今月売上ありなら100%増
+    } else {
+        $salesTrend = 0;
+    }
+
+    // 2. 顧客一覧データ (customer_summary ビューを使用)
+    $customerListQuery = "SELECT * FROM customer_summary ORDER BY total_sales DESC";
+    $customersStmt = $pdo->query($customerListQuery);
+    $customerList = $customersStmt->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (PDOException $e) {
+    // 本番環境では、エラーメッセージをログに記録するなどの処理を推奨
+    error_log("Statistics page database error: " . $e->getMessage());
+    // ユーザーには汎用的なエラーメッセージを表示
+    die("データベースへの接続中にエラーが発生しました。しばらくしてからもう一度お試しください。");
+}
+
+// 数値をフォーマットするヘルパー関数
+function format_yen($amount)
+{
+    if ($amount >= 1000000) {
+        return '¥' . number_format($amount / 1000000, 2) . 'M';
+    } elseif ($amount >= 1000) {
+        return '¥' . number_format($amount / 1000, 1) . 'K';
+    }
+    return '¥' . number_format($amount);
+}
+
+function format_days($days)
+{
+    return number_format($days, 2) . '日';
+}
 ?>
 
 <!DOCTYPE html>
@@ -56,7 +146,7 @@ SessionManager::start();
                         <div class="metric-icon">👥</div>
                         <div class="metric-title">総顧客数</div>
                     </div>
-                    <div class="metric-value">1,234</div>
+                    <div class="metric-value"><?php echo number_format($totalCustomers); ?></div>
                     <div class="metric-trend trend-up">
                         <span>↗</span>
                         <span>+12% 前月比</span>
@@ -66,9 +156,9 @@ SessionManager::start();
                 <div class="metric-card">
                     <div class="metric-header">
                         <div class="metric-icon">💰</div>
-                        <div class="metric-title">月間売上</div>
+                        <div class="metric-title">月間売上 (推定)</div>
                     </div>
-                    <div class="metric-value">¥2.5M</div>
+                    <div class="metric-value"><?php echo format_yen($monthlySales); ?></div>
                     <div class="metric-trend trend-up">
                         <span>↗</span>
                         <span>+8% 前月比</span>
@@ -78,9 +168,9 @@ SessionManager::start();
                 <div class="metric-card">
                     <div class="metric-header">
                         <div class="metric-icon">🚚</div>
-                        <div class="metric-title">配達回数</div>
+                        <div class="metric-title">総配達回数</div>
                     </div>
-                    <div class="metric-value">456</div>
+                    <div class="metric-value"><?php echo number_format($totalDeliveries); ?></div>
                     <div class="metric-trend trend-down">
                         <span>↘</span>
                         <span>-3% 前月比</span>
@@ -92,7 +182,7 @@ SessionManager::start();
                         <div class="metric-icon">⏱️</div>
                         <div class="metric-title">平均リードタイム</div>
                     </div>
-                    <div class="metric-value">2.3日</div>
+                    <div class="metric-value"><?php echo format_days($avgLeadTime); ?></div>
                     <div class="metric-trend trend-up">
                         <span>↗</span>
                         <span>改善中</span>
@@ -131,199 +221,65 @@ SessionManager::start();
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>
-                                顧客名
-                                <button class="sort-btn" data-column="name">▲▼</button>
-                            </th>
-                            <th>
-                                売上（円）
-                                <button class="sort-btn" data-column="sales">▲▼</button>
-                            </th>
-                            <th>
-                                リードタイム
-                                <button class="sort-btn" data-column="leadtime">▲▼</button>
-                            </th>
-                            <th>
-                                配達回数
-                                <button class="sort-btn" data-column="delivery">▲▼</button>
-                            </th>
+                            <th>顧客名 <button class="sort-btn" data-column="name">▲▼</button></th>
+                            <th>売上（円） <button class="sort-btn" data-column="sales">▲▼</button></th>
+                            <th>リードタイム <button class="sort-btn" data-column="leadtime">▲▼</button></th>
+                            <th>配達回数 <button class="sort-btn" data-column="delivery">▲▼</button></th>
                             <th>操作</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>大阪商事株式会社</td>
-                            <td>¥1,250,000</td>
-                            <td>2日 4時間</td>
-                            <td>45</td>
-                            <td>
-                                <button class="action-btn" onclick="showDetails('大阪商事株式会社')">
-                                    詳細
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>スーパーマーケット田中</td>
-                            <td>¥890,000</td>
-                            <td>1日 12時間</td>
-                            <td>32</td>
-                            <td>
-                                <button class="action-btn" onclick="showDetails('スーパーマーケット田中')">
-                                    詳細
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>食品卸売り鈴木</td>
-                            <td>¥1,560,000</td>
-                            <td>3日 8時間</td>
-                            <td>67</td>
-                            <td>
-                                <button class="action-btn" onclick="showDetails('食品卸売り鈴木')">
-                                    詳細
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>飲食店チェーン佐藤</td>
-                            <td>¥780,000</td>
-                            <td>1日 6時間</td>
-                            <td>28</td>
-                            <td>
-                                <button class="action-btn" onclick="showDetails('飲食店チェーン佐藤')">
-                                    詳細
-                                </button>
-                            </td>
-                        </tr>
+                        <?php foreach ($customerList as $customer) : ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($customer['customer_name']); ?></td>
+                                <td><?php echo format_yen($customer['total_sales']); ?></td>
+                                <td><?php echo format_days($customer['avg_lead_time']); ?></td>
+                                <td><?php echo number_format($customer['delivery_count']); ?></td>
+                                <td>
+                                    <button class="action-btn" onclick="showDetails('<?php echo htmlspecialchars(addslashes($customer['customer_name'])); ?>')">
+                                        詳細
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
 
             <!-- カードビュー -->
-            <div class="card-view">
-                <div class="customer-card">
-                    <div class="card-header">
-                        <div>
-                            <div class="customer-name">大阪商事株式会社</div>
-                            <div class="customer-id">ID: 001</div>
+            <div class="card-view" style="display: none;">
+                <?php foreach ($customerList as $customer) : ?>
+                    <div class="customer-card">
+                        <div class="card-header">
+                            <div>
+                                <div class="customer-name"><?php echo htmlspecialchars($customer['customer_name']); ?></div>
+                                <div class="customer-id">ID: <?php echo htmlspecialchars($customer['customer_no']); ?></div>
+                            </div>
+                        </div>
+                        <div class="card-stats">
+                            <div class="card-stat">
+                                <div class="card-stat-label">売上</div>
+                                <div class="card-stat-value"><?php echo format_yen($customer['total_sales']); ?></div>
+                            </div>
+                            <div class="card-stat">
+                                <div class="card-stat-label">配達回数</div>
+                                <div class="card-stat-value"><?php echo number_format($customer['delivery_count']); ?></div>
+                            </div>
+                            <div class="card-stat">
+                                <div class="card-stat-label">リードタイム</div>
+                                <div class="card-stat-value"><?php echo format_days($customer['avg_lead_time']); ?></div>
+                            </div>
+                            <div class="card-stat">
+                                <div class="card-stat-label">最終注文</div>
+                                <div class="card-stat-value"><?php echo htmlspecialchars($customer['last_order_date'] ? (new DateTime($customer['last_order_date']))->format('Y-m-d') : 'N/A'); ?></div>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="card-btn secondary" onclick="showDetails('<?php echo htmlspecialchars(addslashes($customer['customer_name'])); ?>')">詳細</button>
+                            <button class="card-btn primary" onclick="showGraph('<?php echo htmlspecialchars(addslashes($customer['customer_name'])); ?>')">グラフ</button>
                         </div>
                     </div>
-                    <div class="card-stats">
-                        <div class="card-stat">
-                            <div class="card-stat-label">売上</div>
-                            <div class="card-stat-value">¥1.25M</div>
-                        </div>
-                        <div class="card-stat">
-                            <div class="card-stat-label">配達回数</div>
-                            <div class="card-stat-value">45</div>
-                        </div>
-                        <div class="card-stat">
-                            <div class="card-stat-label">リードタイム</div>
-                            <div class="card-stat-value">2日4時間</div>
-                        </div>
-                        <div class="card-stat">
-                            <div class="card-stat-label">最終注文</div>
-                            <div class="card-stat-value">3日前</div>
-                        </div>
-                    </div>
-                    <div class="card-actions">
-                        <button class="card-btn secondary" onclick="showDetails('大阪商事株式会社')">詳細</button>
-                        <button class="card-btn primary" onclick="showGraph('大阪商事株式会社')">グラフ</button>
-                    </div>
-                </div>
-
-                <div class="customer-card">
-                    <div class="card-header">
-                        <div>
-                            <div class="customer-name">スーパーマーケット田中</div>
-                            <div class="customer-id">ID: 002</div>
-                        </div>
-                    </div>
-                    <div class="card-stats">
-                        <div class="card-stat">
-                            <div class="card-stat-label">売上</div>
-                            <div class="card-stat-value">¥890K</div>
-                        </div>
-                        <div class="card-stat">
-                            <div class="card-stat-label">配達回数</div>
-                            <div class="card-stat-value">32</div>
-                        </div>
-                        <div class="card-stat">
-                            <div class="card-stat-label">リードタイム</div>
-                            <div class="card-stat-value">1日12時間</div>
-                        </div>
-                        <div class="card-stat">
-                            <div class="card-stat-label">最終注文</div>
-                            <div class="card-stat-value">1日前</div>
-                        </div>
-                    </div>
-                    <div class="card-actions">
-                        <button class="card-btn secondary" onclick="showDetails('スーパーマーケット田中')">詳細</button>
-                        <button class="card-btn primary" onclick="showGraph('スーパーマーケット田中')">グラフ</button>
-                    </div>
-                </div>
-
-                <div class="customer-card">
-                    <div class="card-header">
-                        <div>
-                            <div class="customer-name">食品卸売り鈴木</div>
-                            <div class="customer-id">ID: 003</div>
-                        </div>
-                    </div>
-                    <div class="card-stats">
-                        <div class="card-stat">
-                            <div class="card-stat-label">売上</div>
-                            <div class="card-stat-value">¥1.56M</div>
-                        </div>
-                        <div class="card-stat">
-                            <div class="card-stat-label">配達回数</div>
-                            <div class="card-stat-value">67</div>
-                        </div>
-                        <div class="card-stat">
-                            <div class="card-stat-label">リードタイム</div>
-                            <div class="card-stat-value">3日8時間</div>
-                        </div>
-                        <div class="card-stat">
-                            <div class="card-stat-label">最終注文</div>
-                            <div class="card-stat-value">5日前</div>
-                        </div>
-                    </div>
-                    <div class="card-actions">
-                        <button class="card-btn secondary" onclick="showDetails('食品卸売り鈴木')">詳細</button>
-                        <button class="card-btn primary" onclick="showGraph('食品卸売り鈴木')">グラフ</button>
-                    </div>
-                </div>
-
-                <div class="customer-card">
-                    <div class="card-header">
-                        <div>
-                            <div class="customer-name">飲食店チェーン佐藤</div>
-                            <div class="customer-id">ID: 004</div>
-                        </div>
-                    </div>
-                    <div class="card-stats">
-                        <div class="card-stat">
-                            <div class="card-stat-label">売上</div>
-                            <div class="card-stat-value">¥780K</div>
-                        </div>
-                        <div class="card-stat">
-                            <div class="card-stat-label">配達回数</div>
-                            <div class="card-stat-value">28</div>
-                        </div>
-                        <div class="card-stat">
-                            <div class="card-stat-label">リードタイム</div>
-                            <div class="card-stat-value">1日6時間</div>
-                        </div>
-                        <div class="card-stat">
-                            <div class="card-stat-label">最終注文</div>
-                            <div class="card-stat-value">2日前</div>
-                        </div>
-                    </div>
-                    <div class="card-actions">
-                        <button class="card-btn secondary" onclick="showDetails('飲食店チェーン佐藤')">詳細</button>
-                        <button class="card-btn primary" onclick="showGraph('飲食店チェーン佐藤')">グラフ</button>
-                    </div>
-                </div>
+                <?php endforeach; ?>
             </div>
         </div>
 
@@ -359,59 +315,6 @@ SessionManager::start();
                     <span style="font-size: 48px; display: block; margin-bottom: 16px;">📊</span>
                     <h3 style="color: var(--main-green); margin-bottom: 8px;">グラフを選択してください</h3>
                     <p>上記のオプションから表示したいグラフを選択してください</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- データ出力タブ -->
-        <div id="export" class="tab-content">
-            <div class="export-options">
-                <div class="export-card">
-                    <div class="export-icon">📋</div>
-                    <div class="export-title">CSV出力</div>
-                    <div class="export-description">
-                        顧客データをCSV形式でダウンロード。<br>
-                        Excel等で編集・分析が可能です。
-                    </div>
-                    <button class="export-btn" onclick="exportCSV()">
-                        CSVダウンロード
-                    </button>
-                </div>
-
-                <div class="export-card">
-                    <div class="export-icon">📊</div>
-                    <div class="export-title">PDF レポート</div>
-                    <div class="export-description">
-                        統計情報とグラフを含むレポート。<br>
-                        会議資料や報告書として利用可能。
-                    </div>
-                    <button class="export-btn" onclick="exportPDF()">
-                        PDFダウンロード
-                    </button>
-                </div>
-
-                <div class="export-card">
-                    <div class="export-icon">📈</div>
-                    <div class="export-title">Excel ファイル</div>
-                    <div class="export-description">
-                        データと分析用のグラフを含むExcelファイル。<br>
-                        詳細な分析に最適です。
-                    </div>
-                    <button class="export-btn" onclick="exportExcel()">
-                        Excelダウンロード
-                    </button>
-                </div>
-
-                <div class="export-card">
-                    <div class="export-icon">📤</div>
-                    <div class="export-title">メール送信</div>
-                    <div class="export-description">
-                        統計レポートを指定したメールアドレスに送信。<br>
-                        定期報告に便利です。
-                    </div>
-                    <button class="export-btn" onclick="sendEmail()">
-                        メール送信
-                    </button>
                 </div>
             </div>
         </div>
