@@ -32,14 +32,19 @@ if ($storeName) {
                     顧客情報
                 </span>
             </button>
-            <button class="menu-button" data-path="statistics/index.php">
-                <span>統計情報</span>
+            <button class="menu-button" data-path="statistics/">
+                <span>📊 統計情報</span>
             </button>
-            <button class="menu-button" data-path="order_list/index.php">
-                <span>注文書</span>
+            <button class="menu-button" data-path="order_list/">
+                <span>📋 注文書</span>
             </button>
-            <button class="menu-button" data-path="delivery_list/index.php">
-                <span>納品書</span>
+        </div>
+        <div class="menu-row">
+            <button class="menu-button" data-path="delivery_list/">
+                <span>🚚 納品書</span>
+            </button>
+            <button class="menu-button" data-path="#">
+                <span>⚙️ 設定</span>
             </button>
         </div>
     </main>

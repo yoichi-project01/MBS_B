@@ -687,986 +687,499 @@
     }
     
     // ========== 統計情報ページ機能 ==========
-    
+
     /**
      * 統計情報ページの初期化
      */
     function initializeStatisticsPage() {
         // ページ識別のためのクラス追加
         if (window.location.pathname.includes('/statistics/')) {
-            document.body.classList.add('statistics-page');
+            document.body.classList.add('statistics-tab-page');
         }
-    
-        setupStatisticsEventListeners();
-        loadExistingData();
-        setupStatisticsAccessibility();
-        setupGraphButtons();
-        setupSortButtons();
+
+        // 顧客データをグローバル変数にロード
+        loadCustomerDataFromDOM();
+
+        // イベントリスナーを設定
+        setupTabNavigation();
+        setupViewToggle();
+        setupCustomerSearch();
+        setupTableSorting();
+        setupActionButtons();
+        setupChartSelectors();
+        setupModalInteractions();
     }
-    
+
     /**
-     * 統計情報ページのイベントリスナー設定
+     * 顧客データをDOMから読み込む
      */
-    function setupStatisticsEventListeners() {
-        // モーダル関連
-        const modal = document.getElementById('graphModal');
-        if (modal) {
-            modal.addEventListener('click', function(event) {
-                if (event.target === this) {
-                    closeModal();
-                }
-            });
-        }
-    
-        // ESCキーでモーダルを閉じる
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                const modal = document.getElementById('graphModal');
-                if (modal && modal.style.display === 'block') {
-                    closeModal();
-                }
-            }
-        });
-    
-        // 検索フォームの改善
-        const searchInput = document.querySelector('input[name="search"]');
-        if (searchInput) {
-            searchInput.addEventListener('input', debounce(handleSearchInput, 300));
-        }
-    }
-    
-    /**
-     * グラフボタンのセットアップ
-     */
-    function setupGraphButtons() {
-        const graphButtons = document.querySelectorAll('.graph-btn');
-        graphButtons.forEach(function(button) {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-                
-                const customerNo = this.getAttribute('data-customer-no');
-                const customerName = this.getAttribute('data-customer-name');
-                
-                if (customerNo && customerName) {
-                    // 入力値の検証
-                    const validatedCustomerNo = parseInt(customerNo);
-                    if (!Number.isInteger(validatedCustomerNo) || validatedCustomerNo <= 0) {
-                        showErrorMessage('無効な顧客番号です。');
-                        return;
-                    }
-    
-                    if (!validateInput(customerName, 'text', 255)) {
-                        showErrorMessage('無効な顧客名です。');
-                        return;
-                    }
-    
-                    showSalesGraph(validatedCustomerNo, customerName);
-                }
-            });
-        });
-    }
-    
-    /**
-     * ソートボタンのセットアップ
-     */
-    function setupSortButtons() {
-        const sortButtons = document.querySelectorAll('.sort-btn');
-        sortButtons.forEach(function(button) {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-                
-                const column = this.getAttribute('data-column');
-                const order = this.getAttribute('data-order');
-                
-                if (column && order) {
-                    sortTable(column, order, this);
-                }
-            });
-        });
-    }
-    
-    /**
-     * 既存データの読み込み
-     */
-    function loadExistingData() {
-        const tableRows = document.querySelectorAll('.enhanced-table-row, .table-row');
-        customerData = Array.from(tableRows).map(function(row) {
-            const customerNo = row.getAttribute('data-customer-no') || Math.floor(Math.random() * 1000);
-            const customerNameEl = row.querySelector('[data-column="customer_name"]');
-            const salesEl = row.querySelector('[data-column="sales_by_customer"]');
-            const leadTimeEl = row.querySelector('[data-column="lead_time"]');
-            const deliveryAmountEl = row.querySelector('[data-column="delivery_amount"]');
-    
-            if (!customerNameEl) return null;
-    
-            const customerName = customerNameEl.textContent.trim();
-            const sales = salesEl ? salesEl.textContent.replace(/[,¥]/g, '') : '0';
-            const leadTime = leadTimeEl ? leadTimeEl.textContent.trim() : '0秒';
-            const deliveryAmount = deliveryAmountEl ? deliveryAmountEl.textContent.trim() : '0';
-    
+    function loadCustomerDataFromDOM() {
+        const tableRows = document.querySelectorAll('.data-table tbody tr');
+        customerData = Array.from(tableRows).map(row => {
+            const cells = row.cells;
+            if (!cells || cells.length < 4) return null;
+            
+            // `addslashes` でエスケープされたシングルクォートを元に戻す
+            const rawOnClick = row.querySelector('button[onclick*="showDetails"]')
+                                ?.getAttribute('onclick') || '';
+            const nameMatch = rawOnClick.match(/showDetails\('(.+?)'\)/);
+            const customerName = nameMatch ? nameMatch[1].replace(/'/g, "'") : cells[0].textContent.trim();
+
             return {
-                customer_no: parseInt(customerNo),
                 customer_name: customerName,
-                sales_by_customer: parseInt(sales) || 0,
-                lead_time: leadTime,
-                delivery_amount: parseInt(deliveryAmount) || 0
+                total_sales_text: cells[1].textContent.trim(),
+                avg_lead_time: cells[2].textContent.trim(),
+                delivery_count: parseInt(cells[3].textContent.replace(/,/g, '')),
+                customer_no: row.dataset.customerNo || null
             };
         }).filter(Boolean);
     }
-    
+
     /**
-     * 統計情報ページのアクセシビリティ設定
+     * タブナビゲーションの設定
      */
-    function setupStatisticsAccessibility() {
-        // テーブルにaria-labelを追加
-        const tables = document.querySelectorAll('.enhanced-statistics-table, .statistics-table');
-        tables.forEach(function(table) {
-            table.setAttribute('aria-label', '顧客統計情報テーブル');
-        });
-    
-        // ソートボタンにaria-labelを追加
-        document.querySelectorAll('.sort-btn').forEach(function(button) {
-            const column = button.getAttribute('data-column');
-            const order = button.getAttribute('data-order');
-            if (column && order) {
-                const columnNames = {
-                    'customer_name': '顧客名',
-                    'sales_by_customer': '売上',
-                    'lead_time': 'リードタイム',
-                    'delivery_amount': '配達回数'
-                };
-                const orderText = order === 'asc' ? '昇順' : '降順';
-                button.setAttribute('aria-label', `${columnNames[column]}を${orderText}でソート`);
-            }
-        });
-    }
-    
-    /**
-     * テーブルソート機能
-     */
-    function sortTable(column, order, activeButton) {
-        const tbody = document.getElementById('customerTableBody') || 
-                     document.querySelector('.enhanced-statistics-table tbody') ||
-                     document.querySelector('.statistics-table tbody');
-    
-        if (!tbody) return;
-    
-        const rows = Array.from(tbody.querySelectorAll('.enhanced-table-row, .table-row, tr'));
-    
-        rows.sort(function(a, b) {
-            const aCell = a.querySelector('[data-column="' + column + '"]');
-            const bCell = b.querySelector('[data-column="' + column + '"]');
-    
-            if (!aCell || !bCell) return 0;
-    
-            let aValue = aCell.textContent.trim();
-            let bValue = bCell.textContent.trim();
-    
-            // データ型に応じた処理
-            if (column === 'sales_by_customer' || column === 'delivery_amount') {
-                aValue = parseFloat(aValue.replace(/[,円¥]/g, '')) || 0;
-                bValue = parseFloat(bValue.replace(/[,円¥]/g, '')) || 0;
-            } else if (column === 'lead_time') {
-                aValue = parseLeadTimeToSeconds(aValue);
-                bValue = parseLeadTimeToSeconds(bValue);
-            } else {
-                // 文字列の場合
-                aValue = aValue.toLowerCase();
-                bValue = bValue.toLowerCase();
-            }
-    
-            if (order === 'asc') {
-                return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
-            } else {
-                return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
-            }
-        });
-    
-        // アクティブボタンの状態更新
-        updateSortButtonState(activeButton);
-    
-        // 行の再配置（アニメーション付き）
-        animateTableSort(tbody, rows);
-    
-        // アクセシビリティ通知
-        announceSort(column, order);
-    }
-    
-    /**
-     * リードタイム文字列を秒数に変換
-     */
-    function parseLeadTimeToSeconds(timeStr) {
-        let totalSeconds = 0;
-        const patterns = [
-            { regex: /(\d+)日/, multiplier: 86400 },
-            { regex: /(\d+)時間/, multiplier: 3600 },
-            { regex: /(\d+)分/, multiplier: 60 },
-            { regex: /(\d+)秒/, multiplier: 1 }
-        ];
-    
-        patterns.forEach(function(pattern) {
-            const match = timeStr.match(pattern.regex);
-            if (match) {
-                totalSeconds += parseInt(match[1], 10) * pattern.multiplier;
-            }
-        });
-    
-        return totalSeconds;
-    }
-    
-    /**
-     * ソートボタンの状態更新
-     */
-    function updateSortButtonState(activeButton) {
-        // 全てのボタンからactiveクラスを削除
-        document.querySelectorAll('.sort-btn').forEach(function(btn) {
-            btn.classList.remove('active');
-            btn.setAttribute('aria-pressed', 'false');
-        });
-    
-        // アクティブボタンにクラスを追加
-        activeButton.classList.add('active');
-        activeButton.setAttribute('aria-pressed', 'true');
-    }
-    
-    /**
-     * テーブルソートのアニメーション
-     */
-    function animateTableSort(tbody, sortedRows) {
-        // フェードアウト
-        tbody.style.opacity = '0.6';
-        tbody.style.transform = 'translateY(10px)';
-    
-        setTimeout(function() {
-            // 行を再配置
-            tbody.innerHTML = '';
-            sortedRows.forEach(function(row) {
-                tbody.appendChild(row);
+    function setupTabNavigation() {
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                button.classList.add('active');
+                const tabId = button.getAttribute('data-tab');
+                const activeContent = document.getElementById(tabId);
+                if (activeContent) {
+                    activeContent.classList.add('active');
+                }
             });
-    
-            // フェードイン
-            tbody.style.transition = 'all 0.3s ease';
-            tbody.style.opacity = '1';
-            tbody.style.transform = 'translateY(0)';
-    
-            // トランジション完了後にスタイルをリセット
-            setTimeout(function() {
-                tbody.style.transition = '';
-            }, 300);
-        }, 150);
+        });
+    }
+
+    /**
+     * 表示切り替え（テーブル/カード）の設定
+     */
+    function setupViewToggle() {
+        const viewButtons = document.querySelectorAll('.view-btn');
+        const tableView = document.querySelector('.table-view');
+        const cardView = document.querySelector('.card-view');
+
+        if (!tableView || !cardView) return;
+
+        viewButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                viewButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                const view = button.getAttribute('data-view');
+                if (view === 'table') {
+                    tableView.style.display = '';
+                    cardView.style.display = 'none';
+                } else {
+                    tableView.style.display = 'none';
+                    cardView.style.display = '';
+                }
+            });
+        });
+    }
+
+    /**
+     * 顧客検索機能の設定
+     */
+    function setupCustomerSearch() {
+        const searchInput = document.querySelector('.search-input');
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', debounce(e => {
+            const searchTerm = e.target.value.toLowerCase();
+            filterCustomers(searchTerm);
+        }, 300));
+    }
+
+    /**
+     * 顧客リストのフィルタリング
+     */
+    function filterCustomers(searchTerm) {
+        const tableRows = document.querySelectorAll('.data-table tbody tr');
+        const customerCards = document.querySelectorAll('.customer-card');
+
+        tableRows.forEach(row => {
+            const customerName = row.cells[0].textContent.toLowerCase();
+            row.style.display = customerName.includes(searchTerm) ? '' : 'none';
+        });
+
+        customerCards.forEach(card => {
+            const customerName = card.querySelector('.customer-name').textContent.toLowerCase();
+            card.style.display = customerName.includes(searchTerm) ? '' : 'none';
+        });
+    }
+
+    /**
+     * テーブルソート機能の設定
+     */
+    function setupTableSorting() {
+        const sortButtons = document.querySelectorAll('.sort-btn');
+        sortButtons.forEach(button => {
+            button.setAttribute('data-order', 'desc');
+            button.addEventListener('click', () => {
+                const column = button.getAttribute('data-column');
+                const currentOrder = button.getAttribute('data-order');
+                const newOrder = currentOrder === 'desc' ? 'asc' : 'desc';
+
+                sortButtons.forEach(btn => {
+                    btn.innerHTML = '▲▼';
+                    if (btn !== button) {
+                        btn.setAttribute('data-order', 'desc');
+                    }
+                });
+
+                button.setAttribute('data-order', newOrder);
+                button.innerHTML = newOrder === 'asc' ? '▲' : '▼';
+                sortTable(column, newOrder);
+            });
+        });
     }
     
     /**
-     * ソート完了の音声通知
+     * 数値変換
      */
-    function announceSort(column, order) {
-        const columnNames = {
-            'customer_name': '顧客名',
-            'sales_by_customer': '売上',
-            'lead_time': 'リードタイム',
-            'delivery_amount': '配達回数'
-        };
-        const orderText = order === 'asc' ? '昇順' : '降順';
-        const message = `${columnNames[column]}を${orderText}でソートしました`;
-    
-        // スクリーンリーダー用の通知
-        announceToScreenReader(message);
+    function parseSalesValue(text) {
+        const value = parseFloat(text.replace(/[¥,]/g, ''));
+        if (text.includes('M')) return value * 1000000;
+        if (text.includes('K')) return value * 1000;
+        return value;
     }
-    
+
     /**
-     * スクリーンリーダーへの通知
+     * テーブルのソート処理
      */
-    function announceToScreenReader(message) {
-        const announcement = document.createElement('div');
-        announcement.setAttribute('aria-live', 'polite');
-        announcement.setAttribute('aria-atomic', 'true');
-        announcement.className = 'sr-only';
-        announcement.textContent = message;
-    
-        document.body.appendChild(announcement);
-    
-        setTimeout(function() {
-            if (announcement.parentNode) {
-                document.body.removeChild(announcement);
+    function sortTable(column, order) {
+        const tbody = document.querySelector('.data-table tbody');
+        if (!tbody) return;
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+        rows.sort((a, b) => {
+            let valA, valB;
+            const getCellText = (row, index) => row.cells[index].textContent.trim();
+
+            switch (column) {
+                case 'name':
+                    valA = getCellText(a, 0);
+                    valB = getCellText(b, 0);
+                    return order === 'asc' ? valA.localeCompare(valB, 'ja') : valB.localeCompare(valA, 'ja');
+                case 'sales':
+                    valA = parseSalesValue(getCellText(a, 1));
+                    valB = parseSalesValue(getCellText(b, 1));
+                    break;
+                case 'leadtime':
+                    valA = parseFloat(getCellText(a, 2));
+                    valB = parseFloat(getCellText(b, 2));
+                    break;
+                case 'delivery':
+                    valA = parseInt(getCellText(a, 3).replace(/,/g, ''));
+                    valB = parseInt(getCellText(b, 3).replace(/,/g, ''));
+                    break;
+                default:
+                    return 0;
             }
-        }, 1000);
+            return order === 'asc' ? valA - valB : valB - valA;
+        });
+
+        rows.forEach(row => tbody.appendChild(row));
     }
-    
+
     /**
-     * 検索入力の処理
+     * 詳細・グラフボタンの設定
      */
-    function handleSearchInput(event) {
-        const searchTerm = event.target.value.toLowerCase().trim();
+    function setupActionButtons() {
+        document.body.addEventListener('click', e => {
+            const button = e.target.closest('button[onclick]');
+            if (!button) return;
+
+            const onclickAttr = button.getAttribute('onclick');
+            
+            if (onclickAttr.startsWith('showDetails')) {
+                e.preventDefault();
+                const customerName = onclickAttr.match(/'(.*?)'/)[1].replace(/'/g, "'");
+                showDetails(customerName);
+            } else if (onclickAttr.startsWith('showGraph')) {
+                e.preventDefault();
+                const customerName = onclickAttr.match(/'(.*?)'/)[1].replace(/'/g, "'");
+                showGraph(customerName);
+            }
+        });
+    }
+
+    /**
+     * グラフ分析タブのグラフ選択機能
+     */
+    function setupChartSelectors() {
+        const chartOptions = document.querySelectorAll('.chart-option');
+        const chartContainer = document.querySelector('#charts .chart-container');
+
+        chartOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                chartOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                const chartType = option.getAttribute('data-chart');
+                renderMainChart(chartType, chartContainer);
+            });
+        });
+    }
+
+    /**
+     * メインのグラフを描画
+     */
+    function renderMainChart(chartType, container) {
+        container.innerHTML = ''; // Clear previous chart
+        const canvas = document.createElement('canvas');
+        container.appendChild(canvas);
         
-        // 入力値の検証
-        if (!validateInput(searchTerm, 'text', 100)) {
-            event.target.value = '';
-            showErrorMessage('無効な文字が含まれています。');
+        let chartConfig;
+        if (chartType === 'sales') {
+            const salesData = prepareChartData('total_sales_text', 'desc');
+            chartConfig = createMainChartConfig('売上分析', 'bar', salesData, '売上', val => format_yen(val));
+        } else if (chartType === 'delivery') {
+            const deliveryData = prepareChartData('delivery_count', 'desc');
+            chartConfig = createMainChartConfig('配達実績', 'doughnut', deliveryData, '配達回数', val => `${val} 回`);
+        } else if (chartType === 'leadtime') {
+            const leadTimeData = prepareChartData('avg_lead_time', 'asc');
+            chartConfig = createMainChartConfig('リードタイム分析', 'line', leadTimeData, '平均リードタイム', val => `${val} 日`);
+        } else {
+             container.innerHTML = `<div style="text-align: center;">
+                <span style="font-size: 48px; display: block; margin-bottom: 16px;">📈</span>
+                <h3 style="color: var(--main-green); margin-bottom: 8px;">トレンド分析</h3>
+                <p>この機能は現在開発中です。</p>
+            </div>`;
             return;
         }
-    
-        const tbody = document.getElementById('customerTableBody') || 
-                     document.querySelector('.enhanced-statistics-table tbody') ||
-                     document.querySelector('.statistics-table tbody');
-    
-        if (!tbody) return;
-    
-        const rows = tbody.querySelectorAll('.enhanced-table-row, .table-row, tr');
-        let visibleCount = 0;
-    
-        rows.forEach(function(row) {
-            const customerNameCell = row.querySelector('[data-column="customer_name"]');
-            if (!customerNameCell) return;
-    
-            const customerName = customerNameCell.textContent.toLowerCase();
-            const isVisible = searchTerm === '' || customerName.includes(searchTerm);
-    
-            if (isVisible) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
+
+        if (currentChart) currentChart.destroy();
+        currentChart = new Chart(canvas.getContext('2d'), chartConfig);
+    }
+
+    /**
+     * チャート用のデータ準備
+     */
+    function prepareChartData(dataKey, sortOrder) {
+        const sortedData = [...customerData].sort((a, b) => {
+            const valA = (dataKey === 'total_sales_text') ? parseSalesValue(a[dataKey]) : parseFloat(a[dataKey]);
+            const valB = (dataKey === 'total_sales_text') ? parseSalesValue(b[dataKey]) : parseFloat(b[dataKey]);
+            return sortOrder === 'desc' ? valB - valA : valA - valB;
+        }).slice(0, 10);
+
+        return {
+            labels: sortedData.map(c => c.customer_name),
+            values: sortedData.map(c => (dataKey === 'total_sales_text') ? parseSalesValue(c[dataKey]) : parseFloat(c[dataKey]))
+        };
+    }
+
+    /**
+     * メインチャートの設定を生成
+     */
+    function createMainChartConfig(title, type, data, label, tooltipCallback) {
+        const isDoughnut = type === 'doughnut';
+        const backgroundColors = [
+            '#2f5d3f', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b',
+            '#ffc107', '#ff9800', '#ff5722', '#795548', '#9e9e9e'
+        ];
+
+        return {
+            type: type,
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: label,
+                    data: data.values,
+                    backgroundColor: isDoughnut ? backgroundColors : 'rgba(47, 93, 63, 0.8)',
+                    borderColor: isDoughnut ? '#fff' : '#2f5d3f',
+                    borderWidth: 2,
+                    fill: type === 'line',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: true, text: title, font: { size: 18 }, padding: 20 },
+                    legend: { display: isDoughnut, position: 'right' },
+                    tooltip: {
+                        callbacks: {
+                            label: context => `${context.label}: ${tooltipCallback(context.parsed.y || context.parsed)}`
+                        }
+                    }
+                },
+                scales: isDoughnut ? {} : {
+                    y: { beginAtZero: true, ticks: { callback: value => tooltipCallback(value) } },
+                    x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 45 } }
+                }
+            }
+        };
+    }
+
+
+    /**
+     * モーダル関連の操作設定
+     */
+    function setupModalInteractions() {
+        document.body.addEventListener('click', e => {
+            if (e.target.matches('.modal .close')) {
+                const modalId = e.target.closest('.modal').id;
+                closeModal(modalId);
+            }
+            if (e.target.matches('.modal')) {
+                closeModal(e.target.id);
             }
         });
-    
-        // 検索結果の通知
-        const message = searchTerm ? `${visibleCount}件の顧客が見つかりました` : '全ての顧客を表示しています';
-        announceToScreenReader(message);
+         document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                const openModal = document.querySelector('.modal[style*="display: block"]');
+                if (openModal) {
+                    closeModal(openModal.id);
+                }
+            }
+        });
     }
-    
-    /**
-     * グラフ描画機能
-     */
-    function openModal(graphType) {
-        const modal = document.getElementById('graphModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalCanvas = document.getElementById('modalCanvas');
-    
-        if (!modal || !modalTitle || !modalCanvas) return;
-    
-        const graphTitles = {
-            'sales': '顧客別売上グラフ',
-            'delivery': '顧客別配達回数グラフ',
-            'leadtime': '顧客別リードタイムグラフ'
-        };
-    
-        modalTitle.textContent = graphTitles[graphType] || 'グラフ';
-        modal.style.display = 'block';
-        modal.setAttribute('aria-hidden', 'false');
-    
-        // モーダルにフォーカスを移動
-        modal.focus();
-    
-        // 現在のチャートを破棄
-        if (currentChart) {
-            currentChart.destroy();
-            currentChart = null;
-        }
-    
-        // キャンバスのコンテキストを取得
-        const ctx = modalCanvas.getContext('2d');
-    
-        // データの準備
-        let data, config;
-        
-        switch(graphType) {
-            case 'sales':
-                data = prepareSalesData();
-                config = createSalesChartConfig(data);
-                break;
-            case 'delivery':
-                data = prepareDeliveryData();
-                config = createDeliveryChartConfig(data);
-                break;
-            case 'leadtime':
-                data = prepareLeadTimeData();
-                config = createLeadTimeChartConfig(data);
-                break;
-            default:
-                console.error('Unknown graph type:', graphType);
-                return;
-        }
-    
-        // Chart.jsでグラフを描画
-        if (typeof Chart !== 'undefined') {
-            currentChart = new Chart(ctx, config);
-        } else {
-            // Chart.jsが利用できない場合の代替処理
-            modalCanvas.style.display = 'none';
-            const errorMessage = document.createElement('div');
-            errorMessage.className = 'chart-error';
-            errorMessage.innerHTML = `
-                <p>グラフライブラリが読み込まれていません。</p>
-                <p>Chart.jsが必要です。</p>
-            `;
-            modalCanvas.parentNode.appendChild(errorMessage);
-        }
-    }
-    
+
     /**
      * モーダルを閉じる
      */
-    function closeModal() {
-        const modal = document.getElementById('graphModal');
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
         if (modal) {
             modal.style.display = 'none';
-            modal.setAttribute('aria-hidden', 'true');
-    
-            // チャートを破棄
-            if (currentChart) {
-                currentChart.destroy();
-                currentChart = null;
-            }
-    
-            // エラーメッセージを削除
-            const errorMessage = modal.querySelector('.chart-error');
-            if (errorMessage) {
-                errorMessage.remove();
-            }
-    
-            // キャンバスを再表示
-            const modalCanvas = document.getElementById('modalCanvas');
-            if (modalCanvas) {
-                modalCanvas.style.display = 'block';
-            }
+        }
+        if (modalId === 'graphModal' && currentChart) {
+            currentChart.destroy();
+            currentChart = null;
         }
     }
     
     /**
-     * 売上グラフ表示（セキュリティ強化版）
+     * PHPのフォーマット関数をJSで再現
+     */
+    function format_yen(amount) {
+        if (amount >= 1000000) {
+            return `¥${(amount / 1000000).toFixed(2)}M`;
+        } else if (amount >= 1000) {
+            return `¥${(amount / 1000).toFixed(1)}K`;
+        }
+        return `¥${amount.toLocaleString()}`;
+    }
+
+    /**
+     * 詳細モーダル表示
+     */
+    function showDetails(customerName) {
+        const modal = document.getElementById('detailModal');
+        const title = document.getElementById('detailTitle');
+        const content = document.getElementById('detailContent');
+        if (!modal || !title || !content) return;
+
+        const customer = customerData.find(c => c.customer_name === customerName);
+        title.textContent = `${customerName} の詳細情報`;
+        
+        if (customer) {
+            content.innerHTML = `
+                <p><strong>顧客名:</strong> ${escapeHtml(customer.customer_name)}</p>
+                <p><strong>総売上:</strong> ${customer.total_sales_text}</p>
+                <p><strong>平均リードタイム:</strong> ${customer.avg_lead_time}</p>
+                <p><strong>配達回数:</strong> ${customer.delivery_count.toLocaleString()} 回</p>
+            `;
+        } else {
+            content.innerHTML = '<p>詳細情報が見つかりませんでした。</p>';
+        }
+        modal.style.display = 'block';
+    }
+
+    /**
+     * グラフモーダル表示
+     */
+    function showGraph(customerName) {
+        const customer = customerData.find(c => c.customer_name === customerName);
+        const customerNo = customer ? customer.customer_no : Math.floor(Math.random() * 1000);
+        showSalesGraph(customerNo, customerName);
+    }
+
+    /**
+     * 売上グラフ表示（モーダル）
      */
     function showSalesGraph(customerNo, customerName) {
-        // 入力値の検証
-        if (!Number.isInteger(customerNo) || customerNo <= 0) {
-            console.error('Invalid customer number');
-            return;
-        }
-    
-        if (!customerName || typeof customerName !== 'string') {
-            console.error('Invalid customer name');
-            return;
-        }
-    
-        // XSS対策
-        const sanitizedCustomerName = escapeHtml(customerName);
-        
-        // サンプルデータ生成
-        const salesHistory = generateSalesHistory();
-    
-        // モーダルタイトルの設定
-        const modalTitle = document.getElementById('modalTitle');
-        if (modalTitle) {
-            modalTitle.textContent = `${sanitizedCustomerName} - 売上推移グラフ（過去6ヶ月）`;
-        }
-    
-        // グラフの作成と表示
-        createChart(salesHistory);
-        
         const modal = document.getElementById('graphModal');
-        if (modal) {
-            modal.style.display = 'block';
-            modal.setAttribute('aria-hidden', 'false');
-            
-            // フォーカス管理（アクセシビリティ）
-            const closeButton = modal.querySelector('.close');
-            if (closeButton) {
-                closeButton.focus();
-            }
-        }
-    }
-    
-    /**
-     * 売上履歴データ生成（サンプル）
-     */
-    function generateSalesHistory() {
-        const months = ['7月', '8月', '9月', '10月', '11月', '12月'];
-        const history = [];
-    
-        months.forEach(function(month) {
-            // ランダムな売上データを生成（0〜800,000円）
-            const sales = Math.floor(Math.random() * 800000) + 50000;
-            history.push({
-                month: month,
-                sales: sales
-            });
-        });
-    
-        return history;
-    }
-    
-    /**
-     * チャート作成
-     */
-    function createChart(salesHistory) {
-        const ctx = document.getElementById('modalCanvas');
-        if (!ctx) return;
-    
-        const chartCtx = ctx.getContext('2d');
-    
+        const modalTitle = document.getElementById('graphTitle');
+        const canvas = document.getElementById('modalCanvas');
+        if (!modal || !modalTitle || !canvas) return;
+
+        modalTitle.textContent = `${escapeHtml(customerName)} - 売上推移グラフ`;
+        
+        // サンプルデータでグラフ描画
+        const salesHistory = generateSalesHistory();
+        const chartCtx = canvas.getContext('2d');
         if (currentChart) {
             currentChart.destroy();
         }
-    
+        currentChart = new Chart(chartCtx, createIndividualSalesChartConfig(salesHistory));
+        
+        modal.style.display = 'block';
+    }
+
+    /**
+     * 個人売上グラフの設定を生成
+     */
+    function createIndividualSalesChartConfig(salesHistory) {
         const labels = salesHistory.map(item => item.month);
         const data = salesHistory.map(item => item.sales);
-    
-        if (typeof Chart !== 'undefined') {
-            currentChart = new Chart(chartCtx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: '売上（円）',
-                        data: data,
-                        borderColor: '#2f5d3f',
-                        backgroundColor: 'rgba(47, 93, 63, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#2f5d3f',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
-                        pointHoverBackgroundColor: '#7ed957',
-                        pointHoverBorderColor: '#fff',
-                        pointHoverBorderWidth: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                font: {
-                                    size: 14,
-                                    family: "'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', sans-serif",
-                                    weight: '600'
-                                },
-                                color: '#2f5d3f',
-                                usePointStyle: true,
-                                pointStyle: 'circle'
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(47, 93, 63, 0.9)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
-                            borderColor: '#7ed957',
-                            borderWidth: 2,
-                            cornerRadius: 8,
-                            displayColors: false,
-                            callbacks: {
-                                title: function(context) {
-                                    return context[0].label + 'の売上';
-                                },
-                                label: function(context) {
-                                    return '¥' + context.parsed.y.toLocaleString();
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '¥' + value.toLocaleString();
-                                },
-                                font: {
-                                    size: 12,
-                                    family: "'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', sans-serif"
-                                },
-                                color: '#4b7a5c'
-                            },
-                            grid: {
-                                color: 'rgba(75, 122, 92, 0.1)',
-                                drawBorder: false
-                            },
-                            title: {
-                                display: true,
-                                text: '売上金額（円）',
-                                color: '#2f5d3f',
-                                font: {
-                                    size: 14,
-                                    weight: '600'
-                                }
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                font: {
-                                    size: 12,
-                                    family: "'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', sans-serif"
-                                },
-                                color: '#4b7a5c'
-                            },
-                            grid: {
-                                color: 'rgba(75, 122, 92, 0.1)',
-                                drawBorder: false
-                            },
-                            title: {
-                                display: true,
-                                text: '月',
-                                color: '#2f5d3f',
-                                font: {
-                                    size: 14,
-                                    weight: '600'
-                                }
-                            }
-                        }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
-                    },
-                    animation: {
-                        duration: 1000,
-                        easing: 'easeInOutQuart'
-                    }
-                }
-            });
-        }
-    }
-    
-    /**
-     * 売上データの準備
-     */
-    function prepareSalesData() {
-        if (customerData.length === 0) {
-            generateSampleData();
-        }
-    
-        const sortedData = customerData
-            .filter(function(customer) {
-                return customer.sales_by_customer > 0;
-            })
-            .sort(function(a, b) {
-                return b.sales_by_customer - a.sales_by_customer;
-            })
-            .slice(0, 10); // 上位10件
-    
-        return {
-            labels: sortedData.map(function(customer) {
-                return customer.customer_name;
-            }),
-            values: sortedData.map(function(customer) {
-                return customer.sales_by_customer;
-            })
-        };
-    }
-    
-    /**
-     * 配達回数データの準備
-     */
-    function prepareDeliveryData() {
-        if (customerData.length === 0) {
-            generateSampleData();
-        }
-    
-        const sortedData = customerData
-            .filter(function(customer) {
-                return customer.delivery_amount > 0;
-            })
-            .sort(function(a, b) {
-                return b.delivery_amount - a.delivery_amount;
-            })
-            .slice(0, 10); // 上位10件
-    
-        return {
-            labels: sortedData.map(function(customer) {
-                return customer.customer_name;
-            }),
-            values: sortedData.map(function(customer) {
-                return customer.delivery_amount;
-            })
-        };
-    }
-    
-    /**
-     * リードタイムデータの準備
-     */
-    function prepareLeadTimeData() {
-        if (customerData.length === 0) {
-            generateSampleData();
-        }
-    
-        // リードタイムを秒数に変換してソート
-        const dataWithSeconds = customerData.map(function(customer) {
-            return {
-                ...customer,
-                lead_time_seconds: parseLeadTimeToSeconds(customer.lead_time)
-            };
-        });
-    
-        const sortedData = dataWithSeconds
-            .filter(function(customer) {
-                return customer.lead_time_seconds > 0;
-            })
-            .sort(function(a, b) {
-                return b.lead_time_seconds - a.lead_time_seconds;
-            })
-            .slice(0, 10); // 上位10件
-    
-        return {
-            labels: sortedData.map(function(customer) {
-                return customer.customer_name;
-            }),
-            values: sortedData.map(function(customer) {
-                return customer.lead_time_seconds / 3600; // 時間単位に変換
-            }),
-            originalValues: sortedData.map(function(customer) {
-                return customer.lead_time;
-            })
-        };
-    }
-    
-    /**
-     * 売上チャート設定
-     */
-    function createSalesChartConfig(data) {
-        return {
-            type: 'bar',
-            data: {
-                labels: data.labels,
-                datasets: [{
-                    label: '売上（円）',
-                    data: data.values,
-                    backgroundColor: 'rgba(47, 93, 63, 0.8)',
-                    borderColor: 'rgba(47, 93, 63, 1)',
-                    borderWidth: 2,
-                    borderRadius: 8,
-                    borderSkipped: false
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: '顧客別売上ランキング（上位10位）',
-                        font: { size: 16, weight: 'bold' },
-                        color: '#2f5d3f'
-                    },
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return '売上: ¥' + context.parsed.y.toLocaleString();
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return '¥' + value.toLocaleString();
-                            }
-                        },
-                        title: {
-                            display: true,
-                            text: '売上（円）'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: '顧客名'
-                        },
-                        ticks: {
-                            maxRotation: 45,
-                            minRotation: 45
-                        }
-                    }
-                }
-            }
-        };
-    }
-    
-    /**
-     * 配達回数チャート設定
-     */
-    function createDeliveryChartConfig(data) {
-        return {
-            type: 'doughnut',
-            data: {
-                labels: data.labels,
-                datasets: [{
-                    label: '配達回数',
-                    data: data.values,
-                    backgroundColor: [
-                        'rgba(47, 93, 63, 0.8)',
-                        'rgba(126, 217, 87, 0.8)',
-                        'rgba(76, 175, 80, 0.8)',
-                        'rgba(139, 195, 74, 0.8)',
-                        'rgba(156, 204, 101, 0.8)',
-                        'rgba(174, 213, 129, 0.8)',
-                        'rgba(191, 223, 156, 0.8)',
-                        'rgba(209, 233, 184, 0.8)',
-                        'rgba(226, 242, 211, 0.8)',
-                        'rgba(244, 252, 239, 0.8)'
-                    ],
-                    borderColor: '#ffffff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: '顧客別配達回数（上位10位）',
-                        font: { size: 16, weight: 'bold' },
-                        color: '#2f5d3f'
-                    },
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            padding: 20,
-                            usePointStyle: true
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const total = context.dataset.data.reduce(function(a, b) { return a + b; }, 0);
-                                const percentage = ((context.parsed / total) * 100).toFixed(1);
-                                return context.label + ': ' + context.parsed + '回 (' + percentage + '%)';
-                            }
-                        }
-                    }
-                }
-            }
-        };
-    }
-    
-    /**
-     * リードタイムチャート設定
-     */
-    function createLeadTimeChartConfig(data) {
+
         return {
             type: 'line',
             data: {
-                labels: data.labels,
+                labels: labels,
                 datasets: [{
-                    label: 'リードタイム（時間）',
-                    data: data.values,
-                    borderColor: 'rgba(47, 93, 63, 1)',
+                    label: '売上（円）',
+                    data: data,
+                    borderColor: '#2f5d3f',
                     backgroundColor: 'rgba(47, 93, 63, 0.1)',
                     borderWidth: 3,
                     fill: true,
                     tension: 0.4,
-                    pointBackgroundColor: 'rgba(47, 93, 63, 1)',
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2,
+                    pointBackgroundColor: '#2f5d3f',
+                    pointBorderColor: '#fff',
                     pointRadius: 6,
-                    pointHoverRadius: 8
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    title: {
-                        display: true,
-                        text: '顧客別リードタイム（上位10位）',
-                        font: { size: 16, weight: 'bold' },
-                        color: '#2f5d3f'
-                    },
-                    legend: {
-                        display: false
-                    },
+                    legend: { display: false },
                     tooltip: {
+                        backgroundColor: 'rgba(47, 93, 63, 0.9)',
                         callbacks: {
-                            label: function(context) {
-                                const index = context.dataIndex;
-                                return data.originalValues[index];
-                            }
+                            label: context => `売上: ${format_yen(context.parsed.y)}`
                         }
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'リードタイム（時間）'
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return value.toFixed(1) + 'h';
-                            }
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: '顧客名'
-                        },
-                        ticks: {
-                            maxRotation: 45,
-                            minRotation: 45
-                        }
+                        ticks: { callback: value => format_yen(value) }
                     }
                 }
             }
         };
     }
-    
+
     /**
-     * サンプルデータの生成（デモ用）
+     * 売上履歴データ生成（サンプル）
      */
-    function generateSampleData() {
-        if (sampleDataGenerated) return;
-    
-        const sampleCustomers = [
-            '大阪商事株式会社', 'スーパーマーケット田中', '食品卸売り鈴木',
-            '飲食店チェーン佐藤', 'コンビニエンスストア高橋', '百貨店伊藤',
-            'レストラン山田', 'カフェ渡辺', 'ファミリーレストラン中村',
-            '居酒屋小林', '弁当屋加藤', 'パン屋吉田', '肉屋山本', '魚屋松本',
-            '八百屋井上', 'ケーキ屋木村', 'アイスクリーム店林', '和菓子店清水',
-            'ピザ店森', 'ラーメン店池田'
-        ];
-    
-        customerData = sampleCustomers.map(function(name, index) {
-            return {
-                customer_no: index + 1,
-                customer_name: name,
-                sales_by_customer: Math.floor(Math.random() * 2000000) + 100000,
-                lead_time: generateRandomLeadTime(),
-                delivery_amount: Math.floor(Math.random() * 50) + 1
-            };
-        });
-    
-        sampleDataGenerated = true;
-    }
-    
-    /**
-     * ランダムなリードタイムの生成
-     */
-    function generateRandomLeadTime() {
-        const types = [
-            function() { return Math.floor(Math.random() * 10) + 1 + '日'; },
-            function() { return Math.floor(Math.random() * 23) + 1 + '時間'; },
-            function() { return Math.floor(Math.random() * 59) + 1 + '分'; },
-            function() { 
-                const days = Math.floor(Math.random() * 3) + 1;
-                const hours = Math.floor(Math.random() * 23) + 1;
-                return days + '日' + hours + '時間';
-            }
-        ];
-    
-        const randomType = types[Math.floor(Math.random() * types.length)];
-        return randomType();
+    function generateSalesHistory() {
+        const months = ['1月', '2月', '3月', '4月', '5月', '6月'];
+        return months.map(month => ({
+            month: month,
+            sales: Math.floor(Math.random() * 800000) + 50000
+        }));
     }
     
     // ========== セキュリティ機能 ==========
