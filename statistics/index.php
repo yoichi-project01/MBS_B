@@ -107,246 +107,227 @@ function format_days($days)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>統計情報 - 受注管理システム</title>
     <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="statistics.css">
     <!-- SweetAlert CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body class="with-header statistics-tab-page">
-    <!-- タブナビゲーション -->
-    <div class="tab-navigation">
-        <div class="tab-container">
-            <button class="tab-btn active" data-tab="dashboard">
-                <span class="tab-icon">📊</span>
-                <span>ダッシュボード</span>
-            </button>
-            <button class="tab-btn" data-tab="customers">
-                <span class="tab-icon">👥</span>
-                <span>顧客一覧</span>
-            </button>
-            <button class="tab-btn" data-tab="charts">
-                <span class="tab-icon">📈</span>
-                <span>グラフ分析</span>
-            </button>
-            <button class="tab-btn" data-tab="export">
-                <span class="tab-icon">📁</span>
-                <span>データ出力</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- メインコンテンツ -->
-    <div class="main-content">
-        <!-- ダッシュボードタブ -->
-        <div id="dashboard" class="tab-content active">
-            <div class="dashboard-overview">
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <div class="metric-icon">👥</div>
-                        <div class="metric-title">総顧客数</div>
-                    </div>
-                    <div class="metric-value"><?php echo number_format($totalCustomers); ?></div>
-                    <div class="metric-trend trend-up">
-                        <span>↗</span>
-                        <span>+12% 前月比</span>
-                    </div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <div class="metric-icon">💰</div>
-                        <div class="metric-title">月間売上 (推定)</div>
-                    </div>
-                    <div class="metric-value"><?php echo format_yen($monthlySales); ?></div>
-                    <div class="metric-trend trend-up">
-                        <span>↗</span>
-                        <span>+8% 前月比</span>
-                    </div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <div class="metric-icon">🚚</div>
-                        <div class="metric-title">総配達回数</div>
-                    </div>
-                    <div class="metric-value"><?php echo number_format($totalDeliveries); ?></div>
-                    <div class="metric-trend trend-down">
-                        <span>↘</span>
-                        <span>-3% 前月比</span>
-                    </div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <div class="metric-icon">⏱️</div>
-                        <div class="metric-title">平均リードタイム</div>
-                    </div>
-                    <div class="metric-value"><?php echo format_days($avgLeadTime); ?></div>
-                    <div class="metric-trend trend-up">
-                        <span>↗</span>
-                        <span>改善中</span>
-                    </div>
-                </div>
+<body class="statistics-page">
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-book-open"></i>
+                <h3>受注管理</h3>
             </div>
-        </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-link active" data-tab="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>ダッシュボード</span>
+                </a>
+                <a href="#" class="nav-link" data-tab="customers">
+                    <i class="fas fa-users"></i>
+                    <span>顧客一覧</span>
+                </a>
+                <a href="#" class="nav-link" data-tab="charts">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>グラフ分析</span>
+                </a>
+            </nav>
+        </aside>
 
-        <!-- 顧客一覧タブ -->
-        <div id="customers" class="tab-content">
-            <div class="customer-search">
-                <div class="search-header">
-                    <h2 class="search-title">
-                        <span>🔍</span>
-                        顧客検索
-                    </h2>
+        <main class="main-content">
+            <header class="main-header">
+                <button class="menu-toggle-btn" id="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 id="main-title">ダッシュボード</h1>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="customerSearch" placeholder="顧客を検索...">
+                    </div>
+                    <button class="action-button" title="通知">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button class="action-button" title="設定">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="content-scroll-area">
+                <!-- ダッシュボードタブ -->
+                <div id="dashboard" class="tab-content active">
+                    <div class="dashboard-grid">
+                        <div class="metric-card">
+                            <div class="card-icon" style="background-color: #e7f3ff; color: #4a90e2;">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="card-info">
+                                <h3 class="card-title">総顧客数</h3>
+                                <p class="metric-value"><?php echo number_format($totalCustomers); ?></p>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="card-icon" style="background-color: #e5f9f0; color: #2f855a;">
+                                <i class="fas fa-yen-sign"></i>
+                            </div>
+                            <div class="card-info">
+                                <h3 class="card-title">月間売上 (推定)</h3>
+                                <p class="metric-value"><?php echo format_yen($monthlySales); ?></p>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="card-icon" style="background-color: #fff4e6; color: #d66a00;">
+                                <i class="fas fa-truck"></i>
+                            </div>
+                            <div class="card-info">
+                                <h3 class="card-title">総配達回数</h3>
+                                <p class="metric-value"><?php echo number_format($totalDeliveries); ?></p>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="card-icon" style="background-color: #f0e8ff; color: #6b46c1;">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="card-info">
+                                <h3 class="card-title">平均リードタイム</h3>
+                                <p class="metric-value"><?php echo format_days($avgLeadTime); ?></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-and-list-container">
+                        <div class="main-chart-container">
+                            <h4>売上トレンド</h4>
+                            <canvas id="mainSalesChart"></canvas>
+                        </div>
+                        <div class="top-customers-container">
+                            <h4>トップ顧客</h4>
+                            <ul class="top-customers-list">
+                                <?php
+                                $topCustomers = array_slice($customerList, 0, 5);
+                                foreach ($topCustomers as $customer) :
+                                ?>
+                                    <li>
+                                        <span class="customer-name"><?php echo htmlspecialchars($customer['customer_name']); ?></span>
+                                        <span class="customer-sales"><?php echo format_yen($customer['total_sales']); ?></span>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 顧客一覧タブ -->
+                <div id="customers" class="tab-content">
                     <div class="view-toggle">
-                        <button class="view-btn active" data-view="table">
-                            <span>📋</span>
-                            テーブル
-                        </button>
-                        <button class="view-btn" data-view="card">
-                            <span>📱</span>
-                            カード
-                        </button>
+                        <button class="view-btn active" data-view="table"><i class="fas fa-table"></i> テーブル表示</button>
+                        <button class="view-btn" data-view="card"><i class="fas fa-id-card"></i> カード表示</button>
                     </div>
-                </div>
-                <div class="search-box">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" class="search-input" placeholder="顧客名で検索...">
-                </div>
-            </div>
 
-            <!-- テーブルビュー -->
-            <div class="table-view">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>顧客名 <button class="sort-btn" data-column="name">▲▼</button></th>
-                            <th>売上（円） <button class="sort-btn" data-column="sales">▲▼</button></th>
-                            <th>リードタイム <button class="sort-btn" data-column="leadtime">▲▼</button></th>
-                            <th>配達回数 <button class="sort-btn" data-column="delivery">▲▼</button></th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                    <div class="table-view-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th data-sort="name">顧客名 <i class="fas fa-sort"></i></th>
+                                    <th data-sort="sales">売上 <i class="fas fa-sort"></i></th>
+                                    <th data-sort="leadtime">リードタイム <i class="fas fa-sort"></i></th>
+                                    <th data-sort="deliveries">配達回数 <i class="fas fa-sort"></i></th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($customerList as $customer) : ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($customer['customer_name']); ?></td>
+                                        <td class="text-right"><?php echo format_yen($customer['total_sales']); ?></td>
+                                        <td class="text-center"><?php echo format_days($customer['avg_lead_time']); ?></td>
+                                        <td class="text-center"><?php echo number_format($customer['delivery_count']); ?></td>
+                                        <td class="text-center">
+                                            <button class="table-action-btn" onclick="showDetails('<?php echo htmlspecialchars(addslashes($customer['customer_name'])); ?>')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="table-action-btn" onclick="showGraph('<?php echo htmlspecialchars(addslashes($customer['customer_name'])); ?>')">
+                                                <i class="fas fa-chart-line"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card-view-container" style="display: none;">
                         <?php foreach ($customerList as $customer) : ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($customer['customer_name']); ?></td>
-                                <td><?php echo format_yen($customer['total_sales']); ?></td>
-                                <td><?php echo format_days($customer['avg_lead_time']); ?></td>
-                                <td><?php echo number_format($customer['delivery_count']); ?></td>
-                                <td>
-                                    <button class="action-btn" onclick="showDetails('<?php echo htmlspecialchars(addslashes($customer['customer_name'])); ?>')">
-                                        詳細
-                                    </button>
-                                </td>
-                            </tr>
+                            <div class="customer-card">
+                                <div class="card-main-info">
+                                    <h4 class="customer-name"><?php echo htmlspecialchars($customer['customer_name']); ?></h4>
+                                    <p class="customer-id">ID: <?php echo htmlspecialchars($customer['customer_no']); ?></p>
+                                </div>
+                                <div class="card-stats">
+                                    <div class="stat">
+                                        <p class="stat-value"><?php echo format_yen($customer['total_sales']); ?></p>
+                                        <p class="stat-label">売上</p>
+                                    </div>
+                                    <div class="stat">
+                                        <p class="stat-value"><?php echo number_format($customer['delivery_count']); ?></p>
+                                        <p class="stat-label">配達回数</p>
+                                    </div>
+                                    <div class="stat">
+                                        <p class="stat-value"><?php echo format_days($customer['avg_lead_time']); ?></p>
+                                        <p class="stat-label">リードタイム</p>
+                                    </div>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="card-btn" onclick="showDetails('<?php echo htmlspecialchars(addslashes($customer['customer_name'])); ?>')">詳細</button>
+                                    <button class="card-btn primary" onclick="showGraph('<?php echo htmlspecialchars(addslashes($customer['customer_name'])); ?>')">グラフ</button>
+                                </div>
+                            </div>
                         <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
+                    </div>
+                </div>
 
-            <!-- カードビュー -->
-            <div class="card-view" style="display: none;">
-                <?php foreach ($customerList as $customer) : ?>
-                    <div class="customer-card">
-                        <div class="card-header">
-                            <div>
-                                <div class="customer-name"><?php echo htmlspecialchars($customer['customer_name']); ?></div>
-                                <div class="customer-id">ID: <?php echo htmlspecialchars($customer['customer_no']); ?></div>
-                            </div>
-                        </div>
-                        <div class="card-stats">
-                            <div class="card-stat">
-                                <div class="card-stat-label">売上</div>
-                                <div class="card-stat-value"><?php echo format_yen($customer['total_sales']); ?></div>
-                            </div>
-                            <div class="card-stat">
-                                <div class="card-stat-label">配達回数</div>
-                                <div class="card-stat-value"><?php echo number_format($customer['delivery_count']); ?></div>
-                            </div>
-                            <div class="card-stat">
-                                <div class="card-stat-label">リードタイム</div>
-                                <div class="card-stat-value"><?php echo format_days($customer['avg_lead_time']); ?></div>
-                            </div>
-                            <div class="card-stat">
-                                <div class="card-stat-label">最終注文</div>
-                                <div class="card-stat-value"><?php echo htmlspecialchars($customer['last_order_date'] ? (new DateTime($customer['last_order_date']))->format('Y-m-d') : 'N/A'); ?></div>
-                            </div>
-                        </div>
-                        <div class="card-actions">
-                            <button class="card-btn secondary" onclick="showDetails('<?php echo htmlspecialchars(addslashes($customer['customer_name'])); ?>')">詳細</button>
-                            <button class="card-btn primary" onclick="showGraph('<?php echo htmlspecialchars(addslashes($customer['customer_name'])); ?>')">グラフ</button>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-
-        <!-- グラフ分析タブ -->
-        <div id="charts" class="tab-content">
-            <div class="chart-selector">
-                <h2 class="search-title">
-                    <span>📊</span>
-                    分析グラフを選択
-                </h2>
-                <div class="chart-options">
-                    <div class="chart-option active" data-chart="sales">
-                        <span class="chart-option-icon">💰</span>
-                        <div class="chart-option-title">売上分析</div>
-                    </div>
-                    <div class="chart-option" data-chart="delivery">
-                        <span class="chart-option-icon">🚚</span>
-                        <div class="chart-option-title">配達実績</div>
-                    </div>
-                    <div class="chart-option" data-chart="leadtime">
-                        <span class="chart-option-icon">⏱️</span>
-                        <div class="chart-option-title">リードタイム</div>
-                    </div>
-                    <div class="chart-option" data-chart="trend">
-                        <span class="chart-option-icon">📈</span>
-                        <div class="chart-option-title">トレンド分析</div>
+                <!-- グラフ分析タブ -->
+                <div id="charts" class="tab-content">
+                    <div class="chart-container-full">
+                        <canvas id="salesChart"></canvas>
                     </div>
                 </div>
             </div>
-
-            <div class="chart-container">
-                <div style="text-align: center;">
-                    <span style="font-size: 48px; display: block; margin-bottom: 16px;">📊</span>
-                    <h3 style="color: var(--main-green); margin-bottom: 8px;">グラフを選択してください</h3>
-                    <p>上記のオプションから表示したいグラフを選択してください</p>
-                </div>
-            </div>
-        </div>
+        </main>
     </div>
 
-    <!-- 詳細モーダル -->
+    <!-- モーダル -->
     <div id="detailModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title" id="detailTitle">顧客詳細情報</h2>
-                <button class="close" onclick="closeModal('detailModal')">&times;</button>
+                <h2 id="detailTitle">顧客詳細</h2>
+                <button class="close-modal" onclick="closeModal('detailModal')">&times;</button>
             </div>
-            <div id="detailContent">
-                <!-- 詳細情報がここに表示されます -->
+            <div class="modal-body" id="detailContent">
+                <!-- ここに詳細コンテンツが挿入されます -->
             </div>
         </div>
     </div>
 
-    <!-- グラフモーダル -->
     <div id="graphModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title" id="graphTitle">売上推移グラフ</h2>
-                <button class="close" onclick="closeModal('graphModal')">&times;</button>
+                <h2 id="graphTitle">売上推移</h2>
+                <button class="close-modal" onclick="closeModal('graphModal')">&times;</button>
             </div>
-            <div class="chart-container">
-                <canvas id="modalCanvas"></canvas>
+            <div class="modal-body">
+                <canvas id="modalChart"></canvas>
             </div>
         </div>
     </div>
 
     <script src="../script.js"></script>
+    <script src="statistics.js"></script>
 </body>
 
 </html>
