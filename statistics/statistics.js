@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function () {
     const menuToggle = document.getElementById('menu-toggle');
     const sidebar = document.querySelector('.sidebar');
@@ -28,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
         menuToggle.addEventListener('click', toggleSidebar);
     }
 
-    // --- Navigation & other functionalities --- //
+    // --- Navigation functionality --- //
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -40,18 +39,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Tab switching logic
             const tab = link.dataset.tab;
-            document.querySelector('.nav-link.active').classList.remove('active');
+            const activeNavLink = document.querySelector('.nav-link.active');
+            const activeTabContent = document.querySelector('.tab-content.active');
+            
+            if (activeNavLink) {
+                activeNavLink.classList.remove('active');
+            }
             link.classList.add('active');
             
-            document.querySelector('.tab-content.active').classList.remove('active');
-            document.getElementById(tab).classList.add('active');
+            if (activeTabContent) {
+                activeTabContent.classList.remove('active');
+            }
+            const targetTab = document.getElementById(tab);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
 
             // Update title
-            mainTitle.textContent = link.querySelector('span').textContent;
+            const titleSpan = link.querySelector('span');
+            if (titleSpan) {
+                mainTitle.textContent = titleSpan.textContent;
+            }
         });
     });
 
-    // ... (The rest of the chart, search, and modal JS remains the same)
+    // --- View Toggle (Table/Card) --- //
     const viewBtns = document.querySelectorAll('.view-btn');
     const tableView = document.querySelector('.table-view-container');
     const cardView = document.querySelector('.card-view-container');
@@ -63,124 +75,199 @@ document.addEventListener('DOMContentLoaded', function () {
                 btn.classList.add('active');
 
                 if (btn.dataset.view === 'table') {
-                    tableView.style.display = 'block';
-                    cardView.style.display = 'none';
+                    if (tableView) tableView.style.display = 'block';
+                    if (cardView) cardView.style.display = 'none';
                 } else {
-                    tableView.style.display = 'none';
-                    cardView.style.display = 'grid';
+                    if (tableView) tableView.style.display = 'none';
+                    if (cardView) cardView.style.display = 'grid';
                 }
             });
         });
     }
 
-    const searchInput = document.getElementById('customerSearch');
-    if (searchInput) {
-        searchInput.addEventListener('keyup', () => {
-            const filter = searchInput.value.toLowerCase();
+    // --- Customer Search Functionality (in customers tab) --- //
+    const customerSearchInput = document.getElementById('customerSearchInput');
+    if (customerSearchInput) {
+        customerSearchInput.addEventListener('keyup', () => {
+            const filter = customerSearchInput.value.toLowerCase();
             
+            // Search in table view
             const rows = document.querySelectorAll('.data-table tbody tr');
             rows.forEach(row => {
-                const name = row.cells[0].textContent.toLowerCase();
-                row.style.display = name.includes(filter) ? '' : 'table-row';
+                const name = row.cells[0]?.textContent.toLowerCase() || '';
+                row.style.display = name.includes(filter) ? '' : 'none';
             });
 
+            // Search in card view
             const cards = document.querySelectorAll('.card-view-container .customer-card');
             cards.forEach(card => {
-                const name = card.querySelector('.customer-name').textContent.toLowerCase();
+                const name = card.querySelector('.customer-name')?.textContent.toLowerCase() || '';
                 card.style.display = name.includes(filter) ? 'flex' : 'none';
             });
         });
     }
 
-    const mainSalesChartCtx = document.getElementById('mainSalesChart')?.getContext('2d');
-    if (mainSalesChartCtx) {
-        new Chart(mainSalesChartCtx, {
-            type: 'line',
-            data: {
-                labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月'],
-                datasets: [{
-                    label: '売上',
-                    data: [65000, 59000, 80000, 81000, 56000, 55000, 40000],
-                    borderColor: '#2c5e42',
-                    backgroundColor: 'rgba(44, 94, 66, 0.1)',
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: { y: { beginAtZero: true } }
-            }
+    // --- Table Sorting Functionality --- //
+    const sortHeaders = document.querySelectorAll('[data-sort]');
+    sortHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+            const sortType = header.dataset.sort;
+            const table = header.closest('table');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            // Determine sort direction
+            const isAscending = header.classList.contains('sort-asc');
+            
+            // Remove all sort classes
+            sortHeaders.forEach(h => {
+                h.classList.remove('sort-asc', 'sort-desc');
+            });
+            
+            // Add appropriate sort class
+            header.classList.add(isAscending ? 'sort-desc' : 'sort-asc');
+            
+            // Sort rows
+            rows.sort((a, b) => {
+                let aValue, bValue;
+                
+                switch(sortType) {
+                    case 'name':
+                        aValue = a.cells[0].textContent.trim();
+                        bValue = b.cells[0].textContent.trim();
+                        break;
+                    case 'sales':
+                        aValue = parseFloat(a.cells[1].textContent.replace(/[,¥]/g, '')) || 0;
+                        bValue = parseFloat(b.cells[1].textContent.replace(/[,¥]/g, '')) || 0;
+                        break;
+                    case 'leadtime':
+                        aValue = parseFloat(a.cells[2].textContent.replace(/[日]/g, '')) || 0;
+                        bValue = parseFloat(b.cells[2].textContent.replace(/[日]/g, '')) || 0;
+                        break;
+                    case 'deliveries':
+                        aValue = parseInt(a.cells[3].textContent.replace(/[,]/g, '')) || 0;
+                        bValue = parseInt(b.cells[3].textContent.replace(/[,]/g, '')) || 0;
+                        break;
+                    default:
+                        return 0;
+                }
+                
+                if (typeof aValue === 'string') {
+                    return isAscending ? bValue.localeCompare(aValue) : aValue.localeCompare(bValue);
+                } else {
+                    return isAscending ? bValue - aValue : aValue - bValue;
+                }
+            });
+            
+            // Re-append sorted rows
+            rows.forEach(row => tbody.appendChild(row));
         });
+    });
+
+    // --- Add hover effects for better UX --- //
+    const metricCards = document.querySelectorAll('.metric-card');
+    metricCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-5px)';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+        });
+    });
+
+    // --- Top Customer Cards Animation --- //
+    const customerCards = document.querySelectorAll('.top-customer-card');
+    customerCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('fade-in-up');
+    });
+
+    // --- Responsive handling --- //
+    function handleResize() {
+        if (window.innerWidth > 768) {
+            // Close mobile sidebar on desktop
+            if (sidebar.classList.contains('active')) {
+                toggleSidebar();
+            }
+        }
     }
 
-    const salesChartCtx = document.getElementById('salesChart')?.getContext('2d');
-    if (salesChartCtx) {
-        new Chart(salesChartCtx, {
-            type: 'bar',
-            data: {
-                labels: ['商品A', '商品B', '商品C', '商品D', '商品E'],
-                datasets: [{
-                    label: '販売数',
-                    data: [120, 190, 150, 210, 130],
-                    backgroundColor: '#6ac083',
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: { y: { beginAtZero: true } }
-            }
-        });
-    }
+    window.addEventListener('resize', handleResize);
 });
 
+// --- Customer Details Modal --- //
 function showDetails(customerName) {
     const modal = document.getElementById('detailModal');
     const title = document.getElementById('detailTitle');
     const content = document.getElementById('detailContent');
 
-    title.textContent = customerName + ' の詳細';
-    content.innerHTML = `<p>ここに ${customerName} の詳細な顧客情報、注文履歴、連絡先などを表示します。</p>`;
-    modal.style.display = 'block';
+    if (modal && title && content) {
+        title.textContent = customerName + ' の詳細';
+        content.innerHTML = `
+            <div class="customer-detail-info">
+                <h4>顧客情報</h4>
+                <p><strong>顧客名:</strong> ${customerName}</p>
+                <p><strong>登録日:</strong> 詳細情報を取得中...</p>
+                <p><strong>連絡先:</strong> 詳細情報を取得中...</p>
+                <p><strong>住所:</strong> 詳細情報を取得中...</p>
+                
+                <h4>取引履歴</h4>
+                <p>過去の注文履歴や配達記録をここに表示します。</p>
+                
+                <h4>備考</h4>
+                <p>特記事項があればここに表示されます。</p>
+            </div>
+        `;
+        modal.style.display = 'block';
+        
+        // Focus management for accessibility
+        modal.focus();
+    }
 }
 
-function showGraph(customerName) {
-    const modal = document.getElementById('graphModal');
-    const title = document.getElementById('graphTitle');
-    
-    title.textContent = customerName + ' の売上推移';
-    modal.style.display = 'block';
-
-    const modalChartCtx = document.getElementById('modalChart').getContext('2d');
-    new Chart(modalChartCtx, {
-        type: 'line',
-        data: {
-            labels: ['4月', '5月', '6月', '7月'],
-            datasets: [{
-                label: '月間売上',
-                data: [12000, 19000, 13000, 17000],
-                borderColor: '#2c5e42',
-                tension: 0.1
-            }]
-        },
-        options: { responsive: true }
-    });
-}
-
+// --- Modal Close Function --- //
 function closeModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
 }
 
+// --- Close modal when clicking outside --- //
 window.addEventListener('click', function(event) {
     const detailModal = document.getElementById('detailModal');
-    const graphModal = document.getElementById('graphModal');
-    if (event.target == detailModal) {
+    if (event.target === detailModal) {
         closeModal('detailModal');
     }
-    if (event.target == graphModal) {
-        closeModal('graphModal');
+});
+
+// --- Keyboard navigation for modals --- //
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const openModal = document.querySelector('.modal[style*="block"]');
+        if (openModal) {
+            closeModal(openModal.id);
+        }
     }
 });
+
+// --- Initialize animations --- //
+document.addEventListener('DOMContentLoaded', function() {
+    // Add fade-in animation to elements
+    const animatedElements = document.querySelectorAll('.metric-card, .top-customer-card');
+    animatedElements.forEach((element, index) => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            element.style.transition = 'all 0.6s ease';
+            element.style.opacity = '1';
+            element.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+
+// --- Export functions for global access --- //
+window.showDetails = showDetails;
+window.closeModal = closeModal;

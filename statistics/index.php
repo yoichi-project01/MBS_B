@@ -74,7 +74,6 @@ try {
     $customerListQuery = "SELECT * FROM customer_summary ORDER BY total_sales DESC";
     $customersStmt = $pdo->query($customerListQuery);
     $customerList = $customersStmt->fetchAll(PDO::FETCH_ASSOC);
-
 } catch (PDOException $e) {
     // 本番環境では、エラーメッセージをログに記録するなどの処理を推奨
     error_log("Statistics page database error: " . $e->getMessage());
@@ -112,8 +111,6 @@ function format_days($days)
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body class="statistics-page">
@@ -132,10 +129,6 @@ function format_days($days)
                     <i class="fas fa-users"></i>
                     <span>顧客一覧</span>
                 </a>
-                <a href="#" class="nav-link" data-tab="charts">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>グラフ分析</span>
-                </a>
             </nav>
         </aside>
 
@@ -145,18 +138,6 @@ function format_days($days)
                     <i class="fas fa-bars"></i>
                 </button>
                 <h1 id="main-title">ダッシュボード</h1>
-                <div class="header-actions">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="customerSearch" placeholder="顧客を検索...">
-                    </div>
-                    <button class="action-button" title="通知">
-                        <i class="fas fa-bell"></i>
-                    </button>
-                    <button class="action-button" title="設定">
-                        <i class="fas fa-cog"></i>
-                    </button>
-                </div>
             </header>
 
             <div class="content-scroll-area">
@@ -200,33 +181,47 @@ function format_days($days)
                             </div>
                         </div>
                     </div>
-                    <div class="chart-and-list-container">
-                        <div class="main-chart-container">
-                            <h4>売上トレンド</h4>
-                            <canvas id="mainSalesChart"></canvas>
-                        </div>
-                        <div class="top-customers-container">
-                            <h4>トップ顧客</h4>
-                            <ul class="top-customers-list">
-                                <?php
-                                $topCustomers = array_slice($customerList, 0, 5);
-                                foreach ($topCustomers as $customer) :
-                                ?>
-                                    <li>
-                                        <span class="customer-name"><?php echo htmlspecialchars($customer['customer_name']); ?></span>
-                                        <span class="customer-sales"><?php echo format_yen($customer['total_sales']); ?></span>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
+                    <div class="top-customers-section">
+                        <h4>トップ顧客</h4>
+                        <div class="top-customers-grid">
+                            <?php
+                            $topCustomers = array_slice($customerList, 0, 10);
+                            foreach ($topCustomers as $index => $customer) :
+                            ?>
+                            <div class="top-customer-card">
+                                <div class="customer-rank"><?php echo $index + 1; ?></div>
+                                <div class="customer-info">
+                                    <div class="customer-name">
+                                        <?php echo htmlspecialchars($customer['customer_name']); ?></div>
+                                    <div class="customer-stats">
+                                        <span class="stat-item">
+                                            <i class="fas fa-yen-sign"></i>
+                                            <?php echo format_yen($customer['total_sales']); ?>
+                                        </span>
+                                        <span class="stat-item">
+                                            <i class="fas fa-truck"></i>
+                                            <?php echo number_format($customer['delivery_count']); ?>回
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
 
                 <!-- 顧客一覧タブ -->
                 <div id="customers" class="tab-content">
-                    <div class="view-toggle">
-                        <button class="view-btn active" data-view="table"><i class="fas fa-table"></i> テーブル表示</button>
-                        <button class="view-btn" data-view="card"><i class="fas fa-id-card"></i> カード表示</button>
+                    <div class="customer-search-section">
+                        <div class="search-container">
+                            <input type="text" id="customerSearchInput" placeholder="顧客名で検索..." class="search-input">
+                            <i class="fas fa-search search-icon"></i>
+                        </div>
+                        <div class="view-toggle">
+                            <button class="view-btn active" data-view="table"><i class="fas fa-table"></i>
+                                テーブル表示</button>
+                            <button class="view-btn" data-view="card"><i class="fas fa-id-card"></i> カード表示</button>
+                        </div>
                     </div>
 
                     <div class="table-view-container">
@@ -242,20 +237,19 @@ function format_days($days)
                             </thead>
                             <tbody>
                                 <?php foreach ($customerList as $customer) : ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($customer['customer_name']); ?></td>
-                                        <td class="text-right"><?php echo format_yen($customer['total_sales']); ?></td>
-                                        <td class="text-center"><?php echo format_days($customer['avg_lead_time']); ?></td>
-                                        <td class="text-center"><?php echo number_format($customer['delivery_count']); ?></td>
-                                        <td class="text-center">
-                                            <button class="table-action-btn" onclick="showDetails('<?php echo htmlspecialchars(addslashes($customer['customer_name'])); ?>')">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button class="table-action-btn" onclick="showGraph('<?php echo htmlspecialchars(addslashes($customer['customer_name'])); ?>')">
-                                                <i class="fas fa-chart-line"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($customer['customer_name']); ?></td>
+                                    <td class="text-right"><?php echo format_yen($customer['total_sales']); ?></td>
+                                    <td class="text-center"><?php echo format_days($customer['avg_lead_time']); ?></td>
+                                    <td class="text-center"><?php echo number_format($customer['delivery_count']); ?>
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="table-action-btn"
+                                            onclick="showDetails('<?php echo htmlspecialchars(addslashes($customer['customer_name'])); ?>')">
+                                            <i class="fas fa-eye"></i> 詳細
+                                        </button>
+                                    </td>
+                                </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
@@ -263,45 +257,41 @@ function format_days($days)
 
                     <div class="card-view-container" style="display: none;">
                         <?php foreach ($customerList as $customer) : ?>
-                            <div class="customer-card">
-                                <div class="card-main-info">
-                                    <h4 class="customer-name"><?php echo htmlspecialchars($customer['customer_name']); ?></h4>
-                                    <p class="customer-id">ID: <?php echo htmlspecialchars($customer['customer_no']); ?></p>
+                        <div class="customer-card">
+                            <div class="card-main-info">
+                                <h4 class="customer-name"><?php echo htmlspecialchars($customer['customer_name']); ?>
+                                </h4>
+                                <p class="customer-id">ID: <?php echo htmlspecialchars($customer['customer_no']); ?></p>
+                            </div>
+                            <div class="card-stats">
+                                <div class="stat">
+                                    <p class="stat-value"><?php echo format_yen($customer['total_sales']); ?></p>
+                                    <p class="stat-label">売上</p>
                                 </div>
-                                <div class="card-stats">
-                                    <div class="stat">
-                                        <p class="stat-value"><?php echo format_yen($customer['total_sales']); ?></p>
-                                        <p class="stat-label">売上</p>
-                                    </div>
-                                    <div class="stat">
-                                        <p class="stat-value"><?php echo number_format($customer['delivery_count']); ?></p>
-                                        <p class="stat-label">配達回数</p>
-                                    </div>
-                                    <div class="stat">
-                                        <p class="stat-value"><?php echo format_days($customer['avg_lead_time']); ?></p>
-                                        <p class="stat-label">リードタイム</p>
-                                    </div>
+                                <div class="stat">
+                                    <p class="stat-value"><?php echo number_format($customer['delivery_count']); ?></p>
+                                    <p class="stat-label">配達回数</p>
                                 </div>
-                                <div class="card-actions">
-                                    <button class="card-btn" onclick="showDetails('<?php echo htmlspecialchars(addslashes($customer['customer_name'])); ?>')">詳細</button>
-                                    <button class="card-btn primary" onclick="showGraph('<?php echo htmlspecialchars(addslashes($customer['customer_name'])); ?>')">グラフ</button>
+                                <div class="stat">
+                                    <p class="stat-value"><?php echo format_days($customer['avg_lead_time']); ?></p>
+                                    <p class="stat-label">リードタイム</p>
                                 </div>
                             </div>
+                            <div class="card-actions">
+                                <button class="card-btn"
+                                    onclick="showDetails('<?php echo htmlspecialchars(addslashes($customer['customer_name'])); ?>')">
+                                    <i class="fas fa-eye"></i> 詳細
+                                </button>
+                            </div>
+                        </div>
                         <?php endforeach; ?>
-                    </div>
-                </div>
-
-                <!-- グラフ分析タブ -->
-                <div id="charts" class="tab-content">
-                    <div class="chart-container-full">
-                        <canvas id="salesChart"></canvas>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- モーダル -->
+    <!-- 顧客詳細モーダル -->
     <div id="detailModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -310,18 +300,6 @@ function format_days($days)
             </div>
             <div class="modal-body" id="detailContent">
                 <!-- ここに詳細コンテンツが挿入されます -->
-            </div>
-        </div>
-    </div>
-
-    <div id="graphModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="graphTitle">売上推移</h2>
-                <button class="close-modal" onclick="closeModal('graphModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <canvas id="modalChart"></canvas>
             </div>
         </div>
     </div>
