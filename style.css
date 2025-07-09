@@ -1,3 +1,4 @@
+[File content truncated: showing lines 1-2000 of 3100 total lines. Use offset/limit parameters to view more.]
 :root {
     --main-green: #2f5d3f;
     --sub-green: #4b7a5c;
@@ -314,6 +315,25 @@ textarea:focus-visible {
 .menu-overlay.active {
     opacity: 1;
     visibility: visible;
+}
+
+.mobile-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.menu-overlay .nav {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+}
+
+.menu-overlay .nav-item {
+    font-size: 24px;
 }
 
 /* ========== 統計情報タブナビゲーション ========== */
@@ -847,63 +867,6 @@ textarea:focus-visible {
     background: var(--main-green);
     transform: translateY(-2px);
 }
-
-/* ブレッドクラムナビゲーション（オプション機能） */
-.breadcrumb-nav {
-    background: linear-gradient(135deg, #f8faf9 0%, #e8f5e8 100%);
-    border-bottom: 1px solid rgba(126, 217, 87, 0.2);
-    padding: 8px 32px;
-    font-size: 14px;
-    color: var(--sub-green);
-    box-shadow: 0 2px 8px rgba(47, 93, 63, 0.05);
-    position: fixed;
-    top: var(--header-height);
-    left: 0;
-    right: 0;
-    z-index: 999;
-    transition: all 0.3s ease;
-}
-
-.breadcrumb-item {
-    display: inline-flex;
-    align-items: center;
-}
-
-.breadcrumb-link {
-    color: var(--main-green);
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    padding: 4px 8px;
-    border-radius: 4px;
-}
-
-.breadcrumb-link:hover {
-    background: rgba(126, 217, 87, 0.1);
-    color: var(--sub-green);
-    transform: translateX(2px);
-}
-
-.breadcrumb-separator {
-    margin: 0 8px;
-    color: var(--sub-green);
-    font-weight: 600;
-}
-
-.breadcrumb-current {
-    color: var(--main-green);
-    font-weight: 700;
-}
-
-/* ブレッドクラムが表示される場合のbody調整 */
-body.with-breadcrumb {
-    padding-top: calc(var(--header-height) + 40px);
-}
-
-body.with-breadcrumb .container {
-    min-height: calc(100vh - var(--header-height) - 40px);
-}
-
 /* ========== メインコンテンツエリア ========== */
 
 /* 背景の装飾 */
@@ -2055,7 +2018,7 @@ body.with-header .back-button-top {
 @keyframes modalSlideIn {
     from {
         opacity: 0;
-        transform: translateY(-30px) scale(0.9);
+        transform: translateY(-50px) scale(0.9);
     }
 
     to {
@@ -2070,295 +2033,428 @@ body.with-header .back-button-top {
     align-items: center;
     margin-bottom: 20px;
     padding-bottom: 15px;
-    border-bottom: 2px solid rgba(126, 217, 87, 0.2);
+    border-bottom: 2px solid var(--border-color);
 }
 
-.modal-title {
-    color: var(--main-green);
+.modal-header h2 {
+    color: var(--primary-color);
     font-size: 20px;
     font-weight: 700;
     margin: 0;
 }
 
-.close {
-    color: var(--sub-green);
+.close-modal {
+    color: var(--font-color-light);
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.3s ease;
-    border: none;
     background: none;
-    width: 40px;
-    height: 40px;
+    border: none;
+    padding: 0;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
+    transition: all 0.3s ease;
 }
 
-.close:hover {
-    color: var(--main-green);
-    background: rgba(126, 217, 87, 0.1);
-    transform: scale(1.1);
+.close-modal:hover {
+    color: var(--primary-color);
+    background-color: var(--bg-color);
 }
 
-.chart-container {
-    height: 300px;
-    padding: 15px;
-    margin: 20px 0;
-    position: relative;
-    background: rgba(248, 250, 249, 0.5);
-    border-radius: 12px;
-    border: 1px solid rgba(126, 217, 87, 0.2);
+.customer-detail-info h4 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    margin-top: 20px;
+    font-size: 16px;
 }
 
-.chart-container::before {
-    content: '';
+.customer-detail-info h4:first-child {
+    margin-top: 0;
+}
+
+.customer-detail-info p {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+/* --- Animation Classes --- */
+.fade-in-up {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+/* --- Responsive Styles --- */
+@media (max-width: 768px) {
+    .top-nav {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px;
+    }
+
+    .top-nav-header {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .top-nav-links {
+        width: 100%;
+        justify-content: space-around;
+        gap: 5px;
+    }
+
+    .nav-link {
+        flex: 1;
+        justify-content: center;
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+    
+    .nav-link span {
+        display: none;
+    }
+
+    .main-header {
+        padding: 15px;
+    }
+
+    #main-title {
+        font-size: 20px;
+    }
+
+    .content-scroll-area {
+        padding: 15px;
+    }
+
+    .customer-search-section {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+
+    .search-container {
+        max-width: none;
+    }
+
+    .view-toggle {
+        align-self: center;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .metric-card {
+        padding: 16px;
+    }
+
+    .card-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+
+    .card-info .metric-value {
+        font-size: 24px;
+    }
+
+    .top-customers-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .top-customer-card {
+        padding: 12px;
+    }
+
+    .customer-rank {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+
+    .customer-name {
+        font-size: 14px;
+    }
+
+    .customer-stats {
+        gap: 12px;
+    }
+
+    .stat-item {
+        font-size: 12px;
+    }
+
+    .data-table {
+        font-size: 12px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 10px 8px;
+    }
+
+    .card-view-container {
+        grid-template-columns: 1fr;
+    }
+
+    .customer-card {
+        padding: 16px;
+    }
+
+    .card-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-link {
+        font-size: 12px;
+        gap: 5px;
+    }
+    
+    .nav-link i {
+        font-size: 14px;
+    }
+
+    .metric-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px 16px;
+    }
+
+    .card-icon {
+        margin-bottom: 12px;
+    }
+
+    .top-customer-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .customer-info {
+        width: 100%;
+    }
+
+    .customer-stats {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .view-toggle {
+        display: flex;
+        width: 100%;
+    }
+
+    .view-btn {
+        flex: 1;
+        padding: 12px 8px;
+        font-size: 12px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 8px 6px;
+        font-size: 11px;
+    }
+
+    .table-action-btn {
+        padding: 6px 8px;
+        font-size: 12px;
+    }
+
+    .card-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- Accessibility --- */
+.sr-only {
     position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+:root {
+    --primary-color: #2c5e42;
+    --primary-dark: #244d36;
+    --accent-color: #6ac083;
+    --bg-color: #f4f7f6;
+    --top-nav-bg: #ffffff;
+    --card-bg: #ffffff;
+    --font-color: #333333;
+    --font-color-light: #757575;
+    --border-color: #e0e0e0;
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    --radius: 12px;
+    --transition-speed: 0.3s;
+}
+
+/* --- Base Styles & Resets --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body.statistics-page {
+    font-family: 'Noto Sans JP', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--font-color);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* --- Dashboard Container (Main Layout) --- */
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+}
+
+/* --- Top Navigation --- */
+.top-nav {
+    display: flex;
+    align-items: center;
+    background-color: var(--top-nav-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 20px;
+    flex-shrink: 0;
+    box-shadow: var(--shadow);
+}
+
+.top-nav-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 0;
+    margin-right: 30px;
+    color: var(--primary-color);
+}
+
+.top-nav-header i {
+    font-size: 24px;
+}
+
+.top-nav-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.top-nav-links {
+    display: flex;
+    gap: 10px;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    color: var(--font-color-light);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.nav-link:hover {
+    background-color: var(--bg-color);
+    color: var(--primary-dark);
+}
+
+.nav-link.active {
+    background-color: #e7f3ff;
+    color: #4a90e2;
+    font-weight: 700;
+}
+
+.nav-link i {
+    font-size: 16px;
+}
+
+/* --- Main Content --- */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.main-header {
+    display: flex;
+    align-items: center;
+    padding: 20px 30px;
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+#main-title {
+    font-size: 24px;
+}
+
+.content-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px;
+}
+
+/* --- Overlay --- */
+.overlay {
+    display: none;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(126, 217, 87, 0.05) 0%, rgba(47, 93, 63, 0.02) 100%);
-    border-radius: 12px;
-    pointer-events: none;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity var(--transition-speed) ease;
 }
 
-/* スクロールバーのカスタマイズ */
-.enhanced-statistics-table tbody::-webkit-scrollbar {
-    width: 8px;
-}
-
-.enhanced-statistics-table tbody::-webkit-scrollbar-track {
-    background: rgba(47, 93, 63, 0.1);
-    border-radius: 4px;
-}
-
-.enhanced-statistics-table tbody::-webkit-scrollbar-thumb {
-    background: linear-gradient(90deg, var(--main-green), var(--sub-green));
-    border-radius: 4px;
-}
-
-.enhanced-statistics-table tbody::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(90deg, var(--sub-green), var(--accent-green));
-}
-
-/* Firefox用スクロールバー */
-.enhanced-statistics-table tbody {
-    scrollbar-width: thin;
-    scrollbar-color: var(--main-green) rgba(47, 93, 63, 0.1);
-}
-
-/* ========== 通常の統計情報ページスタイル（既存との互換性） ========== */
-.search-container {
-    max-width: 600px;
-    margin: 0 auto 40px auto;
-    padding: 0 20px;
-}
-
-.search-form {
-    width: 100%;
-}
-
-.search-input-container {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
-    border-radius: var(--radius);
-    padding: 8px;
-    box-shadow: var(--shadow);
-    border: 2px solid transparent;
-    transition: all var(--transition);
-}
-
-.search-input-container:focus-within {
-    border-color: var(--accent-green);
-    box-shadow: var(--shadow-hover);
-}
-
-.statistics-container {
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-.no-data-message {
-    text-align: center;
-    padding: 60px 20px;
-    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    border: 2px dashed var(--sub-green);
-}
-
-.no-data-message i {
-    font-size: 48px;
-    margin-bottom: 16px;
+.overlay.active {
     display: block;
+    opacity: 1;
 }
 
-.no-data-message p {
-    font-size: 18px;
-    color: var(--main-green);
-    margin-bottom: 8px;
-    font-weight: 600;
+/* --- Component Styles (Mobile First) --- */
+.tab-content {
+    display: none;
+    animation: fadeIn .5s;
 }
 
-.sub-message {
-    font-size: 14px !important;
-    color: var(--sub-green) !important;
-    font-weight: 400 !important;
-}
-
-.table-wrapper {
-    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    margin-bottom: 24px;
-}
-
-.statistics-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: var(--font-family);
-}
-
-.statistics-table thead {
-    background: linear-gradient(135deg, var(--main-green) 0%, var(--sub-green) 100%);
-}
-
-.statistics-table th {
-    padding: 16px 12px;
-    text-align: left;
-    color: white;
-    font-weight: 600;
-    font-size: 14px;
-    position: relative;
-}
-
-.statistics-table th span {
+.tab-content.active {
     display: block;
-    margin-bottom: 4px;
-}
-
-.statistics-table td {
-    padding: 16px 12px;
-    border-bottom: 1px solid rgba(47, 93, 63, 0.1);
-    color: var(--font-color);
-    transition: background-color 0.2s ease;
-}
-
-.table-row:hover {
-    background: rgba(126, 217, 87, 0.05);
-}
-
-.customer-name-col {
-    width: 30%;
-}
-
-.sales-col {
-    width: 23%;
-}
-
-.lead-time-col {
-    width: 27%;
-}
-
-.delivery-col {
-    width: 20%;
-}
-
-.pagination-nav {
-    margin-top: 32px;
-}
-
-/* サンプルデータボタン */
-.sample-data-btn {
-    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-    position: relative;
-    overflow: hidden;
-}
-
-.sample-data-btn::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: all 0.6s ease;
-}
-
-.sample-data-btn:hover::after {
-    width: 300px;
-    height: 300px;
-}
-
-.sample-data-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
-    background: linear-gradient(135deg, #ee5a52, #ff6b6b);
-}
-
-/* ========== 動的アニメーション ========== */
-
-/* ローディングアニメーション */
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(47, 93, 63, 0.9);
-    backdrop-filter: blur(8px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    animation: fadeIn 0.3s ease-out;
-}
-
-.loading-spinner {
-    text-align: center;
-    color: white;
-}
-
-.spinner {
-    width: 50px;
-    height: 50px;
-    border: 4px solid rgba(126, 217, 87, 0.3);
-    border-top: 4px solid #7ed957;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 20px;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
 }
 
 @keyframes fadeIn {
@@ -2371,787 +2467,684 @@ body.with-header .back-button-top {
     }
 }
 
-/* リップル効果 */
-@keyframes ripple {
-    to {
-        transform: scale(2);
-        opacity: 0;
-    }
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
 }
 
-/* パルス効果 */
-.pulse-effect {
-    animation: pulse 2s ease-in-out;
+.metric-card {
+    background-color: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all .3s ease;
 }
 
-@keyframes pulse {
-
-    0%,
-    100% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.05);
-    }
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .08);
 }
 
-/* エラートースト */
-.error-toast {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #ff6b6b;
+.card-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.card-info .card-title {
+    font-size: 14px;
+    color: var(--font-color-light);
+    margin-bottom: 5px;
+}
+
+.card-info .metric-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-dark);
+}
+
+/* --- Top Customers Section --- */
+.top-customers-section {
+    background-color: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 25px;
+    box-shadow: var(--shadow);
+}
+
+.top-customers-section h4 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--primary-dark);
+}
+
+.top-customers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.top-customer-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, #f8faf9 0%, #ffffff 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(106, 192, 131, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.top-customer-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--accent-color), var(--primary-color));
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+}
+
+.top-customer-card:hover::before {
+    transform: scaleY(1);
+}
+
+.top-customer-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(44, 94, 66, 0.15);
+    border-color: var(--accent-color);
+}
+
+.customer-rank {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
     color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    z-index: 10000;
-    animation: slideInUp 0.3s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
 }
 
-@keyframes slideInUp {
+.customer-info {
+    flex: 1;
+}
+
+.customer-name {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+}
+
+.customer-stats {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--font-color-light);
+    font-weight: 500;
+}
+
+.stat-item i {
+    font-size: 12px;
+    color: var(--accent-color);
+}
+
+/* --- Customer Search Section --- */
+.customer-search-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.search-container {
+    position: relative;
+    flex: 1;
+    max-width: 400px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 45px 12px 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background-color: var(--card-bg);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(44, 94, 66, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--font-color-light);
+    pointer-events: none;
+}
+
+/* --- View Toggle --- */
+.view-toggle {
+    margin-bottom: 20px;
+}
+
+.view-btn {
+    padding: 10px 20px;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+    color: var(--font-color-light);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all .3s ease;
+}
+
+.view-btn:first-child {
+    border-radius: 8px 0 0 8px;
+}
+
+.view-btn:last-child {
+    border-radius: 0 8px 8px 0;
+}
+
+.view-btn.active {
+    background-color: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+
+/* --- Table View --- */
+.table-view-container {
+    background-color: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.data-table th:hover {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+}
+
+.data-table th.sort-asc::after {
+    content: ' ↑';
+    color: var(--accent-color);
+}
+
+.data-table th.sort-desc::after {
+    content: ' ↓';
+    color: var(--accent-color);
+}
+
+.data-table td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.data-table tr:hover td {
+    background-color: rgba(106, 192, 131, 0.05);
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.table-action-btn {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.table-action-btn:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+/* --- Card View --- */
+.card-view-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.customer-card {
+    background-color: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    transition: all .3s ease;
+}
+
+.customer-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .1);
+}
+
+.card-main-info {
+    margin-bottom: 16px;
+}
+
+.customer-card .customer-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+
+.customer-id {
+    font-size: 12px;
+    color: var(--font-color-light);
+    background: var(--bg-color);
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.card-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.stat {
+    text-align: center;
+    padding: 12px;
+    background: rgba(106, 192, 131, 0.1);
+    border-radius: 8px;
+}
+
+.stat-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--font-color-light);
+    font-weight: 500;
+}
+
+.card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.card-btn {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all .3s ease;
+    background: var(--accent-color);
+    color: white;
+}
+
+.card-btn:hover {
+    transform: translateY(-2px);
+    background: var(--primary-color);
+}
+
+/* --- Modal Styles --- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: var(--radius);
+    width: 80%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(-50px) scale(0.9);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 }
 
-/* スクロールバーのカスタマイズ（Webkit系ブラウザ） */
-.enhanced-table-container::-webkit-scrollbar,
-.table-wrapper::-webkit-scrollbar {
-    height: 8px;
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--border-color);
 }
 
-.enhanced-table-container::-webkit-scrollbar-track,
-.table-wrapper::-webkit-scrollbar-track {
-    background: rgba(47, 93, 63, 0.1);
-    border-radius: 4px;
+.modal-header h2 {
+    color: var(--primary-color);
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
 }
 
-.enhanced-table-container::-webkit-scrollbar-thumb,
-.table-wrapper::-webkit-scrollbar-thumb {
-    background: linear-gradient(90deg, var(--main-green), var(--sub-green));
-    border-radius: 4px;
+.close-modal {
+    color: var(--font-color-light);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
 }
 
-.enhanced-table-container::-webkit-scrollbar-thumb:hover,
-.table-wrapper::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(90deg, var(--sub-green), var(--accent-green));
+.close-modal:hover {
+    color: var(--primary-color);
+    background-color: var(--bg-color);
 }
 
-/* ========== 統計情報ページのレスポンシブ対応 ========== */
+.customer-detail-info h4 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+.customer-detail-info h4:first-child {
+    margin-top: 0;
+}
+
+.customer-detail-info p {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+/* --- Animation Classes --- */
+.fade-in-up {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+/* --- Responsive Styles --- */
 @media (max-width: 768px) {
-
-    /* ヘッダー関連 */
-    .header-inner {
-        padding: 0 16px;
-    }
-
-    .site-header .store-title {
-        font-size: 22px;
-    }
-
-    .page-icon {
-        font-size: 26px;
-    }
-
-    .menu-toggle {
-        display: flex;
-    }
-
-    .nav {
-        position: fixed;
-        top: var(--header-height);
-        right: -320px;
-        width: 300px;
-        height: calc(100vh - var(--header-height));
-        background: linear-gradient(180deg, var(--main-green) 0%, var(--sub-green) 100%);
+    .top-nav {
         flex-direction: column;
-        padding: 24px 0;
-        gap: 0;
-        box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
-        transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        overflow-y: auto;
-        z-index: 1000;
+        align-items: flex-start;
+        padding: 10px;
     }
 
-    .nav.active {
-        right: 0;
+    .top-nav-header {
+        margin-right: 0;
+        margin-bottom: 10px;
     }
 
-    .nav-item {
+    .top-nav-links {
         width: 100%;
-        padding: 18px 24px;
-        border-radius: 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        font-size: 16px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        text-decoration: none;
-        color: #fff;
+        justify-content: space-around;
+        gap: 5px;
     }
 
-    .nav-item:hover {
-        background: rgba(126, 217, 87, 0.2);
-        transform: translateX(8px);
-        box-shadow: none;
-        border-left: 4px solid var(--accent-green);
+    .nav-link {
+        flex: 1;
+        justify-content: center;
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+    
+    .nav-link span {
+        display: none;
     }
 
-    .nav-item:active {
-        background: rgba(126, 217, 87, 0.3);
-        transform: translateX(12px);
+    .main-header {
+        padding: 15px;
     }
 
-    .nav-item:last-child {
-        border-bottom: none;
+    #main-title {
+        font-size: 20px;
     }
 
-    .nav-item.active {
-        background: rgba(126, 217, 87, 0.3);
-        border-left: 4px solid var(--accent-green);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        transform: translateX(8px);
+    .content-scroll-area {
+        padding: 15px;
     }
 
-    /* タブナビゲーション */
-    .tab-navigation {
-        height: auto;
+    .customer-search-section {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
     }
 
-    .tab-container {
-        flex-wrap: wrap;
+    .search-container {
+        max-width: none;
     }
 
-    .tab-btn {
-        flex: 1 1 50%;
-        min-width: 50%;
-        padding: 12px 8px;
-        font-size: 12px;
+    .view-toggle {
+        align-self: center;
     }
 
-    .tab-icon {
-        font-size: 14px;
-    }
-
-    .main-content {
-        padding: 20px 16px;
-    }
-
-    /* ダッシュボード */
-    .dashboard-overview {
+    .dashboard-grid {
         grid-template-columns: 1fr;
         gap: 16px;
     }
 
-    /* 顧客一覧 */
-    .search-header {
-        flex-direction: column;
-        align-items: stretch;
+    .metric-card {
+        padding: 16px;
     }
 
-    .search-box {
-        max-width: none;
+    .card-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
     }
 
-    .table-view {
-        overflow-x: auto;
+    .card-info .metric-value {
+        font-size: 24px;
     }
 
-    .data-table {
-        min-width: 600px;
-    }
-
-    .card-view {
+    .top-customers-grid {
         grid-template-columns: 1fr;
+        gap: 12px;
     }
 
-    /* グラフ */
-    .chart-options {
-        grid-template-columns: 1fr;
+    .top-customer-card {
+        padding: 12px;
     }
 
-    .chart-container {
-        height: 250px;
-        padding: 10px;
+    .customer-rank {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
     }
 
-    /* エクスポート */
-    .export-options {
-        grid-template-columns: 1fr;
+    .customer-name {
+        font-size: 14px;
     }
 
-    /* ブレッドクラム */
-    .breadcrumb-nav {
-        padding: 6px 16px;
+    .customer-stats {
+        gap: 12px;
+    }
+
+    .stat-item {
         font-size: 12px;
     }
 
-    .breadcrumb-separator {
-        margin: 0 6px;
+    .data-table {
+        font-size: 12px;
     }
 
-    body.with-breadcrumb {
-        padding-top: calc(var(--header-height) + 36px);
+    .data-table th,
+    .data-table td {
+        padding: 10px 8px;
     }
 
-    /* 統計情報ページ */
-    body.with-header.statistics-page .container {
-        padding: 20px 16px 10px 16px;
+    .card-view-container {
+        grid-template-columns: 1fr;
     }
 
-    body.statistics-tab-page {
-        padding-top: calc(var(--header-height) + 100px);
+    .customer-card {
+        padding: 16px;
     }
 
-    .statistics-page .page-title {
-        font-size: 24px;
-        margin-bottom: 20px;
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .enhanced-controls {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 10px;
-        margin-bottom: 10px;
-    }
-
-    .search-form-container {
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .search-input {
-        max-width: none !important;
-    }
-
-    .enhanced-statistics-table th,
-    .enhanced-statistics-table td {
-        padding: 8px 6px;
-        font-size: 13px;
-    }
-
-    /* モバイルでも列幅を保持 */
-    .enhanced-statistics-table th:nth-child(1),
-    .enhanced-statistics-table td:nth-child(1) {
-        width: 30%;
-    }
-
-    .enhanced-statistics-table th:nth-child(2),
-    .enhanced-statistics-table td:nth-child(2) {
-        width: 25%;
-    }
-
-    .enhanced-statistics-table th:nth-child(3),
-    .enhanced-statistics-table td:nth-child(3) {
-        width: 25%;
-    }
-
-    .enhanced-statistics-table th:nth-child(4),
-    .enhanced-statistics-table td:nth-child(4) {
-        width: 10%;
-    }
-
-    .enhanced-statistics-table th:nth-child(5),
-    .enhanced-statistics-table td:nth-child(5) {
-        width: 10%;
-    }
-
-    .graph-btn {
-        padding: 4px 8px;
-        font-size: 11px;
+    .card-stats {
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .modal-content {
         width: 95%;
-        max-height: 90vh;
-    }
-
-    .search-input-container {
-        flex-direction: column;
-        gap: 8px;
-        padding: 12px;
-    }
-
-    .search-input,
-    .search-button {
-        width: 100%;
-    }
-
-    .statistics-table {
-        font-size: 14px;
-    }
-
-    .statistics-table th,
-    .statistics-table td {
-        padding: 12px 8px;
-    }
-
-    .statistics-table th span {
-        font-size: 12px;
-    }
-
-    .table-wrapper {
-        overflow-x: auto;
-    }
-
-    .pagination-container {
-        flex-direction: column;
-        gap: 12px;
-        padding: 16px;
-    }
-
-    .pagination-btn {
-        width: 100%;
-        max-width: 200px;
-        justify-content: center;
-    }
-
-    .sort-buttons {
-        flex-direction: row;
-        gap: 1px;
-    }
-
-    .sort-btn {
-        font-size: 8px;
-        padding: 2px 4px;
-        min-width: 16px;
-        height: 16px;
-    }
-
-    .count-value {
-        font-size: 12px;
-        padding: 2px 6px;
-    }
-
-    /* メインコンテンツ関連 */
-    .container {
-        padding: 20px 16px;
-    }
-
-    body.with-header .container {
-        padding: 20px 16px;
-        min-height: calc(100vh - var(--header-height) - 40px);
-    }
-
-    .container .store-title {
-        margin-bottom: 40px;
-    }
-
-    .menu-button {
-        padding: 20px 24px;
-        font-size: 18px;
-    }
-
-    .back-button-top {
-        top: 16px;
-        left: 16px;
-        padding: 10px 16px;
-        font-size: 13px;
-    }
-
-    body.with-header .back-button-top {
-        top: calc(var(--header-height) + 10px);
-        left: 16px;
-    }
-
-    .menu {
-        gap: 20px;
-    }
-
-    /* 顧客情報ページ関連 */
-    .page-title {
-        font-size: 24px;
-        flex-direction: column;
-        gap: 8px;
-        margin-bottom: 30px;
-    }
-
-    .file-upload-area {
-        padding: 30px 16px;
-    }
-
-    .upload-icon {
-        font-size: 40px;
-    }
-
-    .help-section {
+        margin: 10% auto;
         padding: 20px;
     }
 }
 
 @media (max-width: 480px) {
-
-    /* ヘッダー関連 */
-    .header-inner {
-        padding: 0 12px;
+    .nav-link {
+        font-size: 12px;
+        gap: 5px;
+    }
+    
+    .nav-link i {
+        font-size: 14px;
     }
 
-    .site-header .store-title {
-        font-size: 20px;
+    .metric-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px 16px;
     }
 
-    .page-icon {
-        font-size: 24px;
+    .card-icon {
+        margin-bottom: 12px;
     }
 
-    /* タブナビゲーション */
-    body.statistics-tab-page {
-        padding-top: calc(var(--header-height) + 120px);
+    .top-customer-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
     }
 
-    .tab-btn {
-        flex: 1 1 50%;
-        min-width: 50%;
-        padding: 10px 6px;
-        font-size: 11px;
+    .customer-info {
+        width: 100%;
     }
 
-    /* ブレッドクラム */
-    .breadcrumb-nav {
-        padding: 4px 12px;
-        font-size: 11px;
+    .customer-stats {
+        justify-content: center;
+        flex-wrap: wrap;
     }
 
-    .breadcrumb-link {
-        padding: 2px 4px;
+    .view-toggle {
+        display: flex;
+        width: 100%;
     }
 
-    .breadcrumb-separator {
-        margin: 0 4px;
-    }
-
-    body.with-breadcrumb {
-        padding-top: calc(var(--header-height) + 32px);
-    }
-
-    /* 統計ページ */
-    body.with-header.statistics-page .container {
-        padding: 16px 12px 10px 12px;
-    }
-
-    .statistics-page .page-title {
-        font-size: 18px;
-        flex-direction: row;
-        gap: 8px;
-    }
-
-    .enhanced-controls {
-        padding: 8px;
-    }
-
-    .statistics-container {
-        padding: 0 12px;
-    }
-
-    .search-container {
-        padding: 0 12px;
-    }
-
-    .statistics-table {
+    .view-btn {
+        flex: 1;
+        padding: 12px 8px;
         font-size: 12px;
     }
 
-    .statistics-table th,
-    .statistics-table td {
+    .data-table th,
+    .data-table td {
         padding: 8px 6px;
+        font-size: 11px;
     }
 
-    .enhanced-table-container {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .enhanced-statistics-table {
-        min-width: 600px;
-    }
-
-    .modal-content {
-        padding: 20px 15px;
-    }
-
-    .chart-container {
-        padding: 15px;
-        height: 250px;
-    }
-
-    /* 極小画面でも列の整列を保持 */
-    .enhanced-statistics-table th:nth-child(1),
-    .enhanced-statistics-table td:nth-child(1) {
-        width: 25%;
-    }
-
-    .enhanced-statistics-table th:nth-child(2),
-    .enhanced-statistics-table td:nth-child(2) {
-        width: 22%;
-    }
-
-    .enhanced-statistics-table th:nth-child(3),
-    .enhanced-statistics-table td:nth-child(3) {
-        width: 25%;
-    }
-
-    .enhanced-statistics-table th:nth-child(4),
-    .enhanced-statistics-table td:nth-child(4) {
-        width: 13%;
-    }
-
-    .enhanced-statistics-table th:nth-child(5),
-    .enhanced-statistics-table td:nth-child(5) {
-        width: 15%;
-    }
-
-    /* メインページのストアタイトル */
-    .container .store-title::before {
-        top: -35px;
-        font-size: 40px;
-    }
-
-    .menu-button {
-        padding: 18px 20px;
-        font-size: 16px;
-    }
-
-    .back-button-top {
-        top: 12px;
-        left: 12px;
-        padding: 8px 14px;
+    .table-action-btn {
+        padding: 6px 8px;
         font-size: 12px;
     }
 
-    body.with-header .back-button-top {
-        top: calc(var(--header-height) + 8px);
-        left: 12px;
-    }
-
-    .container {
-        padding: 16px 12px;
-    }
-
-    body.with-header .container {
-        padding: 16px 12px;
-        min-height: calc(100vh - var(--header-height) - 32px);
-    }
-
-    /* 顧客情報ページ関連 */
-    .page-title {
-        font-size: 20px;
-        margin-bottom: 24px;
-    }
-
-    .file-upload-area {
-        padding: 24px 12px;
-    }
-
-    .upload-icon {
-        font-size: 36px;
-    }
-
-    .file-upload-content h3 {
-        font-size: 18px;
-    }
-
-    .upload-button {
-        font-size: 16px;
-        padding: 14px 24px;
-    }
-
-    .upload-container {
-        padding: 0 12px;
+    .card-stats {
+        grid-template-columns: 1fr;
     }
 }
 
-/* 極小デバイス対応 */
-@media (max-width: 320px) {
-    .site-header .store-title {
-        font-size: 18px;
-        gap: 8px;
-    }
-
-    .page-icon {
-        font-size: 22px;
-    }
-
-    .page-text {
-        line-height: 1.2;
-    }
-}
-
-/* ========== アニメーション ========== */
-@keyframes slideInFromRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-/* ========== アクセシビリティ改善 ========== */
-
-/* フォーカス表示の改善 */
-.enhanced-statistics-table:focus-within {
-    box-shadow: 0 0 0 3px rgba(126, 217, 87, 0.3);
-}
-
-/* アクセシビリティ改善 */
-@media (prefers-reduced-motion: reduce) {
-
-    .enhanced-table-row,
-    .sort-btn,
-    .graph-btn,
-    .modal-content {
-        transition: none;
-        animation: none;
-    }
-
-    .enhanced-no-data::before {
-        animation: none;
-    }
-}
-
-/* ハイコントラストモード */
-@media (prefers-contrast: high) {
-
-    .enhanced-table-container,
-    .enhanced-controls {
-        border: 2px solid;
-    }
-
-    .sort-btn:focus-visible,
-    .graph-btn:focus-visible {
-        outline: 3px solid;
-    }
-}
-
-/* ダークモード対応（オプション） */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --font-color: #e2e8f0;
-        --bg-light: #1a202c;
-    }
-
-    body {
-        background: linear-gradient(135deg, #2d3748 0%, #1a202c 50%, #171923 100%);
-    }
-
-    .menu-button,
-    .upload-container,
-    .help-section,
-    .enhanced-controls,
-    .enhanced-table-container,
-    .modal-content {
-        background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
-        color: var(--font-color);
-    }
-
-    .enhanced-statistics-table td {
-        color: #e2e8f0;
-        border-bottom-color: rgba(226, 232, 240, 0.1);
-    }
-
-    .chart-container {
-        background: rgba(45, 55, 72, 0.5);
-        border-color: rgba(226, 232, 240, 0.2);
-    }
-}
-
-/* タッチデバイス用の改善 */
-@media (hover: none) and (pointer: coarse) {
-    .menu-toggle:hover {
-        transform: none;
-        background: rgba(255, 255, 255, 0.1);
-    }
-
-    .menu-toggle:active {
-        background: rgba(126, 217, 87, 0.3);
-        transform: scale(0.95);
-    }
-
-    .nav-item:hover {
-        background: rgba(126, 217, 87, 0.15);
-        transform: none;
-        border-left: none;
-    }
-
-    .nav-item:active {
-        background: rgba(126, 217, 87, 0.25);
-    }
-
-    .menu-button:hover {
-        transform: none;
-    }
-
-    .menu-button:active {
-        transform: scale(0.98);
-    }
-}
-
-/* プリント用スタイル */
-@media print {
-
-    .site-header,
-    .menu-toggle,
-    .back-button-top,
-    .upload-button,
-    .search-container,
-    .enhanced-controls,
-    .graph-btn,
-    .sample-data-btn,
-    .sort-buttons,
-    .tab-navigation {
-        display: none;
-    }
-
-    body {
-        background: white;
-        color: black;
-    }
-
-    .container {
-        max-width: none;
-        padding: 0;
-    }
-
-    .statistics-table,
-    .enhanced-statistics-table {
-        border: 1px solid #000;
-    }
-
-    .statistics-table th,
-    .statistics-table td,
-    .enhanced-statistics-table th,
-    .enhanced-statistics-table td {
-        border: 1px solid #000;
-        background: white !important;
-        color: black !important;
-    }
-
-    .statistics-table th,
-    .enhanced-statistics-table th {
-        background: #f0f0f0 !important;
-    }
-
-    .pagination-nav {
-        display: none;
-    }
-
-    .enhanced-table-container,
-    .table-wrapper {
-        box-shadow: none;
-        border: 1px solid #000;
-    }
+/* --- Accessibility --- */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }

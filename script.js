@@ -278,38 +278,7 @@
     /**
      * ブレッドクラム風の表示を追加（オプション）
      */
-    function createBreadcrumb() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const storeName = urlParams.get('store');
-        
-        if (!storeName) return;
     
-        const breadcrumbContainer = document.createElement('div');
-        breadcrumbContainer.className = 'breadcrumb-nav';
-        breadcrumbContainer.innerHTML = `
-            <span class="breadcrumb-item">
-                <a href="/MBS_B/menu.php?store=${encodeURIComponent(storeName)}" class="breadcrumb-link">
-                    🏠 ${escapeHtml(storeName)}
-                </a>
-            </span>
-            <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-current"></span>
-        `;
-    
-        // 現在のページ名を設定
-        const currentPageSpan = breadcrumbContainer.querySelector('.breadcrumb-current');
-        const pageInfo = getCurrentPageInfo();
-        
-        if (currentPageSpan) {
-            currentPageSpan.textContent = `${pageInfo.icon} ${pageInfo.name}`;
-        }
-    
-        // ヘッダーの下に挿入
-        const header = document.querySelector('.site-header');
-        if (header && !document.querySelector('.breadcrumb-nav')) {
-            header.parentNode.insertBefore(breadcrumbContainer, header.nextSibling);
-        }
-    }
     
     // ========== ハンバーガーメニューの制御 ==========
     let menuToggle, nav, menuOverlay;
@@ -1080,7 +1049,7 @@
         }
     
         // ブレッドクラムの作成（オプション）
-        createBreadcrumb();
+        
     }
     
     // ========== パフォーマンス最適化 ==========

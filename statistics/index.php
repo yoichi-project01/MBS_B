@@ -106,7 +106,7 @@ function format_days($days)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>統計情報 - 受注管理システム</title>
     <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="statistics.css">
+    
     <!-- SweetAlert CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Font Awesome for icons -->
@@ -115,12 +115,12 @@ function format_days($days)
 
 <body class="statistics-page">
     <div class="dashboard-container">
-        <aside class="sidebar">
-            <div class="sidebar-header">
+        <aside class="top-nav">
+            <div class="top-nav-header">
                 <i class="fas fa-book-open"></i>
                 <h3>受注管理</h3>
             </div>
-            <nav class="sidebar-nav">
+            <nav class="top-nav-links">
                 <a href="#" class="nav-link active" data-tab="dashboard">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>ダッシュボード</span>
@@ -133,13 +133,6 @@ function format_days($days)
         </aside>
 
         <main class="main-content">
-            <header class="main-header">
-                <button class="menu-toggle-btn" id="menu-toggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 id="main-title">ダッシュボード</h1>
-            </header>
-
             <div class="content-scroll-area">
                 <!-- ダッシュボードタブ -->
                 <div id="dashboard" class="tab-content active">
