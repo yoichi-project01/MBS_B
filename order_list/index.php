@@ -103,9 +103,11 @@ function translate_status($status) {
     <title>注文書一覧</title>
     <link rel="stylesheet" href="../style.css">
 </head>
-<body class="with-header">
+<body class="with-header order-list-page">
     <div class="container">
-        <h1 class="page-title">注文書一覧</h1>
+        <h2 class="main-page-title">
+            <span class="icon">📋</span> 注文書一覧
+        </h2>
 
         <!-- 検索・フィルタリング -->
         <div class="search-container">
@@ -138,7 +140,7 @@ function translate_status($status) {
                         <?php foreach ($orders as $order): ?>
                             <tr>
                                 <td><?= htmlspecialchars($order['order_no']) ?></td>
-                                <td><?= htmlspecialchars($order['customer_name']) ?></td>
+                                <td><span class="customer-name-clickable" data-customer-name="<?= htmlspecialchars($order['customer_name']) ?>"><?= htmlspecialchars($order['customer_name']) ?></span></td>
                                 <td><?= htmlspecialchars($order['registration_date']) ?></td>
                                 <td>¥<?= number_format($order['total_amount']) ?></td>
                                 <td><span class="status-<?= htmlspecialchars($order['status']) ?>"><?= translate_status($order['status']) ?></span></td>
@@ -163,5 +165,21 @@ function translate_status($status) {
             <?php endif; ?>
         </div>
     </div>
+
+    <!-- 顧客注文詳細モーダル -->
+    <div id="customerOrdersModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="customerOrdersTitle"></h2>
+                <button class="close-modal" onclick="closeModal('customerOrdersModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="customerOrdersContent">
+                <!-- 注文内容がここに表示されます -->
+            </div>
+        </div>
+    </div>
+
+    <script src="../script.js"></script>
+</body>
 </body>
 </html>

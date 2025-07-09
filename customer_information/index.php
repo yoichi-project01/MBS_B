@@ -30,6 +30,9 @@ $uploadResult = SessionManager::getUploadResult();
 <body class="with-header">
     <!-- メインコンテナ -->
     <div class="container">
+        <h2 class="main-page-title">
+            <span class="icon">👥</span> 顧客情報
+        </h2>
         <!-- アップロードフォーム -->
         <div class="upload-container">
             <form action="upload.php" method="post" enctype="multipart/form-data" class="upload-form">

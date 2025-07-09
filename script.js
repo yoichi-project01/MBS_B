@@ -1790,7 +1790,97 @@
         // 統計ページ用の詳細表示を使用
         showStatisticsDetails(customerName);
     }
-    
+
+    // ========== 注文書ページ機能 ==========
+    function initializeOrderListPage() {
+        const customerNameClickables = document.querySelectorAll('.customer-name-clickable');
+
+        customerNameClickables.forEach(element => {
+            element.style.cursor = 'pointer'; // カーソルをポインターに変更
+            element.addEventListener('click', function() {
+                const customerName = this.dataset.customerName;
+                if (customerName) {
+                    showCustomerOrdersModal(customerName);
+                }
+            });
+        });
+    }
+
+    function showCustomerOrdersModal(customerName) {
+        const modal = document.getElementById('customerOrdersModal');
+        const titleElement = document.getElementById('customerOrdersTitle');
+        const contentElement = document.getElementById('customerOrdersContent');
+
+        if (!modal || !titleElement || !contentElement) return;
+
+        titleElement.textContent = `${customerName} の注文履歴`;
+        contentElement.innerHTML = '<p class="loading-text">注文履歴を読み込み中...</p>';
+        modal.style.display = 'block';
+        modal.setAttribute('aria-hidden', 'false');
+
+        // モーダル表示アニメーション
+        modal.style.opacity = '0';
+        modal.style.transform = 'scale(0.9)';
+        requestAnimationFrame(() => {
+            modal.style.transition = 'all 0.3s ease';
+            modal.style.opacity = '1';
+            modal.style.transform = 'scale(1)';
+        });
+
+        fetch(`order_list/get_customer_orders.php?customer_name=${encodeURIComponent(customerName)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    if (data.orders.length > 0) {
+                        let html = '';
+                        data.orders.forEach(order => {
+                            html += `
+                                <div class="order-history-item">
+                                    <h4>注文番号: ${escapeHtml(order.order_no)} (${escapeHtml(order.registration_date)})</h4>
+                                    <p>ステータス: <span class="status-${escapeHtml(order.status)}">${translateStatus(order.status)}</span></p>
+                                    <ul class="order-items-list">
+                            `;
+                            order.items.forEach(item => {
+                                html += `
+                                        <li>${escapeHtml(item.item_name)} - ${escapeHtml(item.order_volume)}個 @ ¥${escapeHtml(item.price.toLocaleString())}</li>
+                                `;
+                            });
+                            html += `
+                                    </ul>
+                                </div>
+                            `;
+                        });
+                        contentElement.innerHTML = html;
+                    } else {
+                        contentElement.innerHTML = '<p>この顧客の注文履歴はありません。</p>';
+                    }
+                } else {
+                    contentElement.innerHTML = `<p>エラー: ${escapeHtml(data.error || '注文履歴の取得に失敗しました。')}</p>`;
+                    showErrorMessage(`注文履歴の取得に失敗しました: ${data.error || '不明なエラー'}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching customer orders:', error);
+                contentElement.innerHTML = '<p>注文履歴の読み込み中にエラーが発生しました。</p>';
+                showErrorMessage(`注文履歴の読み込み中にエラーが発生しました: ${error.message}`);
+            });
+    }
+
+    function translateStatus(status) {
+        switch (status) {
+            case 'pending': return '保留';
+            case 'processing': return '処理中';
+            case 'completed': return '完了';
+            case 'cancelled': return 'キャンセル';
+            default: return status;
+        }
+    }
+
     /**
      * モーダルを閉じる（統合版）
      */
@@ -1908,674 +1998,3 @@
     }
     
     /**
-     * CSV形式でエクスポート
-     */
-    function exportToCSV(data) {
-        const headers = ['顧客番号', '顧客名', '売上', 'リードタイム', '配達回数'];
-        const csvContent = [
-            headers.join(','),
-            ...data.map(customer => [
-                customer.customer_no,
-                `"${customer.customer_name}"`,
-                customer.sales_by_customer,
-                `"${customer.lead_time}"`,
-                customer.delivery_amount
-            ].join(','))
-        ].join('\n');
-        
-        downloadFile(csvContent, 'customer_statistics.csv', 'text/csv;charset=utf-8;');
-        showSuccessMessage('エクスポート完了', 'CSVファイルがダウンロードされました。');
-    }
-    
-    /**
-     * ファイルダウンロード
-     */
-    function downloadFile(content, filename, mimeType) {
-        const blob = new Blob([content], { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        
-        link.href = url;
-        link.download = filename;
-        link.style.display = 'none';
-        
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        URL.revokeObjectURL(url);
-    }
-    
-    /**
-     * フィルタリング機能
-     */
-    function initializeFiltering() {
-        const filterButtons = document.querySelectorAll('[data-filter]');
-        const rangeInputs = document.querySelectorAll('.range-filter');
-        
-        filterButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const filterType = this.getAttribute('data-filter');
-                const filterValue = this.getAttribute('data-filter-value');
-                applyFilter(filterType, filterValue);
-            });
-        });
-        
-        rangeInputs.forEach(input => {
-            input.addEventListener('input', debounce(function() {
-                const filterType = this.getAttribute('data-filter-type');
-                const minValue = this.value;
-                applyRangeFilter(filterType, minValue);
-            }, 300));
-        });
-    }
-    
-    /**
-     * フィルター適用
-     */
-    function applyFilter(filterType, filterValue) {
-        const tbody = document.querySelector('.data-table tbody');
-        if (!tbody) return;
-        
-        const rows = tbody.querySelectorAll('tr');
-        let visibleCount = 0;
-        
-        rows.forEach(row => {
-            let shouldShow = true;
-            
-            switch (filterType) {
-                case 'sales-range':
-                    const salesCell = row.querySelector('[data-column="sales_by_customer"]') || row.cells[1];
-                    const salesValue = salesCell ? parseFloat(salesCell.textContent.replace(/[,¥]/g, '')) : 0;
-                    shouldShow = checkSalesRange(salesValue, filterValue);
-                    break;
-                    
-                case 'delivery-count':
-                    const deliveryCell = row.querySelector('[data-column="delivery_amount"]') || row.cells[3];
-                    const deliveryValue = deliveryCell ? parseInt(deliveryCell.textContent) : 0;
-                    shouldShow = checkDeliveryCount(deliveryValue, filterValue);
-                    break;
-            }
-            
-            if (shouldShow) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
-        });
-        
-        announceToScreenReader(`フィルター適用: ${visibleCount}件の顧客が表示されています`);
-    }
-    
-    /**
-     * 売上範囲チェック
-     */
-    function checkSalesRange(value, range) {
-        switch (range) {
-            case 'low': return value < 300000;
-            case 'medium': return value >= 300000 && value < 600000;
-            case 'high': return value >= 600000;
-            default: return true;
-        }
-    }
-    
-    /**
-     * 配達回数チェック
-     */
-    function checkDeliveryCount(value, range) {
-        switch (range) {
-            case 'low': return value < 50;
-            case 'medium': return value >= 50 && value < 100;
-            case 'high': return value >= 100;
-            default: return true;
-        }
-    }
-    
-    /**
-     * 印刷機能
-     */
-    function initializePrintFeature() {
-        const printButton = document.getElementById('print-statistics');
-        
-        if (printButton) {
-            printButton.addEventListener('click', function() {
-                window.print();
-            });
-        }
-        
-        // 印刷前の処理
-        window.addEventListener('beforeprint', function() {
-            // サイドバーやナビゲーションを一時的に隠す
-            const elementsToHide = document.querySelectorAll('.sidebar, .top-nav, .modal');
-            elementsToHide.forEach(el => {
-                el.style.display = 'none';
-            });
-        });
-        
-        // 印刷後の処理
-        window.addEventListener('afterprint', function() {
-            // 隠した要素を復元
-            const elementsToShow = document.querySelectorAll('.sidebar, .top-nav');
-            elementsToShow.forEach(el => {
-                el.style.display = '';
-            });
-        });
-    }
-    
-    // ========== セキュリティ機能 ==========
-    
-    /**
-     * 外部スクリプトの制限
-     */
-    function restrictExternalScripts() {
-        const allowedDomains = ['cdnjs.cloudflare.com', 'cdn.jsdelivr.net'];
-        const scripts = document.querySelectorAll('script[src]');
-        
-        scripts.forEach(function(script) {
-            const src = script.getAttribute('src');
-            if (src && !allowedDomains.some(domain => src.includes(domain))) {
-                script.remove();
-                console.warn('Blocked potentially unsafe script:', src);
-            }
-        });
-    }
-    
-    /**
-     * CSP違反の監視
-     */
-    function setupSecurityMonitoring() {
-        document.addEventListener('securitypolicyviolation', function(e) {
-            console.warn('CSP Violation:', {
-                directive: e.violatedDirective,
-                blockedURI: e.blockedURI,
-                lineNumber: e.lineNumber,
-                columnNumber: e.columnNumber
-            });
-        });
-    }
-    
-    /**
-     * グローバルエラーハンドラー
-     */
-    function setupErrorHandling() {
-        window.addEventListener('error', function(event) {
-            console.error('JavaScript Error:', event.error);
-            
-            // ユーザーに表示するかどうかは環境に応じて判断
-            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                console.warn('Development mode: Error details logged to console');
-            }
-        });
-    
-        window.addEventListener('unhandledrejection', function(event) {
-            console.error('Unhandled Promise Rejection:', event.reason);
-            
-            // 重要なエラーの場合はユーザーに通知
-            if (event.reason && event.reason.message && event.reason.message.includes('fetch')) {
-                showErrorMessage('ネットワークエラーが発生しました。しばらく経ってから再度お試しください。');
-            }
-        });
-    }
-    
-    // ========== メニューボタンの機能初期化 ==========
-    function initializeMenuButtons() {
-        // menu.phpページのメニューボタン
-        const menuButtons = document.querySelectorAll('.menu-button[data-path]');
-        menuButtons.forEach(function(button) {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const path = this.getAttribute('data-path');
-                const urlParams = new URLSearchParams(window.location.search);
-                const store = urlParams.get('store');
-                
-                if (path && store) {
-                    const fullPath = `/MBS_B/${path}?store=${encodeURIComponent(store)}`;
-                    window.location.href = fullPath;
-                }
-            });
-        });
-    
-        // index.htmlページの店舗選択ボタン
-        const storeButtons = document.querySelectorAll('.menu-button[onclick]');
-        storeButtons.forEach(function(button) {
-            // onclick属性を削除して、新しいイベントリスナーを追加
-            const onclickValue = button.getAttribute('onclick');
-            if (onclickValue && onclickValue.includes('selectedStore')) {
-                button.removeAttribute('onclick');
-                
-                // 店舗名を抽出
-                const match = onclickValue.match(/selectedStore\(['"]([^'"]+)['"]\)/);
-                if (match && match[1]) {
-                    const storeName = match[1];
-                    button.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        selectedStore(storeName);
-                    });
-                }
-            }
-        });
-    }
-    
-    // ========== パフォーマンス最適化 ==========
-    
-    /**
-     * 画像の遅延読み込み
-     */
-    function initializeLazyLoading() {
-        if ('IntersectionObserver' in window) {
-            const imageObserver = new IntersectionObserver(function(entries, observer) {
-                entries.forEach(function(entry) {
-                    if (entry.isIntersecting) {
-                        const img = entry.target;
-                        if (img.dataset.src) {
-                            img.src = img.dataset.src;
-                            img.classList.remove('lazy');
-                            imageObserver.unobserve(img);
-                        }
-                    }
-                });
-            });
-    
-            document.querySelectorAll('img[data-src]').forEach(function(img) {
-                imageObserver.observe(img);
-            });
-        }
-    }
-    
-    /**
-     * CSSアニメーションの最適化
-     */
-    function optimizeAnimations() {
-        // アニメーションの preference を確認
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            document.documentElement.classList.add('reduced-motion');
-        }
-    
-        // パフォーマンス監視
-        if ('requestIdleCallback' in window) {
-            window.requestIdleCallback(function() {
-                // アイドル時間に非重要なアニメーションを設定
-                document.querySelectorAll('.animate-on-idle').forEach(function(element) {
-                    element.classList.add('animate');
-                });
-            });
-        }
-    }
-    
-    // ========== アクセシビリティサポート機能 ==========
-    
-    /**
-     * キーボードナビゲーションの強化
-     */
-    function enhanceKeyboardNavigation() {
-        // テーブル内のキーボードナビゲーション
-        const tables = document.querySelectorAll('.enhanced-statistics-table, .statistics-table, .data-table');
-        tables.forEach(function(table) {
-            table.addEventListener('keydown', function(e) {
-                if (e.target.matches('.sort-btn, [data-sort]')) {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        e.target.click();
-                    }
-                }
-            });
-        });
-    
-        // フォーカス管理の改善
-        document.addEventListener('focusin', function(e) {
-            if (e.target.matches('.sort-btn, [data-sort]')) {
-                e.target.setAttribute('tabindex', '0');
-            }
-        });
-    }
-    
-    /**
-     * スクリーンリーダー用の追加情報
-     */
-    function enhanceScreenReaderSupport() {
-        // テーブルの説明を追加
-        const tables = document.querySelectorAll('.enhanced-statistics-table, .statistics-table, .data-table');
-        tables.forEach(function(table) {
-            if (!table.getAttribute('aria-describedby')) {
-                const description = document.createElement('div');
-                description.id = 'table-description-' + Date.now();
-                description.className = 'sr-only';
-                description.textContent = 'このテーブルは顧客の統計情報を表示します。列見出しのソートボタンで並び替えができます。';
-                table.parentNode.insertBefore(description, table);
-                table.setAttribute('aria-describedby', description.id);
-            }
-        });
-    }
-    
-    // ========== 追加のユーティリティ機能 ==========
-    
-    /**
-     * フィルターテーブル機能（検索機能の別名）
-     */
-    function filterTable(searchTerm) {
-        const tbody = document.getElementById('customerTableBody') || 
-                     document.querySelector('.enhanced-statistics-table tbody') ||
-                     document.querySelector('.statistics-table tbody') ||
-                     document.querySelector('.data-table tbody');
-    
-        if (!tbody) return 0;
-    
-        const rows = tbody.querySelectorAll('tr');
-        let visibleCount = 0;
-    
-        rows.forEach(function(row) {
-            const customerNameCell = row.querySelector('[data-column="customer_name"]') || row.cells[0];
-            if (!customerNameCell) return;
-    
-            const customerName = customerNameCell.textContent.toLowerCase();
-            const isVisible = searchTerm === '' || customerName.includes(searchTerm.toLowerCase());
-    
-            if (isVisible) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    
-        return visibleCount;
-    }
-    
-    /**
-     * ツールチップ機能
-     */
-    function initializeTooltips() {
-        document.addEventListener('mouseover', function(e) {
-            if (e.target.classList.contains('tooltip')) {
-                const tooltipText = e.target.getAttribute('data-tooltip');
-                if (tooltipText && !e.target.querySelector('.tooltip-content')) {
-                    showTooltip(e.target, tooltipText);
-                }
-            }
-        });
-        
-        document.addEventListener('mouseout', function(e) {
-            if (e.target.classList.contains('tooltip')) {
-                hideTooltip(e.target);
-            }
-        });
-    }
-    
-    function showTooltip(element, text) {
-        const tooltip = document.createElement('div');
-        tooltip.className = 'tooltip-content';
-        tooltip.textContent = text;
-        tooltip.style.cssText = `
-            position: absolute;
-            bottom: 120%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(47, 93, 63, 0.9);
-            color: white;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            white-space: nowrap;
-            z-index: 1000;
-            pointer-events: none;
-        `;
-        element.appendChild(tooltip);
-    }
-    
-    function hideTooltip(element) {
-        const tooltip = element.querySelector('.tooltip-content');
-        if (tooltip) {
-            tooltip.remove();
-        }
-    }
-    
-    // ========== メイン初期化関数 ==========
-    
-    /**
-     * アプリケーション全体の初期化
-     */
-    function initializeApp() {
-        try {
-            // セキュリティ監視の設定
-            setupSecurityMonitoring();
-            restrictExternalScripts();
-    
-            // エラーハンドリングの設定
-            setupErrorHandling();
-    
-            // ヘッダー管理機能の初期化
-            headerManager = new HeaderManager();
-            scrollEffects = new ScrollEffects();
-    
-            // メニューボタンの初期化
-            initializeMenuButtons();
-    
-            // ツールチップの初期化
-            initializeTooltips();
-    
-            // 顧客アップロード機能の初期化（該当ページのみ）
-            if (document.getElementById('fileUploadArea')) {
-                initializeCustomerUpload();
-            }
-    
-            // 統計情報ページの初期化（該当ページのみ）
-            if (document.querySelector('.statistics-table, .enhanced-statistics-table, .data-table') || 
-                window.location.pathname.includes('/statistics/')) {
-                initializeStatisticsPage();
-            }
-    
-            // メニューボタンの効果（メニューページのみ）
-            if (document.querySelector('.menu-button')) {
-                enhanceMenuButtons();
-            }
-    
-            // パフォーマンス最適化
-            initializeLazyLoading();
-            optimizeAnimations();
-    
-            // アクセシビリティ機能
-            enhanceKeyboardNavigation();
-            enhanceScreenReaderSupport();
-    
-            // 初期化完了の通知
-            console.log('MBS_B System: All modules initialized successfully');
-    
-            // カスタムイベントの発火
-            window.dispatchEvent(new CustomEvent('appInitialized', {
-                detail: { 
-                    timestamp: new Date().toISOString(),
-                    version: '3.0.0',
-                    modules: [
-                        'HeaderManager',
-                        'ScrollEffects', 
-                        'MenuSystem',
-                        'FileUpload',
-                        'Statistics',
-                        'Security',
-                        'Accessibility',
-                        'Tooltips'
-                    ]
-                }
-            }));
-    
-        } catch (error) {
-            console.error('Initialization error:', error);
-            showErrorMessage('アプリケーションの初期化中にエラーが発生しました。ページを再読み込みしてください。');
-        }
-    }
-    
-    // ========== イベントリスナーの設定 ==========
-    
-    // DOM読み込み完了時の初期化
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeApp);
-    } else {
-        // 既に読み込み完了している場合は即座に実行
-        initializeApp();
-    }
-    
-    // ページ表示時の処理（Back Forward Cache対応）
-    window.addEventListener('pageshow', function(event) {
-        if (event.persisted) {
-            // キャッシュから復元された場合の処理
-            if (headerManager) {
-                headerManager.updateHeaderTitle();
-                headerManager.updateActiveNavItem();
-            }
-        }
-    });
-    
-    // ページ非表示時のクリーンアップ
-    window.addEventListener('pagehide', function(event) {
-        // メニューが開いている場合は閉じる
-        if (headerManager && headerManager.isMenuOpen) {
-            headerManager.closeMenu();
-        }
-    });
-    
-    // モーダル外クリックで閉じる機能
-    window.addEventListener('click', function(event) {
-        const detailModal = document.getElementById('detailModal');
-        if (event.target === detailModal) {
-            closeModal('detailModal');
-        }
-    });
-    
-    // ========== 公開API ==========
-    
-    // グローバル関数として公開（後方互換性のため）
-    window.selectedStore = selectedStore;
-    window.closeModal = closeModal;
-    window.showDetails = showDetails;
-    window.sortTable = sortTable;
-    window.filterTable = filterTable;
-    
-    // HeaderManager API
-    window.HeaderManager = {
-        updateTitle: () => headerManager?.updateHeaderTitle(),
-        updateActiveNav: () => headerManager?.updateActiveNavItem(),
-        addTransitionEffect: () => headerManager?.addPageTransitionEffect(),
-        setStoreName: (name) => headerManager?.setStoreName(name),
-        setCustomPageInfo: (name, icon) => headerManager?.setCustomPageInfo(name, icon),
-        getCurrentPageInfo: () => headerManager?.getCurrentPageInfo(),
-        closeMenu: () => headerManager?.closeMenu(),
-        getStoreName: () => headerManager?.getStoreName(),
-        
-        // イベントリスナー
-        onTitleUpdate: (callback) => {
-            window.addEventListener('headerTitleUpdated', callback);
-        },
-        
-        // 状態取得
-        isMenuOpen: () => headerManager?.isMenuOpen || false,
-        isMobile: () => headerManager?.isMobile || false
-    };
-    
-    // ユーティリティAPI
-    window.MBSUtils = {
-        debounce,
-        throttle,
-        validateInput,
-        sanitizeInput,
-        escapeHtml,
-        showErrorMessage,
-        showSuccessMessage,
-        showInfoMessage,
-        announceToScreenReader,
-        createRippleEffect
-    };
-    
-    // ========== デバッグ用機能（開発環境のみ） ========== 
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        // 開発者向けのヘルプメッセージ
-        console.log('%cMBS_B Development Mode v3.0.0', 'color: #2f5d3f; font-size: 16px; font-weight: bold;');
-        console.log('Available APIs:');
-        console.log('- HeaderManager.* - ヘッダー管理');
-        console.log('- MBSUtils.* - ユーティリティ関数');
-        console.log('- selectedStore("店舗名") - 店舗選択');
-        console.log('- showDetails("顧客名") - 顧客詳細表示');
-        console.log('- sortTable("column", "order", button) - テーブルソート');
-        console.log('- filterTable("検索語") - テーブルフィルター');
-        console.log('- closeModal("modalId") - モーダル閉じる');
-    
-        // パフォーマンス監視
-        if ('performance' in window) {
-            window.addEventListener('load', function() {
-                setTimeout(function() {
-                    const perfData = performance.getEntriesByType('navigation')[0];
-                    if (perfData) {
-                        console.log('🚀 Page Performance:', {
-                            'DOM Ready': Math.round(perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart) + 'ms',
-                            'Load Complete': Math.round(perfData.loadEventEnd - perfData.loadEventStart) + 'ms',
-                            'Total Time': Math.round(perfData.loadEventEnd - perfData.fetchStart) + 'ms'
-                        });
-                    }
-                }, 1000);
-            });
-        }
-    
-        // デバッグ情報の表示
-        window.MBS_DEBUG = {
-            headerManager: () => headerManager,
-            scrollEffects: () => scrollEffects,
-            customerData: () => customerData,
-            version: '3.0.0',
-            modules: [
-                'HeaderManager',
-                'ScrollEffects', 
-                'MenuSystem',
-                'FileUpload',
-                'Statistics',
-                'Security',
-                'Accessibility',
-                'Tooltips'
-            ]
-        };
-    
-        console.log('Debug tools available in window.MBS_DEBUG');
-    }
-    
-    // ========== 最終確認とクリーンアップ ==========
-    
-    // すべての機能が正常に読み込まれたことを確認
-    setTimeout(function() {
-        const requiredFunctions = [
-            'selectedStore',
-            'closeModal', 
-            'showDetails',
-            'sortTable',
-            'filterTable'
-        ];
-        
-        const allLoaded = requiredFunctions.every(fn => typeof window[fn] === 'function');
-        
-        if (allLoaded && headerManager && scrollEffects) {
-            console.log('✅ MBS_B System: All functions loaded successfully');
-            
-            // 初期化完了イベントを発火
-            window.dispatchEvent(new CustomEvent('mbsSystemReady', {
-                detail: {
-                    version: '3.0.0',
-                    timestamp: new Date().toISOString(),
-                    headerManager: !!headerManager,
-                    scrollEffects: !!scrollEffects,
-                    customerData: customerData.length,
-                    modules: [
-                        'HeaderManager',
-                        'ScrollEffects',
-                        'MenuSystem',
-                        'FileUpload',
-                        'Statistics',
-                        'Security',
-                        'Accessibility',
-                        'Tooltips'
-                    ]
-                }
-            }));
-        } else {
-            console.warn('⚠️ MBS_B System: Some functions may not be loaded correctly');
-        }
-    }, 100);
-    
-})();

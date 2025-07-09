@@ -160,6 +160,9 @@ function format_days($days)
         </aside>
 
         <main class="main-content">
+            <h2 class="main-page-title">
+                <span class="icon">📊</span> 統計情報
+            </h2>
             <div class="content-scroll-area">
                 <!-- ダッシュボードタブ -->
                 <div id="dashboard" class="tab-content active">

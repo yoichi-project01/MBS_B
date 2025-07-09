@@ -16,14 +16,16 @@ if ($storeName) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
-<body>
+<body class="menu-page">
     <main class="container">
         <!-- 戻るボタンをタイトルの上に配置 -->
         <button class="back-button-top" onclick="window.location.href='index.html'">
             <span>← 店舗選択に戻る</span>
         </button>
 
-        <h1 class="store-title"><?php echo htmlspecialchars($storeName); ?><br>受注管理システム</h1>
+        <h2 class="main-page-title">
+            <span class="icon">🏠</span> <?php echo htmlspecialchars($storeName); ?><br>受注管理システム
+        </h2>
 
         <div class="menu">
             <button class="menu-button" data-path="customer_information/index.php">
@@ -33,13 +35,22 @@ if ($storeName) {
                 </span>
             </button>
             <button class="menu-button" data-path="statistics/index.php">
-                <span>統計情報</span>
+                <span>
+                    <i class="fas fa-chart-bar"></i>
+                    統計情報
+                </span>
             </button>
             <button class="menu-button" data-path="order_list/index.php">
-                <span>注文書</span>
+                <span>
+                    <i class="fas fa-file-invoice"></i>
+                    注文書
+                </span>
             </button>
             <button class="menu-button" data-path="delivery_list/index.php">
-                <span>納品書</span>
+                <span>
+                    <i class="fas fa-truck"></i>
+                    納品書
+                </span>
             </button>
         </div>
     </main>
