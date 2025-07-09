@@ -10,6 +10,14 @@ include(__DIR__ . '/../component/header.php');
 // セッション開始
 SessionManager::start();
 
+// 現在選択されている店舗名を取得
+$storeName = $_GET['store'] ?? $_COOKIE['selectedStore'] ?? '';
+
+// 店舗名が設定されていない場合はエラーまたはデフォルト処理
+if (empty($storeName)) {
+    die("店舗が選択されていません。"); // またはリダイレクトなど
+}
+
 // 初期化
 $totalCustomers = 0;
 $monthlySales = 0;
@@ -21,7 +29,9 @@ $customerList = [];
 try {
     // 1. ダッシュボードのメトリクス
     // 総顧客数
-    $totalCustomersStmt = $pdo->query("SELECT COUNT(*) FROM customers");
+    $totalCustomersStmt = $pdo->prepare("SELECT COUNT(*) FROM customers WHERE store_name = :storeName");
+    $totalCustomersStmt->bindParam(':storeName', $storeName);
+    $totalCustomersStmt->execute();
     $totalCustomers = $totalCustomersStmt->fetchColumn();
 
     // customer_summary ビューから基本統計を取得
@@ -31,8 +41,11 @@ try {
             SUM(delivery_count) as total_deliveries, 
             AVG(avg_lead_time) as avg_lead_time 
         FROM customer_summary
+        WHERE store_name = :storeName
     ";
-    $dashboardMetricsStmt = $pdo->query($dashboardQuery);
+    $dashboardMetricsStmt = $pdo->prepare($dashboardQuery);
+    $dashboardMetricsStmt->bindParam(':storeName', $storeName);
+    $dashboardMetricsStmt->execute();
     $dashboardMetrics = $dashboardMetricsStmt->fetch(PDO::FETCH_ASSOC);
 
     $totalDeliveries = $dashboardMetrics['total_deliveries'] ?? 0;
@@ -44,21 +57,33 @@ try {
         SELECT SUM(di.amount) 
         FROM deliveries d
         JOIN delivery_items di ON d.delivery_no = di.delivery_no
+        JOIN order_items oi ON di.order_item_no = oi.order_item_no
+        JOIN orders o ON oi.order_no = o.order_no
+        JOIN customers c ON o.customer_no = c.customer_no
         WHERE YEAR(d.delivery_record) = YEAR(CURDATE()) 
           AND MONTH(d.delivery_record) = MONTH(CURDATE())
+          AND c.store_name = :storeName
     ";
-    $monthlySalesStmt = $pdo->query($currentMonthQuery);
-    $monthlySales = $monthlySalesStmt->fetchColumn() ?? 0;
+    $currentMonthSalesStmt = $pdo->prepare($currentMonthQuery);
+    $currentMonthSalesStmt->bindParam(':storeName', $storeName);
+    $currentMonthSalesStmt->execute();
+    $monthlySales = $currentMonthSalesStmt->fetchColumn() ?? 0;
 
     // 前月の売上
     $previousMonthQuery = "
         SELECT SUM(di.amount) 
         FROM deliveries d
         JOIN delivery_items di ON d.delivery_no = di.delivery_no
+        JOIN order_items oi ON di.order_item_no = oi.order_item_no
+        JOIN orders o ON oi.order_no = o.order_no
+        JOIN customers c ON o.customer_no = c.customer_no
         WHERE YEAR(d.delivery_record) = YEAR(CURDATE() - INTERVAL 1 MONTH) 
           AND MONTH(d.delivery_record) = MONTH(CURDATE() - INTERVAL 1 MONTH)
+          AND c.store_name = :storeName
     ";
-    $previousMonthSalesStmt = $pdo->query($previousMonthQuery);
+    $previousMonthSalesStmt = $pdo->prepare($previousMonthQuery);
+    $previousMonthSalesStmt->bindParam(':storeName', $storeName);
+    $previousMonthSalesStmt->execute();
     $previousMonthSales = $previousMonthSalesStmt->fetchColumn() ?? 0;
 
     // 前月比の計算
@@ -71,8 +96,10 @@ try {
     }
 
     // 2. 顧客一覧データ (customer_summary ビューを使用)
-    $customerListQuery = "SELECT * FROM customer_summary ORDER BY total_sales DESC";
-    $customersStmt = $pdo->query($customerListQuery);
+    $customerListQuery = "SELECT * FROM customer_summary WHERE store_name = :storeName ORDER BY total_sales DESC";
+    $customersStmt = $pdo->prepare($customerListQuery);
+    $customersStmt->bindParam(':storeName', $storeName);
+    $customersStmt->execute();
     $customerList = $customersStmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     // 本番環境では、エラーメッセージをログに記録するなどの処理を推奨

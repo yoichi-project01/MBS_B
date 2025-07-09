@@ -683,6 +683,24 @@
             // クリック時のリップル効果
             button.addEventListener('click', function(e) {
                 createRippleEffect(this, e);
+
+                const path = this.dataset.path;
+                if (path) {
+                    // Get the current store name from the URL or a global variable
+                    // Prioritize URL parameter, then global selectedStoreData
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const currentStoreName = urlParams.get('store') || selectedStoreData;
+
+                    let targetUrl = path;
+                    if (currentStoreName) {
+                        // Construct a URL object to safely add/update parameters
+                        const baseUrl = window.location.origin + '/MBS_B/'; // Assuming MBS_B is the base directory
+                        const url = new URL(path, baseUrl);
+                        url.searchParams.set('store', currentStoreName);
+                        targetUrl = url.pathname + url.search;
+                    }
+                    window.location.href = targetUrl;
+                }
             });
     
             // アニメーションの遅延設定

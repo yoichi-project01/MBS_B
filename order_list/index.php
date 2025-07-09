@@ -5,7 +5,7 @@ include(__DIR__ . '/../component/header.php');
 
 SessionManager::start();
 
-$storeName = $_GET['store'] ?? '';
+$storeName = $_GET['store'] ?? $_COOKIE['selectedStore'] ?? '';
 
 // ページネーションの設定
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
