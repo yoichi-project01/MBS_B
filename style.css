@@ -1839,8 +1839,26 @@ body.with-header .back-button-top {
     transition: all var(--transition);
 }
 
-.action-btn:hover {
+.btn-detail:hover {
     background: var(--main-green);
+    transform: translateY(-1px);
+}
+
+.btn-delivery {
+    padding: 6px 12px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    text-decoration: none;
+}
+
+.btn-delivery:hover {
+    background: #45a049;
     transform: translateY(-1px);
 }
 

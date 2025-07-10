@@ -133,7 +133,7 @@ function format_days($days)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>統計情報 - 受注管理システム</title>
     <link rel="stylesheet" href="../style.css">
-    
+
     <!-- SweetAlert CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Font Awesome for icons -->
@@ -160,9 +160,6 @@ function format_days($days)
         </aside>
 
         <main class="main-content">
-            <h2 class="main-page-title">
-                <span class="icon">📊</span> 統計情報
-            </h2>
             <div class="content-scroll-area">
                 <!-- ダッシュボードタブ -->
                 <div id="dashboard" class="tab-content active">

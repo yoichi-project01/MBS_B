@@ -146,6 +146,7 @@ function translate_status($status) {
                                 <td><span class="status-<?= htmlspecialchars($order['status']) ?>"><?= translate_status($order['status']) ?></span></td>
                                 <td>
                                     <a href="detail.php?order_no=<?= htmlspecialchars($order['order_no']) ?>&store=<?= htmlspecialchars($storeName) ?>" class="btn-detail">詳細</a>
+                                    <a href="../delivery_list/index.php?order_id=<?= htmlspecialchars($order['order_no']) ?>" class="btn-delivery" target="_blank">納品書</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
