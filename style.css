@@ -1058,27 +1058,6 @@ body.with-header .back-button-top {
 
 /* ========== 統計情報ページ専用スタイル ========== */
 
-/* 統計ページタイトル専用スタイル */
-.statistics-page .page-title {
-    font-size: clamp(28px, 6vw, 36px);
-    font-weight: 800;
-    color: var(--main-green);
-    margin-bottom: 30px;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    letter-spacing: 1px;
-    flex-shrink: 0;
-}
-
-.statistics-page .page-title::before {
-    content: '📊';
-    font-size: 32px;
-    color: var(--accent-green);
-}
-
 /* コントロールパネル */
 .enhanced-controls {
     background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
