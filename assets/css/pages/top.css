@@ -1,0 +1,71 @@
+
+/* ==================================
+   Top Page (index.html) Styles
+   ================================== */
+
+.container .store-title {
+    font-size: clamp(32px, 8vw, 48px);
+    font-weight: 800;
+    color: var(--main-green);
+    margin-bottom: 60px;
+    position: relative;
+    display: inline-block;
+    letter-spacing: 2px;
+    line-height: 1.2;
+}
+
+.container .store-title::before {
+    content: '📚';
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 48px;
+    filter: drop-shadow(0 4px 12px rgba(47, 93, 63, 0.3));
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%,
+    100% {
+        transform: translateX(-50%) translateY(0px);
+    }
+    50% {
+        transform: translateX(-50%) translateY(-10px);
+    }
+}
+
+.container .store-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-green), var(--sub-green));
+    border-radius: 2px;
+    animation: slideIn 0.8s ease-out 0.3s both;
+}
+
+@keyframes slideIn {
+    from {
+        width: 0;
+        opacity: 0;
+    }
+    to {
+        width: 60px;
+        opacity: 1;
+    }
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+}
+
+.store-selection .menu-button span::before {
+    display: none;
+}

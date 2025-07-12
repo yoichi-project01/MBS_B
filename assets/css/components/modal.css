@@ -1,0 +1,103 @@
+
+/* ==================================
+   Modal Styles
+   ================================== */
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
+    margin: 3% auto;
+    padding: 30px;
+    border-radius: 16px;
+    width: 80%;
+    max-width: 700px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid rgba(126, 217, 87, 0.2);
+    overflow: hidden;
+}
+
+.modal-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--main-green), var(--accent-green), var(--sub-green));
+    z-index: 10;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.modal-header h2 {
+    color: var(--primary-color);
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.close-modal {
+    color: var(--font-color-light);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.close-modal:hover {
+    color: var(--primary-color);
+    background-color: var(--bg-color);
+}

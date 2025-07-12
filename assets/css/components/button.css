@@ -1,0 +1,194 @@
+
+/* ==================================
+   Button Styles
+   ================================== */
+
+.menu-button {
+    width: 100%;
+    max-width: 400px;
+    padding: 24px 32px;
+    font-size: 20px;
+    font-weight: 600;
+    font-family: var(--font-family);
+    color: var(--main-green);
+    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
+    border: 3px solid transparent;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 1px;
+    animation: slideInStagger 0.6s ease-out both;
+}
+
+.menu-button:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.menu-button:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.menu-button:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.menu-button:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.menu-button:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+@keyframes slideInStagger {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.menu-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(126, 217, 87, 0.4),
+            transparent);
+    transition: left 0.6s ease;
+}
+
+.menu-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--accent-green) 0%, var(--sub-green) 100%);
+    opacity: 0;
+    transition: opacity var(--transition);
+    border-radius: calc(var(--radius) - 3px);
+}
+
+.menu-button:hover::before {
+    left: 100%;
+}
+
+.menu-button:hover::after {
+    opacity: 0.1;
+}
+
+.menu-button:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--accent-green);
+    color: var(--main-green);
+}
+
+.menu-button:active {
+    transform: translateY(-4px) scale(0.98);
+    transition: all 0.1s ease;
+}
+
+.menu-button:focus-visible {
+    outline: 3px solid var(--accent-green);
+    outline-offset: 3px;
+}
+
+.back-button-top {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid var(--sub-green);
+    color: var(--sub-green);
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: var(--font-family);
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: 0 4px 16px rgba(47, 93, 63, 0.15);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+}
+
+body.with-header .back-button-top {
+    position: absolute;
+    top: calc(var(--header-height) + 20px);
+    left: 20px;
+    z-index: 10;
+}
+
+.back-button-top:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: var(--main-green);
+    color: var(--main-green);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(47, 93, 63, 0.25);
+}
+
+.back-button-top:active {
+    transform: translateY(0);
+    transition: all 0.1s ease;
+}
+
+.back-button-top span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.5px;
+}
+
+.upload-button {
+    width: 100%;
+    padding: 16px 32px;
+    font-size: 18px;
+    font-weight: 600;
+    font-family: var(--font-family);
+    color: #fff;
+    background: linear-gradient(135deg, var(--main-green) 0%, var(--sub-green) 100%);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    letter-spacing: 0.5px;
+}
+
+.upload-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    background: linear-gradient(135deg, var(--sub-green) 0%, var(--main-green) 100%);
+}
+
+.upload-button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.upload-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.upload-button:focus-visible {
+    outline: 3px solid var(--accent-green);
+    outline-offset: 3px;
+}

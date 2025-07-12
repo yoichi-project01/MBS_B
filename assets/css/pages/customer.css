@@ -1,0 +1,104 @@
+
+/* ==================================
+   Customer Page Styles
+   ================================== */
+
+.page-title {
+    font-size: clamp(28px, 6vw, 36px);
+    font-weight: 800;
+    color: var(--main-green);
+    margin-bottom: 40px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+}
+
+.page-title::before {
+    content: '👥';
+    font-size: 32px;
+    color: var(--accent-green);
+}
+
+.page-title i {
+    font-size: 32px;
+    color: var(--accent-green);
+}
+
+.upload-container {
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.upload-form {
+    margin-bottom: 40px;
+}
+
+.help-section {
+    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(126, 217, 87, 0.2);
+}
+
+.help-section h4 {
+    color: var(--main-green);
+    margin-bottom: 16px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.help-section h4 i {
+    color: var(--accent-green);
+}
+
+.help-content p {
+    margin-bottom: 12px;
+    color: var(--font-color);
+    line-height: 1.6;
+}
+
+.csv-format {
+    background: var(--light-green);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+    border-left: 4px solid var(--accent-green);
+}
+
+.csv-format code {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: var(--main-green);
+    font-weight: 600;
+}
+
+.format-notes {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0 0;
+}
+
+.format-notes li {
+    padding: 8px 0;
+    color: var(--font-color);
+    position: relative;
+    padding-left: 24px;
+    line-height: 1.5;
+}
+
+.format-notes li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--accent-green);
+    font-weight: bold;
+}

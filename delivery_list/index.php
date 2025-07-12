@@ -1,14 +1,10 @@
 <?php
-// delivery_list/index.php
 require_once(__DIR__ . '/../component/autoloader.php');
 require_once(__DIR__ . '/../component/db.php');
 include(__DIR__ . '/../component/header.php');
-
 SessionManager::start();
-
 $storeName = $_GET['store'] ?? $_COOKIE['selectedStore'] ?? '';
 
-// 簡単なサンプルデータ（実際のプロジェクトではDBから取得）
 $sampleDeliveries = [
     ['id' => 1, 'customer_name' => '木村 紗希', 'status' => 'completed', 'completed' => 3, 'total' => 3],
     ['id' => 2, 'customer_name' => '桜井株式会社', 'status' => 'partial', 'completed' => 2, 'total' => 3],
@@ -28,18 +24,6 @@ $sampleCustomers = [
     '桜井株式会社'
 ];
 ?>
-
-<!DOCTYPE html>
-<html lang="ja">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>納品書 - <?php echo htmlspecialchars($storeName); ?> - 受注管理システム</title>
-    <link rel="stylesheet" href="../style.css">
-
-</head>
-
 <body class="with-header">
     <div class="delivery-container">
         <div class="delivery-list">
@@ -94,7 +78,6 @@ $sampleCustomers = [
         </div>
     </div>
 
-    <!-- 顧客選択モーダル -->
     <div class="customer-select" id="customerSelect">
         <div class="customer-modal">
             <button class="close-btn" onclick="hideCustomerSelect()">&times;</button>
@@ -118,7 +101,6 @@ $sampleCustomers = [
         </div>
     </div>
 
-    <!-- 納品書詳細モーダル -->
     <div class="delivery-detail" id="deliveryDetail">
         <div class="delivery-modal">
             <button class="close-btn" onclick="hideDeliveryDetail()">&times;</button>
@@ -148,34 +130,7 @@ $sampleCustomers = [
                     </tr>
                 </thead>
                 <tbody id="deliveryDetailBody">
-                    <tr>
-                        <td class="checkbox-col"><input type="checkbox" checked></td>
-                        <td>週間BCN　10月号</td>
-                        <td>1</td>
-                        <td class="amount">¥1,100</td>
-                        <td class="amount">¥1,210</td>
-                    </tr>
-                    <tr>
-                        <td class="checkbox-col"><input type="checkbox" checked></td>
-                        <td>日経コンピューター　10月号</td>
-                        <td>2</td>
-                        <td class="amount">¥1,000</td>
-                        <td class="amount">¥2,200</td>
-                    </tr>
-                    <tr>
-                        <td class="checkbox-col"><input type="checkbox"></td>
-                        <td>週間マガジン　10月号</td>
-                        <td>1</td>
-                        <td class="amount">¥800</td>
-                        <td class="amount">¥880</td>
-                    </tr>
-                    <tr style="background: #f8f9fa;">
-                        <td colspan="2" style="text-align: right; font-weight: 600;">合計</td>
-                        <td style="font-weight: 600;">3</td>
-                        <td></td>
-                        <td class="amount" style="font-weight: 600;">¥3,410</td>
-                    </tr>
-                </tbody>
+                    </tbody>
             </table>
 
             <div class="total-section">
@@ -188,7 +143,7 @@ $sampleCustomers = [
                     <tr>
                         <td style="border-bottom: 1px solid #ddd; padding: 0.5rem;"></td>
                         <td style="border-bottom: 1px solid #ddd; padding: 0.5rem;"></td>
-                        <td style="border-bottom: 1px solid #ddd; padding: 0.5rem;" class="total-amount">¥3,410</td>
+                        <td style="border-bottom: 1px solid #ddd; padding: 0.5rem;" class="total-amount">¥0</td>
                     </tr>
                 </table>
             </div>
@@ -203,12 +158,4 @@ $sampleCustomers = [
             </div>
         </div>
     </div>
-
-    <!-- SweetAlert CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="../script.js"></script>
 </body>
-
-</html>

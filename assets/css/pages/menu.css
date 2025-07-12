@@ -1,0 +1,24 @@
+
+/* ==================================
+   Menu Page (menu.php) Styles
+   ================================== */
+
+.menu-button span {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.menu-button span::before {
+    font-size: 24px;
+    filter: grayscale(0.3);
+    transition: all var(--transition);
+}
+
+.menu-button:hover span::before {
+    filter: grayscale(0);
+    transform: scale(1.1);
+}

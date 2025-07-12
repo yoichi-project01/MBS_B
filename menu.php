@@ -5,21 +5,27 @@ if ($storeName) {
 }
 ?>
 
+<?php
+$storeName = $_GET['store'] ?? $_COOKIE['selectedStore'] ?? '';
+if ($storeName) {
+    setcookie('selectedStore', $storeName, time() + 3600, '/');
+}
+?>
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
     <meta charset="UTF-8">
-    <title><?php echo htmlspecialchars($storeName); ?> 受注管理システム</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <title><?php echo htmlspecialchars($storeName); ?> 受注管理システム</title>
+    <link rel="stylesheet" href="/MBS_B/assets/css/base.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/components/button.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/pages/menu.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-
 <body class="menu-page">
     <main class="container">
-        <!-- 戻るボタンをタイトルの上に配置 -->
-        <button class="back-button-top" onclick="window.location.href='index.html'">
+        <button class="back-button-top" onclick="window.location.href='index.php'">
             <span>← 店舗選択に戻る</span>
         </button>
 
@@ -54,8 +60,8 @@ if ($storeName) {
             </button>
         </div>
     </main>
-
-    <script src="script.js"></script>
+    <script src="/MBS_B/assets/js/main.js" type="module"></script>
 </body>
+</html>
 
 </html>
