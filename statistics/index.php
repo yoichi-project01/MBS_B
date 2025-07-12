@@ -2,6 +2,7 @@
 require_once(__DIR__ . '/../component/autoloader.php');
 require_once(__DIR__ . '/../component/db.php');
 include(__DIR__ . '/../component/header.php');
+
 SessionManager::start();
 $storeName = $_GET['store'] ?? $_COOKIE['selectedStore'] ?? '';
 if (empty($storeName)) {
@@ -102,69 +103,31 @@ function format_days($days)
     return number_format($days, 2) . '日';
 }
 ?>
-<!DOCTYPE html>
-<html lang="ja">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>統計情報 - 受注管理システム</title>
-    <link rel="stylesheet" href="/MBS_B/assets/css/base.css">
-    <link rel="stylesheet" href="/MBS_B/assets/css/components/header.css">
-    <link rel="stylesheet" href="/MBS_B/assets/css/components/button.css">
-    <link rel="stylesheet" href="/MBS_B/assets/css/components/modal.css">
-    <link rel="stylesheet" href="/MBS_B/assets/css/components/form.css">
-    <link rel="stylesheet" href="/MBS_B/assets/css/components/table.css">
-    <link rel="stylesheet" href="/MBS_B/assets/css/pages/statistics.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-</head>
+<!-- Statistics content starts here -->
+<?php include 'dashboard_content.php'; ?>
+<?php include 'customer_list_content.php'; ?>
+<?php include 'all_customers_content.php'; ?>
 
-<body class="statistics-page">
-    <div class="dashboard-container">
-        <aside class="top-nav">
-            <div class="top-nav-header">
-                <i class="fas fa-book-open"></i>
-                <h3>受注管理</h3>
-            </div>
-            <nav class="top-nav-links">
-                <a href="#" class="nav-link active" data-tab="dashboard">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>ダッシュボード</span>
-                </a>
-                <a href="#" class="nav-link" data-tab="customers">
-                    <i class="fas fa-users"></i>
-                    <span>顧客一覧</span>
-                </a>
-                <a href="#" class="nav-link" data-tab="all-customers">
-                    <i class="fas fa-list"></i>
-                    <span>全顧客</span>
-                </a>
-            </nav>
-        </aside>
+</div>
+</main>
+</div>
 
-        <main class="main-content">
-            <div class="content-scroll-area">
-                <?php include 'dashboard_content.php'; ?>
-                <?php include 'customer_list_content.php'; ?>
-                <?php include 'all_customers_content.php'; ?>
-            </div>
-        </main>
-    </div>
-
-    <div id="detailModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="detailTitle">顧客詳細</h2>
-                <button class="close-modal" onclick="closeModal('detailModal')">&times;</button>
-            </div>
-            <div class="modal-body" id="detailContent">
-            </div>
+<div id="detailModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="detailTitle">顧客詳細</h2>
+            <button class="close-modal" onclick="closeModal('detailModal')">&times;</button>
+        </div>
+        <div class="modal-body" id="detailContent">
         </div>
     </div>
+</div>
 
-    <script>
-    window.customerData = <?php echo json_encode($customerList); ?>;
-    </script>
+<script>
+window.customerData = <?php echo json_encode($customerList); ?>;
+</script>
+
 </body>
+
 </html>

@@ -1,4 +1,3 @@
-
 /* ==================================
    Header Component
    ================================== */
@@ -13,6 +12,8 @@ export class HeaderManager {
         this.resizeDebounceTimer = null;
         this.focusableElements = [];
         this.originalFocus = null;
+        this.currentPageInfo = null;
+        this.storeName = '';
 
         this.init();
     }
@@ -21,6 +22,7 @@ export class HeaderManager {
         this.bindElements();
         this.bindEvents();
         this.checkMobileView();
+        this.detectPageInfo();
         this.updateHeaderTitle();
         this.setupAccessibility();
     }
@@ -140,7 +142,7 @@ export class HeaderManager {
 
         if (this.originalFocus && typeof this.originalFocus.focus === 'function') {
             this.originalFocus.focus();
-        } else {
+        } else if (this.menuToggle) {
             this.menuToggle.focus();
         }
     }
@@ -205,11 +207,14 @@ export class HeaderManager {
         this.isMobile = window.innerWidth <= 768;
     }
 
-    getCurrentPageInfo() {
+    detectPageInfo() {
         const currentPath = window.location.pathname;
-        const currentFile = currentPath.split('/').pop();
+        const urlParams = new URLSearchParams(window.location.search);
+        this.storeName = urlParams.get('store') ||
+            document.documentElement.getAttribute('data-store-name') || '';
 
         const PAGE_CONFIG = {
+            '/menu.php': { name: 'メニュー', icon: '🏠' },
             '/customer_information/': { name: '顧客情報', icon: '👥' },
             '/statistics/': { name: '統計情報', icon: '📊' },
             '/order_list/': { name: '注文書', icon: '📋' },
@@ -218,17 +223,19 @@ export class HeaderManager {
             'upload.php': { name: '顧客情報CSVアップロード', icon: '👥' }
         };
 
+        this.currentPageInfo = { name: '受注管理', icon: '📚' }; // Default
+
         for (const [path, config] of Object.entries(PAGE_CONFIG)) {
             if (path.startsWith('/') && currentPath.includes(path)) {
-                return config;
+                this.currentPageInfo = config;
+                break;
             }
         }
 
+        const currentFile = currentPath.split('/').pop();
         if (PAGE_CONFIG[currentFile]) {
-            return PAGE_CONFIG[currentFile];
+            this.currentPageInfo = PAGE_CONFIG[currentFile];
         }
-
-        return { name: '受注管理', icon: '📋' };
     }
 
     updateHeaderTitle(customPageInfo = null) {
@@ -237,28 +244,26 @@ export class HeaderManager {
 
         if (!titleElement || !iconElement) return;
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const storeName = urlParams.get('store') ||
-                         document.documentElement.getAttribute('data-store-name') || '';
+        const pageInfo = customPageInfo || this.currentPageInfo;
 
-        const pageInfo = customPageInfo || this.getCurrentPageInfo();
-
-        iconElement.textContent = pageInfo.icon;
+        if (pageInfo && pageInfo.icon) {
+            iconElement.textContent = pageInfo.icon;
+        }
 
         let displayTitle;
-        if (this.isMobile && storeName) {
-            const shortStoreName = storeName.replace('店', '');
+        if (this.isMobile && this.storeName) {
+            const shortStoreName = this.storeName.replace('店', '');
             displayTitle = `${shortStoreName} - ${pageInfo.name}`;
-        } else if (storeName) {
-            displayTitle = `${storeName} - ${pageInfo.name}`;
+        } else if (this.storeName) {
+            displayTitle = `${this.storeName} - ${pageInfo.name}`;
         } else {
             displayTitle = pageInfo.name;
         }
 
         titleElement.textContent = displayTitle;
 
-        if (storeName) {
-            document.title = `${pageInfo.name} - ${storeName} - 受注管理システム`;
+        if (this.storeName) {
+            document.title = `${pageInfo.name} - ${this.storeName} - 受注管理システム`;
         } else {
             document.title = `${pageInfo.name} - 受注管理システム`;
         }
@@ -267,7 +272,7 @@ export class HeaderManager {
         this.addPageTransitionEffect();
 
         window.dispatchEvent(new CustomEvent('headerTitleUpdated', {
-            detail: { pageInfo, storeName }
+            detail: { pageInfo, storeName: this.storeName }
         }));
     }
 
@@ -338,6 +343,8 @@ export class HeaderManager {
     setStoreName(storeName) {
         if (!storeName) return;
 
+        this.storeName = storeName;
+
         const url = new URL(window.location);
         url.searchParams.set('store', storeName);
         window.history.replaceState({}, '', url);
@@ -348,13 +355,22 @@ export class HeaderManager {
     }
 
     setCustomPageInfo(name, icon) {
-        const customPageInfo = { name, icon };
-        this.updateHeaderTitle(customPageInfo);
+        this.currentPageInfo = { name, icon };
+        this.updateHeaderTitle();
     }
 
     getStoreName() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('store') ||
-               document.documentElement.getAttribute('data-store-name') || '';
+        return this.storeName;
+    }
+
+    getCurrentPageInfo() {
+        return this.currentPageInfo;
+    }
+
+    // Public method to refresh header
+    refresh() {
+        this.detectPageInfo();
+        this.updateHeaderTitle();
+        this.updateActiveNavItem();
     }
 }

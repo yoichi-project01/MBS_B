@@ -4,7 +4,7 @@
    ================================== */
 
 import { showModal, closeModal } from '../components/modal.js';
-import { showErrorMessage } from '../components/notification.js';
+import { showErrorMessage, showInfoMessage } from '../components/notification.js';
 import { validateInput } from '../components/validator.js';
 
 class DeliverySystem {
@@ -16,23 +16,69 @@ class DeliverySystem {
     init() {
         this.bindEvents();
         this.setupAccessibility();
+        this.updateTotalAmount(); // 初期ロード時に合計金額を計算
     }
 
     bindEvents() {
+        // 納品書ページでない場合は初期化をスキップ
         if (!document.querySelector('.delivery-container')) {
             return;
         }
 
-        const rows = document.querySelectorAll('#deliveryTableBody tr');
-        rows.forEach((row) => {
-            row.addEventListener('click', (e) => {
-                if (e.target.type !== 'checkbox') {
-                    const customerName = row.cells[1].textContent;
+        // イベントデリゲーションを使用してボタンクリックを処理
+        document.addEventListener('click', (e) => {
+            const target = e.target.closest('[data-action]');
+            if (target) {
+                const action = target.dataset.action;
+                switch (action) {
+                    case 'searchDeliveries':
+                        this.searchDeliveries();
+                        break;
+                    case 'showCustomerSelect':
+                        this.showCustomerSelect();
+                        break;
+                    case 'hideCustomerSelect':
+                        this.hideCustomerSelect();
+                        break;
+                    case 'confirmCustomerSelection':
+                        this.confirmCustomerSelection();
+                        break;
+                    case 'hideDeliveryDetail':
+                        this.hideDeliveryDetail();
+                        break;
+                    case 'saveDelivery':
+                        this.saveDelivery();
+                        break;
+                    case 'printDelivery':
+                        this.printDelivery();
+                        break;
+                    case 'showDeliveryDetail':
+                        const customerName = target.dataset.customerName;
+                        this.showDeliveryDetail(customerName);
+                        break;
+                }
+            }
+
+            const customerItem = e.target.closest('.customer-item');
+            if (customerItem) {
+                const customerName = customerItem.dataset.customerName;
+                this.selectCustomer(customerName);
+            }
+        });
+
+        // テーブル行クリックイベント (詳細表示用)
+        const deliveryTableBody = document.getElementById('deliveryTableBody');
+        if (deliveryTableBody) {
+            deliveryTableBody.addEventListener('click', (e) => {
+                const row = e.target.closest('tr');
+                if (row && !e.target.closest('input[type="checkbox"]')) {
+                    const customerName = row.dataset.customerName;
                     this.showDeliveryDetail(customerName);
                 }
             });
-        });
+        }
 
+        // 検索機能 (debounce)
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
             searchInput.addEventListener('input', this.debounce(() => {
@@ -47,6 +93,7 @@ class DeliverySystem {
             }, 300));
         }
 
+        // ESCキーでモーダルを閉じる
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 this.hideCustomerSelect();
@@ -54,24 +101,7 @@ class DeliverySystem {
             }
         });
 
-        const customerSelect = document.getElementById('customerSelect');
-        if (customerSelect) {
-            customerSelect.addEventListener('click', (e) => {
-                if (e.target === customerSelect) {
-                    this.hideCustomerSelect();
-                }
-            });
-        }
-
-        const deliveryDetail = document.getElementById('deliveryDetail');
-        if (deliveryDetail) {
-            deliveryDetail.addEventListener('click', (e) => {
-                if (e.target === deliveryDetail) {
-                    this.hideDeliveryDetail();
-                }
-            });
-        }
-
+        // チェックボックスの動的更新
         this.setupCheckboxHandlers();
     }
 
@@ -92,9 +122,9 @@ class DeliverySystem {
     }
 
     setupCheckboxHandlers() {
-        const detailTable = document.getElementById('deliveryDetailBody');
-        if (detailTable) {
-            detailTable.addEventListener('change', (e) => {
+        const detailTableBody = document.getElementById('deliveryDetailBody');
+        if (detailTableBody) {
+            detailTableBody.addEventListener('change', (e) => {
                 if (e.target.type === 'checkbox') {
                     this.updateTotalAmount();
                 }
@@ -122,6 +152,26 @@ class DeliverySystem {
         }
 
         this.selectedCustomer = customerName;
+        document.querySelectorAll('.customer-item').forEach(item => {
+            item.classList.remove('selected');
+            item.style.background = '';
+        });
+        const selectedItem = document.querySelector(`.customer-item[data-customer-name="${customerName}"]`);
+        if (selectedItem) {
+            selectedItem.classList.add('selected');
+            selectedItem.style.background = 'var(--light-green)';
+        }
+    }
+
+    confirmCustomerSelection() {
+        if (!this.selectedCustomer) {
+            showErrorMessage('顧客が選択されていません。');
+            return;
+        }
+        showInfoMessage('顧客選択', `${this.selectedCustomer} が選択されました。`);
+        this.hideCustomerSelect();
+        // ここで選択された顧客名を使って納品書作成画面に遷移するなどの処理を追加
+        // 例: window.location.href = `create_delivery.php?customer=${encodeURIComponent(this.selectedCustomer)}`;
     }
 
     showDeliveryDetail(customerName) {
@@ -140,8 +190,30 @@ class DeliverySystem {
     }
 
     fetchDeliveryData(customerName) {
-        // In a real application, you would fetch this data from a server
+        // 実際のプロジェクトではここでAPIコールを行う
         console.log(`Fetching data for ${customerName}`);
+        // サンプルデータを表示
+        const sampleItems = [
+            { name: '週間BCN　10月号', quantity: 1, unitPrice: 1100, amount: 1210, checked: true },
+            { name: '日経コンピューター　10月号', quantity: 2, unitPrice: 1000, amount: 2200, checked: true },
+            { name: '週間マガジン　10月号', quantity: 1, unitPrice: 800, amount: 880, checked: false },
+        ];
+        const deliveryDetailBody = document.getElementById('deliveryDetailBody');
+        if (deliveryDetailBody) {
+            deliveryDetailBody.innerHTML = '';
+            sampleItems.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="checkbox-col"><input type="checkbox" ${item.checked ? 'checked' : ''}></td>
+                    <td>${item.name}</td>
+                    <td>${item.quantity}</td>
+                    <td class="text-right">¥${item.unitPrice.toLocaleString()}</td>
+                    <td class="text-right">¥${item.amount.toLocaleString()}</td>
+                `;
+                deliveryDetailBody.appendChild(row);
+            });
+            this.updateTotalAmount();
+        }
     }
 
     updateTotalAmount() {
@@ -162,6 +234,16 @@ class DeliverySystem {
 
         const totalAmountEl = document.getElementById('totalAmount');
         if(totalAmountEl) totalAmountEl.textContent = `¥${total.toLocaleString()}`;
+    }
+
+    saveDelivery() {
+        showInfoMessage('保存', '納品書が保存されました。');
+        this.hideDeliveryDetail();
+    }
+
+    printDelivery() {
+        showInfoMessage('印刷', '納品書を印刷します。');
+        // window.print(); // 実際の印刷処理
     }
 
     searchDeliveries() {

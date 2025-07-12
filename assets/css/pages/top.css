@@ -1,8 +1,199 @@
-
 /* ==================================
    Top Page (index.html) Styles
    ================================== */
 
+/* Store selection page specific styles */
+.store-selection-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    position: relative;
+}
+
+.store-selection-page .container {
+    max-width: 600px;
+    width: 100%;
+    padding: 40px 20px;
+    text-align: center;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.store-selection-page .main-page-title {
+    font-size: clamp(32px, 8vw, 48px);
+    font-weight: 800;
+    color: var(--main-green);
+    margin-bottom: 60px;
+    position: relative;
+    display: inline-block;
+    letter-spacing: 2px;
+    line-height: 1.2;
+}
+
+.store-selection-page .main-page-title .icon {
+    display: block;
+    font-size: 48px;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 4px 12px rgba(47, 93, 63, 0.3));
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.store-selection-page .main-page-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-green), var(--sub-green));
+    border-radius: 2px;
+    animation: slideIn 0.8s ease-out 0.3s both;
+}
+
+@keyframes slideIn {
+    from {
+        width: 0;
+        opacity: 0;
+    }
+
+    to {
+        width: 60px;
+        opacity: 1;
+    }
+}
+
+.store-selection-page .menu {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+}
+
+/* Store selection specific button styles */
+.store-selection-page .menu-button {
+    width: 100%;
+    max-width: 400px;
+    padding: 24px 32px;
+    font-size: 20px;
+    font-weight: 600;
+    font-family: var(--font-family);
+    color: var(--main-green);
+    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
+    border: 3px solid transparent;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 1px;
+    animation: slideInStagger 0.6s ease-out both;
+}
+
+.store-selection-page .menu-button:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.store-selection-page .menu-button:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.store-selection-page .menu-button:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+@keyframes slideInStagger {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.store-selection-page .menu-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(126, 217, 87, 0.4),
+            transparent);
+    transition: left 0.6s ease;
+}
+
+.store-selection-page .menu-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--accent-green) 0%, var(--sub-green) 100%);
+    opacity: 0;
+    transition: opacity var(--transition);
+    border-radius: calc(var(--radius) - 3px);
+}
+
+.store-selection-page .menu-button:hover::before {
+    left: 100%;
+}
+
+.store-selection-page .menu-button:hover::after {
+    opacity: 0.1;
+}
+
+.store-selection-page .menu-button:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--accent-green);
+    color: var(--main-green);
+}
+
+.store-selection-page .menu-button:active {
+    transform: translateY(-4px) scale(0.98);
+    transition: all 0.1s ease;
+}
+
+.store-selection-page .menu-button:focus-visible {
+    outline: 3px solid var(--accent-green);
+    outline-offset: 3px;
+}
+
+.store-selection-page .menu-button span {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+/* Hide icons for store selection buttons */
+.store-selection-page .menu-button span::before {
+    display: none;
+}
+
+/* Legacy support for existing classes */
 .container .store-title {
     font-size: clamp(32px, 8vw, 48px);
     font-weight: 800;
@@ -25,16 +216,6 @@
     animation: float 3s ease-in-out infinite;
 }
 
-@keyframes float {
-    0%,
-    100% {
-        transform: translateX(-50%) translateY(0px);
-    }
-    50% {
-        transform: translateX(-50%) translateY(-10px);
-    }
-}
-
 .container .store-title::after {
     content: '';
     position: absolute;
@@ -48,17 +229,6 @@
     animation: slideIn 0.8s ease-out 0.3s both;
 }
 
-@keyframes slideIn {
-    from {
-        width: 0;
-        opacity: 0;
-    }
-    to {
-        width: 60px;
-        opacity: 1;
-    }
-}
-
 .menu {
     display: flex;
     flex-direction: column;
@@ -66,6 +236,35 @@
     align-items: center;
 }
 
-.store-selection .menu-button span::before {
-    display: none;
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .store-selection-page .container {
+        padding: 20px 15px;
+    }
+
+    .store-selection-page .main-page-title {
+        font-size: clamp(24px, 6vw, 32px);
+        margin-bottom: 40px;
+    }
+
+    .store-selection-page .main-page-title .icon {
+        font-size: 36px;
+        margin-bottom: 12px;
+    }
+
+    .store-selection-page .menu-button {
+        font-size: 18px;
+        padding: 20px 24px;
+    }
+
+    /* Legacy support */
+    .container .store-title {
+        font-size: clamp(24px, 6vw, 32px);
+        margin-bottom: 40px;
+    }
+
+    .container .store-title::before {
+        font-size: 36px;
+        top: -32px;
+    }
 }

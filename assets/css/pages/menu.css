@@ -1,9 +1,195 @@
-
 /* ==================================
    Menu Page (menu.php) Styles
    ================================== */
 
-.menu-button span {
+/* Reset common body styles for menu page */
+.menu-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    position: relative;
+}
+
+.menu-page .container {
+    max-width: 600px;
+    width: 100%;
+    padding: 40px 20px;
+    text-align: center;
+    animation: fadeInUp 0.8s ease-out;
+    position: relative;
+    z-index: 1;
+}
+
+.menu-page .main-page-title {
+    font-size: clamp(32px, 8vw, 48px);
+    font-weight: 800;
+    color: var(--main-green);
+    margin-bottom: 60px;
+    position: relative;
+    display: inline-block;
+    letter-spacing: 2px;
+    line-height: 1.2;
+}
+
+.menu-page .main-page-title .icon {
+    display: block;
+    font-size: 48px;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 4px 12px rgba(47, 93, 63, 0.3));
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.menu-page .main-page-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-green), var(--sub-green));
+    border-radius: 2px;
+    animation: slideIn 0.8s ease-out 0.3s both;
+}
+
+@keyframes slideIn {
+    from {
+        width: 0;
+        opacity: 0;
+    }
+
+    to {
+        width: 60px;
+        opacity: 1;
+    }
+}
+
+.menu-page .menu {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+}
+
+/* Menu button specific styles */
+.menu-page .menu-button {
+    width: 100%;
+    max-width: 400px;
+    padding: 24px 32px;
+    font-size: 20px;
+    font-weight: 600;
+    font-family: var(--font-family);
+    color: var(--main-green);
+    background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
+    border: 3px solid transparent;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 1px;
+    animation: slideInStagger 0.6s ease-out both;
+}
+
+.menu-page .menu-button:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.menu-page .menu-button:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.menu-page .menu-button:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.menu-page .menu-button:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.menu-page .menu-button:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+@keyframes slideInStagger {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.menu-page .menu-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(126, 217, 87, 0.4),
+            transparent);
+    transition: left 0.6s ease;
+}
+
+.menu-page .menu-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--accent-green) 0%, var(--sub-green) 100%);
+    opacity: 0;
+    transition: opacity var(--transition);
+    border-radius: calc(var(--radius) - 3px);
+}
+
+.menu-page .menu-button:hover::before {
+    left: 100%;
+}
+
+.menu-page .menu-button:hover::after {
+    opacity: 0.1;
+}
+
+.menu-page .menu-button:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--accent-green);
+    color: var(--main-green);
+}
+
+.menu-page .menu-button:active {
+    transform: translateY(-4px) scale(0.98);
+    transition: all 0.1s ease;
+}
+
+.menu-page .menu-button:focus-visible {
+    outline: 3px solid var(--accent-green);
+    outline-offset: 3px;
+}
+
+.menu-page .menu-button span {
     position: relative;
     z-index: 2;
     display: flex;
@@ -12,13 +198,63 @@
     gap: 12px;
 }
 
-.menu-button span::before {
+.menu-page .menu-button span i {
     font-size: 24px;
     filter: grayscale(0.3);
     transition: all var(--transition);
 }
 
-.menu-button:hover span::before {
+.menu-page .menu-button:hover span i {
     filter: grayscale(0);
     transform: scale(1.1);
+}
+
+/* Back button specific positioning for menu page */
+.menu-page .back-button-top {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .menu-page .container {
+        padding: 20px 15px;
+    }
+
+    .menu-page .main-page-title {
+        font-size: clamp(24px, 6vw, 32px);
+        margin-bottom: 40px;
+    }
+
+    .menu-page .main-page-title .icon {
+        font-size: 36px;
+        margin-bottom: 12px;
+    }
+
+    .menu-page .menu-button {
+        font-size: 18px;
+        padding: 20px 24px;
+    }
+
+    .menu-page .menu-button span i {
+        font-size: 20px;
+    }
+
+    .menu-page .back-button-top {
+        font-size: 12px;
+        padding: 8px 12px;
+        top: 15px;
+        left: 15px;
+    }
+}
+
+/* Ensure proper stacking */
+.menu-page .back-button-top {
+    z-index: 1000;
+}
+
+.menu-page .container {
+    position: relative;
+    z-index: 1;
 }

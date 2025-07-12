@@ -24,32 +24,35 @@ $sampleCustomers = [
     '桜井株式会社'
 ];
 ?>
-<body class="with-header">
+<body class="with-header delivery-page">
     <div class="delivery-container">
-        <div class="delivery-list">
-            <div class="search-section">
-                <div class="search-box">
-                    <input type="text" class="search-input" placeholder="顧客名で検索..." id="searchInput">
-                    <button class="btn" onclick="searchDeliveries()">
-                        <i class="fas fa-search"></i> 検索
-                    </button>
-                    <button class="btn btn-new" onclick="showCustomerSelect()">
-                        <i class="fas fa-plus"></i> 新規作成
-                    </button>
-                </div>
-            </div>
+        <h1 class="page-title"><i class="fas fa-truck"></i> 納品書管理</h1>
 
-            <table class="table">
+        <div class="delivery-actions-bar">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="顧客名で検索..." id="searchInput">
+                <button class="btn btn-icon" data-action="searchDeliveries">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <button class="btn btn-primary btn-icon" data-action="showCustomerSelect">
+                <i class="fas fa-plus"></i> 新規納品書
+            </button>
+        </div>
+
+        <div class="delivery-list-section card">
+            <table class="table delivery-table">
                 <thead>
                     <tr>
                         <th class="checkbox-col">選択</th>
-                        <th>顧客名（企業名含む）</th>
+                        <th>顧客名</th>
                         <th>ステータス</th>
+                        <th>操作</th>
                     </tr>
                 </thead>
                 <tbody id="deliveryTableBody">
                     <?php foreach ($sampleDeliveries as $delivery): ?>
-                    <tr data-customer="<?php echo htmlspecialchars($delivery['customer_name']); ?>">
+                    <tr data-customer-name="<?php echo htmlspecialchars($delivery['customer_name']); ?>">
                         <td class="checkbox-col">
                             <input type="checkbox" value="<?php echo $delivery['id']; ?>">
                         </td>
@@ -65,94 +68,113 @@ $sampleCustomers = [
                                     ?>
                             </span>
                         </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline" data-action="showDeliveryDetail" data-customer-name="<?php echo htmlspecialchars($delivery['customer_name']); ?>">
+                                <i class="fas fa-eye"></i> 詳細
+                            </button>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
 
-            <div class="pagination">
-                <button class="pagination-btn" id="prevBtn">前</button>
-                <span>1/4</span>
-                <button class="pagination-btn" id="nextBtn">次</button>
+            <div class="pagination-controls">
+                <button class="pagination-btn" id="prevBtn"><i class="fas fa-chevron-left"></i> 前へ</button>
+                <span class="page-info">1/4</span>
+                <button class="pagination-btn" id="nextBtn">次へ <i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
     </div>
 
-    <div class="customer-select" id="customerSelect">
-        <div class="customer-modal">
-            <button class="close-btn" onclick="hideCustomerSelect()">&times;</button>
-            <h2>※顧客名を選択してください</h2>
-            <input type="text" class="search-input" placeholder="検索..." style="margin-bottom: 1rem;"
-                id="customerSearchInput">
+    <div class="modal-overlay customer-select" id="customerSelect">
+        <div class="modal-content customer-modal">
+            <button class="close-modal" data-action="hideCustomerSelect">&times;</button>
+            <h2><i class="fas fa-user-plus"></i> 顧客名を選択してください</h2>
+            <input type="text" class="search-input" placeholder="検索..." id="customerSearchInput">
 
             <div class="customer-list" id="customerList">
                 <?php foreach ($sampleCustomers as $customer): ?>
-                <div class="customer-item" onclick="selectCustomer('<?php echo htmlspecialchars($customer); ?>')">
+                <div class="customer-item" data-customer-name="<?php echo htmlspecialchars($customer); ?>">
                     <?php echo htmlspecialchars($customer); ?>
                 </div>
                 <?php endforeach; ?>
             </div>
 
-            <div class="action-buttons">
-                <button class="btn" onclick="confirmCustomerSelection()">
+            <div class="modal-actions">
+                <button class="btn btn-primary" data-action="confirmCustomerSelection">
                     <i class="fas fa-check"></i> 顧客選択決定
                 </button>
             </div>
         </div>
     </div>
 
-    <div class="delivery-detail" id="deliveryDetail">
-        <div class="delivery-modal">
-            <button class="close-btn" onclick="hideDeliveryDetail()">&times;</button>
+    <div class="modal-overlay delivery-detail" id="deliveryDetail">
+        <div class="modal-content delivery-modal">
+            <button class="close-modal" data-action="hideDeliveryDetail">&times;</button>
 
             <div class="delivery-header">
                 <h2><i class="fas fa-file-invoice"></i> 納品書 No. <span id="deliveryNo">1</span></h2>
-                <div class="delivery-info">
+                <div class="delivery-info-grid">
                     <div class="info-item">
                         <span class="info-label">登録日:</span>
                         <span id="registrationDate">2022/11/25</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">顧客名（企業名含む）:</span>
-                        <span id="customerName">木村 紗希</span>
+                        <span class="info-label">顧客名:</span>
+                        <span id="detailCustomerName">木村 紗希</span>
                     </div>
                 </div>
             </div>
 
-            <table class="detail-table">
-                <thead>
-                    <tr>
-                        <th class="checkbox-col">選択</th>
-                        <th>品名</th>
-                        <th>数量</th>
-                        <th>単価</th>
-                        <th>金額</th>
-                    </tr>
-                </thead>
-                <tbody id="deliveryDetailBody">
+            <div class="detail-table-container">
+                <table class="table detail-table">
+                    <thead>
+                        <tr>
+                            <th class="checkbox-col">選択</th>
+                            <th>品名</th>
+                            <th>数量</th>
+                            <th>単価</th>
+                            <th>金額</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deliveryDetailBody">
+                        <tr>
+                            <td class="checkbox-col"><input type="checkbox" checked></td>
+                            <td>週間BCN　10月号</td>
+                            <td>1</td>
+                            <td class="text-right">¥1,100</td>
+                            <td class="text-right">¥1,210</td>
+                        </tr>
+                        <tr>
+                            <td class="checkbox-col"><input type="checkbox" checked></td>
+                            <td>日経コンピューター　10月号</td>
+                            <td>2</td>
+                            <td class="text-right">¥1,000</td>
+                            <td class="text-right">¥2,200</td>
+                        </tr>
+                        <tr>
+                            <td class="checkbox-col"><input type="checkbox"></td>
+                            <td>週間マガジン　10月号</td>
+                            <td>1</td>
+                            <td class="text-right">¥800</td>
+                            <td class="text-right">¥880</td>
+                        </tr>
                     </tbody>
-            </table>
-
-            <div class="total-section">
-                <table style="width: 100%; margin-bottom: 1rem;">
-                    <tr>
-                        <td>税率</td>
-                        <td>消費税額等</td>
-                        <td>合計金額</td>
-                    </tr>
-                    <tr>
-                        <td style="border-bottom: 1px solid #ddd; padding: 0.5rem;"></td>
-                        <td style="border-bottom: 1px solid #ddd; padding: 0.5rem;"></td>
-                        <td style="border-bottom: 1px solid #ddd; padding: 0.5rem;" class="total-amount">¥0</td>
-                    </tr>
                 </table>
             </div>
 
-            <div class="action-buttons">
-                <button class="btn" onclick="saveDelivery()">
+            <div class="total-section card">
+                <div class="total-row">
+                    <span class="total-label">合計金額:</span>
+                    <span class="total-amount" id="totalAmount">¥4,290</span>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" data-action="saveDelivery">
                     <i class="fas fa-save"></i> 保存
                 </button>
-                <button class="btn" onclick="printDelivery()">
+                <button class="btn btn-primary" data-action="printDelivery">
                     <i class="fas fa-print"></i> 印刷
                 </button>
             </div>
