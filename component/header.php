@@ -1,4 +1,8 @@
 <?php
+// セッションを最初に開始（HTMLの出力前に必須）
+require_once(__DIR__ . '/session_manager.php');
+SessionManager::start();
+
 $storeName = $_GET['store'] ?? $_COOKIE['selectedStore'] ?? '';
 $requestUri = $_SERVER['REQUEST_URI'];
 $path = trim(parse_url($requestUri, PHP_URL_PATH), '/');

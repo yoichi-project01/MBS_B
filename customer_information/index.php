@@ -1,10 +1,14 @@
 <?php
+// セッション関連の処理をHTMLの出力前に実行
 require_once(__DIR__ . '/../component/autoloader.php');
-include(__DIR__ . '/../component/header.php');
 SessionManager::start();
 $csrfToken = CSRFProtection::getToken();
 $uploadResult = SessionManager::getUploadResult();
+
+// HTMLヘッダーの出力
+include(__DIR__ . '/../component/header.php');
 ?>
+
 <body class="with-header">
     <div class="container">
         <div class="upload-container">

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * セッション管理コンポーネント
+ * セッション管理コンポーネント（修正版）
  */
 class SessionManager
 {
@@ -10,12 +10,20 @@ class SessionManager
      */
     public static function start()
     {
-        if (session_status() === PHP_SESSION_NONE) {
+        // セッションが既に開始されている場合は何もしない
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            return;
+        }
+
+        // ヘッダーが送信されている場合は設定をスキップ
+        if (!headers_sent()) {
             // セッションのセキュリティ設定
             ini_set('session.cookie_httponly', 1);
             ini_set('session.use_only_cookies', 1);
             ini_set('session.cookie_secure', isset($_SERVER['HTTPS']));
+        }
 
+        if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
     }
@@ -118,5 +126,14 @@ class SessionManager
     {
         self::start();
         session_destroy();
+    }
+
+    /**
+     * ログイン状態をチェック（統計ページなどで使用）
+     */
+    public static function isLoggedIn()
+    {
+        self::start();
+        return isset($_SESSION['user_id']) || isset($_SESSION['store_name']);
     }
 }

@@ -1,7 +1,6 @@
 <?php
 require_once(__DIR__ . '/../component/autoloader.php');
 require_once(__DIR__ . '/../component/db.php');
-include(__DIR__ . '/../component/header.php');
 
 SessionManager::start();
 $storeName = $_GET['store'] ?? $_COOKIE['selectedStore'] ?? '';
@@ -12,6 +11,8 @@ if (empty($storeName)) {
     header('Location: /MBS_B/index.php');
     exit;
 }
+
+include(__DIR__ . '/../component/header.php');
 
 // デバッグモードの設定
 $debugMode = ($_ENV['ENVIRONMENT'] ?? 'development') !== 'production';
