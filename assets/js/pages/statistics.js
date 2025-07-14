@@ -15,15 +15,23 @@ class StatisticsManager {
         this.currentSort = 'sales';
         this.currentPage = 1;
         this.itemsPerPage = 12;
-        this.customerData = window.customerData || [];
-        this.filteredData = [...this.customerData];
+        this.customerData = []; // 初期化時は空
+        this.filteredData = []; // 初期化時は空
         this.searchTerm = '';
-        this.currentView = 'table';
+
+        this.dashboardMetrics = {
+            totalCustomers: 0,
+            monthlySales: 0,
+            previousMonthSales: 0,
+            salesTrend: 0,
+            totalDeliveries: 0,
+            avgLeadTime: 0
+        };
 
         this.init();
     }
 
-    init() {
+    async init() {
         this.setupPageLayout();
         this.setupEventListeners();
         this.setupAccessibility();
@@ -34,6 +42,9 @@ class StatisticsManager {
         this.enhanceAnimations();
         this.setupModals();
         this.initializeDashboardFeatures();
+
+        // データを非同期で取得
+        await this.fetchDashboardData();
 
         // 初期データの表示
         this.updateDisplayedData();
@@ -46,47 +57,33 @@ class StatisticsManager {
         }
     }
 
-    setupEventListeners() {
-        // ESCキーでモーダルを閉じる
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') {
-                this.closeAllModals();
+    async fetchDashboardData() {
+        try {
+            const storeName = window.statisticsData.storeName;
+            const response = await fetch(`/MBS_B/statistics/get_dashboard_data.php?store=${encodeURIComponent(storeName)}`);
+            const data = await response.json();
+
+            if (data.success) {
+                this.dashboardMetrics.totalCustomers = data.data.totalCustomers;
+                this.dashboardMetrics.monthlySales = data.data.monthlySales;
+                this.dashboardMetrics.previousMonthSales = data.data.previousMonthSales;
+                this.dashboardMetrics.salesTrend = data.data.salesTrend;
+                this.dashboardMetrics.totalDeliveries = data.data.totalDeliveries;
+                this.dashboardMetrics.avgLeadTime = data.data.avgLeadTime;
+                this.customerData = data.data.customerList;
+                this.filteredData = [...this.customerData];
+            } else {
+                showErrorMessage(data.message || 'ダッシュボードデータの取得に失敗しました。');
             }
-        });
-
-        // ウィンドウリサイズ対応
-        window.addEventListener('resize', this.debounce(() => {
-            this.handleResize();
-        }, 250));
-
-        // 詳細ボタンのイベントリスナー
-        this.bindDetailButtons();
-
-        // ダッシュボードソート
-        const dashboardSort = document.getElementById('dashboardSort');
-        if (dashboardSort) {
-            dashboardSort.addEventListener('change', (e) => {
-                this.sortDashboardCustomers(e.target.value);
-            });
+        } catch (error) {
+            console.error('Error fetching dashboard data:', error);
+            showErrorMessage('ダッシュボードデータの取得中にエラーが発生しました。');
         }
     }
 
-    bindDetailButtons() {
-        document.querySelectorAll('.table-action-btn, .card-btn, .quick-action-btn').forEach(button => {
-            button.removeEventListener('click', this.handleDetailButtonClick);
-            button.addEventListener('click', this.handleDetailButtonClick.bind(this));
-        });
-    }
+    
 
-    handleDetailButtonClick(event) {
-        const customerName = event.currentTarget.dataset.customerName ||
-            event.currentTarget.closest('[data-customer-name]')?.dataset.customerName;
-        if (customerName) {
-            this.showStatisticsDetails(customerName);
-        }
-    }
-
-    initializeTabNavigation() {
+    
         const navLinks = document.querySelectorAll('.nav-link[data-tab]');
         const tabContents = document.querySelectorAll('.tab-content');
 
@@ -404,9 +401,12 @@ class StatisticsManager {
         const grid = document.getElementById('customerOverviewGrid');
         if (!grid || this.currentTab !== 'dashboard') return;
 
-        grid.innerHTML = data.map((customer, index) => {
+        // ダッシュボードの顧客リストは、常にthis.customerData全体からソート・フィルタリングなしで表示
+        const dashboardCustomerList = [...this.customerData];
+
+        grid.innerHTML = dashboardCustomerList.map((customer, index) => {
             const globalIndex = this.customerData.indexOf(customer) + 1;
-            const target = 600000;
+            const target = 600000; // 目標売上
             const achievement = Math.min(100, (customer.total_sales / target) * 100);
 
             return `
@@ -460,6 +460,15 @@ class StatisticsManager {
                    </div>
                `;
         }).join('');
+
+        // ダッシュボードの顧客数表示を更新
+        const dashboardCustomerCountElement = document.querySelector('#dashboardCustomerCount');
+        if (dashboardCustomerCountElement) {
+            dashboardCustomerCountElement.innerHTML = `<i class="fas fa-users"></i> 表示中: ${dashboardCustomerList.length}人`;
+        }
+
+        // パフォーマンス指標の更新
+        this.updatePerformanceMetrics();
     }
 
     sortDashboardCustomers(sortType) {
@@ -537,6 +546,26 @@ class StatisticsManager {
 
     updateMetricCards() {
         // メトリックカードの値にアニメーションを追加
+        document.querySelector('#totalCustomersValue').textContent = this.dashboardMetrics.totalCustomers.toLocaleString();
+        document.querySelector('#monthlySalesValue').textContent = this.formatYen(this.dashboardMetrics.monthlySales);
+        document.querySelector('#totalDeliveriesValue').textContent = this.dashboardMetrics.totalDeliveries.toLocaleString();
+        document.querySelector('#avgLeadTimeValue').textContent = this.formatDays(this.dashboardMetrics.avgLeadTime);
+
+        // 売上トレンドの更新
+        const salesTrendElement = document.querySelector('#salesTrendValue');
+        if (salesTrendElement) {
+            salesTrendElement.parentElement.classList.remove('positive', 'negative');
+            if (this.dashboardMetrics.salesTrend >= 0) {
+                salesTrendElement.parentElement.classList.add('positive');
+                salesTrendElement.innerHTML = `${Math.abs(this.dashboardMetrics.salesTrend).toFixed(1)}% 前月比`;
+                salesTrendElement.previousElementSibling.className = 'fas fa-arrow-up';
+            } else {
+                salesTrendElement.parentElement.classList.add('negative');
+                salesTrendElement.innerHTML = `${Math.abs(this.dashboardMetrics.salesTrend).toFixed(1)}% 前月比`;
+                salesTrendElement.previousElementSibling.className = 'fas fa-arrow-down';
+            }
+        }
+
         document.querySelectorAll('.metric-value').forEach(element => {
             const finalValue = element.textContent;
             const isNumeric = /[\d,.]/.test(finalValue);
@@ -1056,10 +1085,10 @@ class StatisticsManager {
         this.updateMetricCards();
     }
 
-    refreshDashboard() {
-        this.filteredData = [...this.customerData];
-        this.currentPage = 1;
+    async refreshDashboard() {
+        await this.fetchDashboardData();
         this.updateDisplayedData();
+        this.updateMetricCards();
         this.animateCustomerCards();
     }
 

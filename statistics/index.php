@@ -17,224 +17,9 @@ include(__DIR__ . '/../component/header.php');
 // デバッグモードの設定
 $debugMode = ($_ENV['ENVIRONMENT'] ?? 'development') !== 'production';
 
-// 統計データの初期化
-$totalCustomers = 0;
-$monthlySales = 0;
-$previousMonthSales = 0;
-$salesTrend = 0;
-$totalDeliveries = 0;
-$avgLeadTime = 0;
-$customerList = [];
-$errorMessage = '';
 
-try {
-    // データベース接続の確認
-    if (!checkDatabaseHealth($pdo)) {
-        throw new Exception('データベース接続に問題があります。');
-    }
 
-    // 1. 総顧客数の取得
-    $totalCustomersStmt = $pdo->prepare("
-        SELECT COUNT(*) 
-        FROM customers 
-        WHERE store_name = :storeName
-    ");
-    $totalCustomersStmt->bindParam(':storeName', $storeName, PDO::PARAM_STR);
-    $totalCustomersStmt->execute();
-    $totalCustomers = (int)$totalCustomersStmt->fetchColumn();
 
-    if ($totalCustomers === 0) {
-        $errorMessage = '指定された店舗の顧客データが見つかりません。';
-    } else {
-        // 2. ダッシュボード基本メトリクスの取得 (customer_summaryビューを使用)
-        $dashboardQuery = "
-            SELECT 
-                COALESCE(SUM(total_sales), 0) as total_sales, 
-                COALESCE(SUM(delivery_count), 0) as total_deliveries, 
-                COALESCE(AVG(avg_lead_time), 0) as avg_lead_time 
-            FROM customer_summary
-            WHERE store_name = :storeName
-        ";
-        $dashboardMetricsStmt = $pdo->prepare($dashboardQuery);
-        $dashboardMetricsStmt->bindParam(':storeName', $storeName, PDO::PARAM_STR);
-        $dashboardMetricsStmt->execute();
-        $dashboardMetrics = $dashboardMetricsStmt->fetch(PDO::FETCH_ASSOC);
-
-        $totalDeliveries = (int)($dashboardMetrics['total_deliveries'] ?? 0);
-        $avgLeadTime = (float)($dashboardMetrics['avg_lead_time'] ?? 0);
-
-        // 3. 今月の売上データ
-        $currentMonthQuery = "
-            SELECT COALESCE(SUM(di.amount), 0) as monthly_sales
-            FROM deliveries d
-            JOIN delivery_items di ON d.delivery_no = di.delivery_no
-            JOIN order_items oi ON di.order_item_no = oi.order_item_no
-            JOIN orders o ON oi.order_no = o.order_no
-            JOIN customers c ON o.customer_no = c.customer_no
-            WHERE YEAR(d.delivery_record) = YEAR(CURDATE()) 
-              AND MONTH(d.delivery_record) = MONTH(CURDATE())
-              AND c.store_name = :storeName
-        ";
-        $currentMonthSalesStmt = $pdo->prepare($currentMonthQuery);
-        $currentMonthSalesStmt->bindParam(':storeName', $storeName, PDO::PARAM_STR);
-        $currentMonthSalesStmt->execute();
-        $monthlySales = (float)$currentMonthSalesStmt->fetchColumn();
-
-        // 4. 先月の売上データ（トレンド計算用）
-        $previousMonthQuery = "
-            SELECT COALESCE(SUM(di.amount), 0) as previous_monthly_sales
-            FROM deliveries d
-            JOIN delivery_items di ON d.delivery_no = di.delivery_no
-            JOIN order_items oi ON di.order_item_no = oi.order_item_no
-            JOIN orders o ON oi.order_no = o.order_no
-            JOIN customers c ON o.customer_no = c.customer_no
-            WHERE YEAR(d.delivery_record) = YEAR(CURDATE() - INTERVAL 1 MONTH) 
-              AND MONTH(d.delivery_record) = MONTH(CURDATE() - INTERVAL 1 MONTH)
-              AND c.store_name = :storeName
-        ";
-        $previousMonthSalesStmt = $pdo->prepare($previousMonthQuery);
-        $previousMonthSalesStmt->bindParam(':storeName', $storeName, PDO::PARAM_STR);
-        $previousMonthSalesStmt->execute();
-        $previousMonthSales = (float)$previousMonthSalesStmt->fetchColumn();
-
-        // 売上トレンドの計算
-        if ($previousMonthSales > 0) {
-            $salesTrend = (($monthlySales - $previousMonthSales) / $previousMonthSales) * 100;
-        } elseif ($monthlySales > 0) {
-            $salesTrend = 100; // 先月がゼロで今月に売上がある場合
-        } else {
-            $salesTrend = 0;
-        }
-
-        // 5. 顧客リストの取得（詳細統計情報付き）(customer_summaryビューを使用)
-        $customerListQuery = "
-            SELECT 
-                *,
-                -- 効率性の計算
-                CASE 
-                    WHEN delivery_count > 0 THEN total_sales / delivery_count
-                    ELSE 0
-                END as efficiency_score,
-                -- 顧客ランクの計算
-                CASE 
-                    WHEN total_sales > 500000 THEN 'VIP'
-                    WHEN total_sales > 100000 THEN 'Premium'
-                    ELSE 'Regular'
-                END as customer_rank
-            FROM customer_summary
-            WHERE store_name = :storeName
-            ORDER BY total_sales DESC, customer_name ASC
-        ";
-
-        $customersStmt = $pdo->prepare($customerListQuery);
-        $customersStmt->bindParam(':storeName', $storeName, PDO::PARAM_STR);
-        $customersStmt->execute();
-        $customerList = $customersStmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // データの後処理
-        foreach ($customerList as &$customer) {
-            // NULL値の処理
-            $customer['total_sales'] = (float)($customer['total_sales'] ?? 0);
-            $customer['delivery_count'] = (int)($customer['delivery_count'] ?? 0);
-            $customer['avg_lead_time'] = (float)($customer['avg_lead_time'] ?? 0);
-            $customer['efficiency_score'] = (float)($customer['efficiency_score'] ?? 0);
-
-            // 日付フォーマットの調整
-            if ($customer['last_order_date']) {
-                $customer['last_order_date_formatted'] = date('Y年m月d日', strtotime($customer['last_order_date']));
-            } else {
-                $customer['last_order_date_formatted'] = '取引実績なし';
-            }
-
-            if ($customer['registration_date']) {
-                $customer['registration_date_formatted'] = date('Y年m月d日', strtotime($customer['registration_date']));
-            }
-        }
-        unset($customer); // 参照を解除
-    }
-} catch (PDOException $e) {
-    $errorMessage = 'データベースエラーが発生しました。';
-    if ($debugMode) {
-        $errorMessage .= ' 詳細: ' . $e->getMessage();
-    }
-    error_log("Statistics page database error: " . $e->getMessage());
-} catch (Exception $e) {
-    $errorMessage = 'システムエラーが発生しました。';
-    if ($debugMode) {
-        $errorMessage .= ' 詳細: ' . $e->getMessage();
-    }
-    error_log("Statistics page error: " . $e->getMessage());
-}
-
-// エラーハンドリング：データが取得できない場合
-if (!empty($errorMessage)) {
-    // エラー表示用のダミーデータ
-    $totalCustomers = 0;
-    $monthlySales = 0;
-    $totalDeliveries = 0;
-    $avgLeadTime = 0;
-    $customerList = [];
-}
-
-// ヘルパー関数群
-function format_yen($amount)
-{
-    if (!is_numeric($amount) || $amount <= 0) {
-        return '¥0';
-    }
-
-    if ($amount >= 1000000) {
-        return '¥' . number_format($amount / 1000000, 1) . 'M';
-    } elseif ($amount >= 1000) {
-        return '¥' . number_format($amount / 1000, 0) . 'K';
-    }
-    return '¥' . number_format($amount);
-}
-
-function format_yen_full($amount)
-{
-    if (!is_numeric($amount)) {
-        return '¥0';
-    }
-    return '¥' . number_format($amount);
-}
-
-function format_days($days)
-{
-    if (!is_numeric($days) || $days <= 0) {
-        return '0日';
-    }
-    return number_format($days, 1) . '日';
-}
-
-function format_percentage($value, $decimals = 1)
-{
-    if (!is_numeric($value)) {
-        return '0%';
-    }
-    return number_format($value, $decimals) . '%';
-}
-
-function get_efficiency_class($efficiency)
-{
-    if ($efficiency > 5000) return 'high';
-    if ($efficiency > 2000) return 'medium';
-    return 'low';
-}
-
-function get_rank_class($index)
-{
-    if ($index < 3) return 'top-rank';
-    if ($index < 10) return 'high-rank';
-    return 'normal-rank';
-}
-
-function get_leadtime_status($leadtime)
-{
-    if ($leadtime <= 2) return 'excellent';
-    if ($leadtime <= 4) return 'good';
-    return 'needs-improvement';
-}
 
 // セキュリティ関連の設定
 $csrfToken = CSRFProtection::getToken();
@@ -290,45 +75,11 @@ $pageDescription = "{$storeName}の売上統計、顧客分析、配達実績な
     <?php endif; ?>
 
     <!-- Statistics content starts here -->
-    <?php if (empty($errorMessage) && !empty($customerList)): ?>
-
     <!-- ダッシュボードタブ -->
     <?php include 'dashboard_content.php'; ?>
 
     <!-- 顧客一覧タブ -->
     <?php include 'customer_list_content.php'; ?>
-
-    
-
-    <?php else: ?>
-    <!-- エラー状態またはデータなしの場合 -->
-    <div class="empty-state-main">
-        <div class="empty-icon">
-            <i class="fas fa-chart-bar"></i>
-        </div>
-        <h2>データが利用できません</h2>
-        <p>
-            <?php if (empty($customerList)): ?>
-            現在、この店舗にはデータが登録されていません。<br>
-            顧客情報を登録してから再度アクセスしてください。
-            <?php else: ?>
-            データの読み込み中にエラーが発生しました。<br>
-            しばらく時間をおいてから再度お試しください。
-            <?php endif; ?>
-        </p>
-        <div class="empty-actions">
-            <a href="/MBS_B/customer_information/index.php?store=<?php echo urlencode($storeName); ?>"
-                class="btn btn-primary">
-                <i class="fas fa-plus"></i>
-                顧客情報を登録
-            </a>
-            <button onclick="location.reload()" class="btn btn-secondary">
-                <i class="fas fa-refresh"></i>
-                ページを再読み込み
-            </button>
-        </div>
-    </div>
-    <?php endif; ?>
 
     </div>
     </main>
@@ -401,18 +152,9 @@ $pageDescription = "{$storeName}の売上統計、顧客分析、配達実績な
     // グローバルデータの設定
     window.statisticsData = {
         storeName: <?php echo json_encode($storeName); ?>,
-        totalCustomers: <?php echo (int)$totalCustomers; ?>,
-        monthlySales: <?php echo (float)$monthlySales; ?>,
-        totalDeliveries: <?php echo (int)$totalDeliveries; ?>,
-        avgLeadTime: <?php echo (float)$avgLeadTime; ?>,
-        salesTrend: <?php echo (float)$salesTrend; ?>,
-        customerList: <?php echo json_encode($customerList, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>,
         csrfToken: <?php echo json_encode($csrfToken); ?>,
         debugMode: <?php echo json_encode($debugMode); ?>
     };
-
-    // 下位互換性のため
-    window.customerData = window.statisticsData.customerList;
 
     // エラーハンドリング
     window.addEventListener('error', function(e) {
