@@ -46,14 +46,15 @@ try {
     if ($totalCustomers === 0) {
         $errorMessage = '指定された店舗の顧客データが見つかりません。';
     } else {
-        // 2. ダッシュボード基本メトリクスの取得 (customer_summaryビューを使用)
+        // 2. ダッシュボード基本メトリクスの取得
         $dashboardQuery = "
             SELECT 
-                COALESCE(SUM(total_sales), 0) as total_sales, 
-                COALESCE(SUM(delivery_count), 0) as total_deliveries, 
-                COALESCE(AVG(avg_lead_time), 0) as avg_lead_time 
-            FROM customer_summary
-            WHERE store_name = :storeName
+                COALESCE(SUM(s.sales_by_customer), 0) as total_sales, 
+                COALESCE(SUM(s.delivery_amount), 0) as total_deliveries, 
+                COALESCE(AVG(s.lead_time), 0) as avg_lead_time 
+            FROM customers c
+            LEFT JOIN statistics_information s ON c.customer_no = s.customer_no
+            WHERE c.store_name = :storeName
         ";
         $dashboardMetricsStmt = $pdo->prepare($dashboardQuery);
         $dashboardMetricsStmt->bindParam(':storeName', $storeName, PDO::PARAM_STR);
@@ -106,24 +107,36 @@ try {
             $salesTrend = 0;
         }
 
-        // 5. 顧客リストの取得（詳細統計情報付き）(customer_summaryビューを使用)
+        // 5. 顧客リストの取得（詳細統計情報付き）
         $customerListQuery = "
             SELECT 
-                *,
+                c.customer_no,
+                c.customer_name,
+                c.store_name,
+                c.address,
+                c.telephone_number,
+                c.registration_date,
+                COALESCE(s.sales_by_customer, 0) as total_sales,
+                COALESCE(s.delivery_amount, 0) as delivery_count,
+                COALESCE(s.lead_time, 0) as avg_lead_time,
+                s.last_order_date,
+                c.created_at,
+                c.updated_at,
                 -- 効率性の計算
                 CASE 
-                    WHEN delivery_count > 0 THEN total_sales / delivery_count
+                    WHEN s.delivery_amount > 0 THEN s.sales_by_customer / s.delivery_amount
                     ELSE 0
                 END as efficiency_score,
                 -- 顧客ランクの計算
                 CASE 
-                    WHEN total_sales > 500000 THEN 'VIP'
-                    WHEN total_sales > 100000 THEN 'Premium'
+                    WHEN s.sales_by_customer > 500000 THEN 'VIP'
+                    WHEN s.sales_by_customer > 100000 THEN 'Premium'
                     ELSE 'Regular'
                 END as customer_rank
-            FROM customer_summary
-            WHERE store_name = :storeName
-            ORDER BY total_sales DESC, customer_name ASC
+            FROM customers c
+            LEFT JOIN statistics_information s ON c.customer_no = s.customer_no
+            WHERE c.store_name = :storeName
+            ORDER BY s.sales_by_customer DESC, c.customer_name ASC
         ";
 
         $customersStmt = $pdo->prepare($customerListQuery);
@@ -298,7 +311,8 @@ $pageDescription = "{$storeName}の売上統計、顧客分析、配達実績な
     <!-- 顧客一覧タブ -->
     <?php include 'customer_list_content.php'; ?>
 
-    
+    <!-- 全顧客タブ -->
+    <?php include 'all_customers_content.php'; ?>
 
     <?php else: ?>
     <!-- エラー状態またはデータなしの場合 -->

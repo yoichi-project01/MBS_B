@@ -177,13 +177,13 @@ class StatisticsManager {
     }
 
     initializeSearch() {
-        const searchInputs = document.querySelectorAll('#customerSearchInput, #allCustomerSearchInput');
+        const searchInput = document.getElementById('customerSearchInput');
 
-        searchInputs.forEach(input => {
-            input.addEventListener('input', this.debounce((e) => {
+        if (searchInput) {
+            searchInput.addEventListener('input', this.debounce((e) => {
                 this.handleSearch(e.target.value);
             }, 300));
-        });
+        }
     }
 
     handleSearch(searchTerm) {
@@ -200,7 +200,9 @@ class StatisticsManager {
 
     filterData() {
         this.filteredData = this.customerData.filter(customer => {
-            return customer.customer_name.toLowerCase().includes(this.searchTerm);
+            const searchTerm = this.searchTerm.toLowerCase();
+            return customer.customer_name.toLowerCase().includes(searchTerm) ||
+                   customer.customer_no.toLowerCase().includes(searchTerm);
         });
     }
 
@@ -223,12 +225,7 @@ class StatisticsManager {
             });
         }
 
-        // ビュー切り替え
-        document.querySelectorAll('.view-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.switchView(btn.dataset.view);
-            });
-        });
+        
     }
 
     handleTableSort(sortType, header) {
@@ -290,25 +287,7 @@ class StatisticsManager {
         });
     }
 
-    switchView(viewType) {
-        const viewBtns = document.querySelectorAll('.view-btn');
-        const tableView = document.querySelector('.table-view-container');
-        const cardView = document.querySelector('.card-view-container');
-
-        viewBtns.forEach(btn => btn.classList.remove('active'));
-        document.querySelector(`[data-view="${viewType}"]`).classList.add('active');
-
-        if (viewType === 'table') {
-            if (tableView) tableView.style.display = 'block';
-            if (cardView) cardView.style.display = 'none';
-        } else if (viewType === 'card') {
-            if (tableView) tableView.style.display = 'none';
-            if (cardView) cardView.style.display = 'grid';
-        }
-
-        this.currentView = viewType;
-        this.animateViewSwitch(viewType);
-    }
+    
 
     animateViewSwitch(viewType) {
         const container = viewType === 'table' ?
@@ -389,35 +368,27 @@ class StatisticsManager {
         const currentData = this.filteredData.slice(start, end);
 
         this.updateTableContent(currentData);
-        this.updateCardContent(currentData);
         this.updateDashboardContent(currentData);
         this.updatePaginationControls();
         this.bindDetailButtons(); // イベントリスナーを再バインド
     }
 
     updateTableContent(data) {
-        const tableBody = document.getElementById('customerTableBody');
+        const tableBody = document.querySelector('#customerTable tbody');
         if (!tableBody) return;
 
         if (data.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="5" class="text-center">該当する顧客が見つかりません。</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="6" class="text-center">該当する顧客が見つかりません。</td></tr>';
             return;
         }
 
         tableBody.innerHTML = data.map(customer => `
                <tr>
-                   <td data-sort-value="${customer.customer_name}">
-                       ${this.highlightSearchTerm(customer.customer_name)}
-                   </td>
-                   <td class="text-right" data-sort-value="${customer.total_sales}">
-                       ${this.formatYen(customer.total_sales)}
-                   </td>
-                   <td class="text-center" data-sort-value="${customer.avg_lead_time}">
-                       ${this.formatDays(customer.avg_lead_time)}
-                   </td>
-                   <td class="text-center" data-sort-value="${customer.delivery_count}">
-                       ${customer.delivery_count.toLocaleString()}
-                   </td>
+                   <td>${customer.customer_no}</td>
+                   <td>${this.highlightSearchTerm(customer.customer_name)}</td>
+                   <td class="text-right">${this.formatYen(customer.total_sales)}</td>
+                   <td class="text-center">${customer.delivery_count.toLocaleString()}</td>
+                   <td class="text-center">${this.formatDays(customer.avg_lead_time)}</td>
                    <td class="text-center">
                        <button class="table-action-btn" data-customer-name="${customer.customer_name}">
                            <i class="fas fa-eye"></i> 詳細
@@ -427,43 +398,7 @@ class StatisticsManager {
            `).join('');
     }
 
-    updateCardContent(data) {
-        const cardContainer = document.querySelector('.card-view-container');
-        if (!cardContainer) return;
-
-        if (data.length === 0) {
-            cardContainer.innerHTML = '<div class="no-results">該当する顧客が見つかりません。</div>';
-            return;
-        }
-
-        cardContainer.innerHTML = data.map(customer => `
-               <div class="customer-card">
-                   <div class="card-main-info">
-                       <h4 class="customer-name">${this.highlightSearchTerm(customer.customer_name)}</h4>
-                       <p class="customer-id">ID: ${customer.customer_no}</p>
-                   </div>
-                   <div class="card-stats">
-                       <div class="stat">
-                           <p class="stat-value">${this.formatYen(customer.total_sales)}</p>
-                           <p class="stat-label">売上</p>
-                       </div>
-                       <div class="stat">
-                           <p class="stat-value">${customer.delivery_count.toLocaleString()}</p>
-                           <p class="stat-label">配達回数</p>
-                       </div>
-                       <div class="stat">
-                           <p class="stat-value">${this.formatDays(customer.avg_lead_time)}</p>
-                           <p class="stat-label">リードタイム</p>
-                       </div>
-                   </div>
-                   <div class="card-actions">
-                       <button class="card-btn" data-customer-name="${customer.customer_name}">
-                           <i class="fas fa-eye"></i> 詳細
-                       </button>
-                   </div>
-               </div>
-           `).join('');
-    }
+    
 
     updateDashboardContent(data) {
         const grid = document.getElementById('customerOverviewGrid');

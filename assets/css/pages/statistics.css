@@ -9,7 +9,6 @@ body.statistics-page {
     display: flex;
     flex-direction: column;
     height: 100%;
-    overflow: hidden;
 }
 
 /* ダッシュボードコンテナ */
@@ -21,103 +20,7 @@ body.statistics-page {
     background: linear-gradient(135deg, #f8faf9 0%, #e8f5e8 100%);
 }
 
-/* トップナビゲーション */
-.top-nav {
-    display: flex;
-    align-items: center;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 249, 0.95) 100%);
-    backdrop-filter: blur(10px);
-    border-bottom: 2px solid rgba(126, 217, 87, 0.2);
-    padding: 0 20px;
-    flex-shrink: 0;
-    box-shadow: 0 4px 20px rgba(47, 93, 63, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
 
-.top-nav-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 15px 0;
-    margin-right: 30px;
-    color: var(--main-green);
-}
-
-.top-nav-header i {
-    font-size: 28px;
-    color: var(--accent-green);
-    filter: drop-shadow(0 2px 8px rgba(126, 217, 87, 0.3));
-}
-
-.top-nav-header h3 {
-    font-size: 22px;
-    font-weight: 800;
-    margin: 0;
-    letter-spacing: 0.5px;
-}
-
-.top-nav-links {
-    display: flex;
-    gap: 8px;
-}
-
-.top-nav .nav-link {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 20px;
-    border-radius: 12px;
-    color: var(--sub-green);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 15px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid transparent;
-    position: relative;
-    overflow: hidden;
-}
-
-.top-nav .nav-link::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(126, 217, 87, 0.3), transparent);
-    transition: left 0.5s ease;
-}
-
-.top-nav .nav-link:hover::before {
-    left: 100%;
-}
-
-.top-nav .nav-link:hover {
-    background: rgba(126, 217, 87, 0.1);
-    color: var(--main-green);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(126, 217, 87, 0.2);
-}
-
-.top-nav .nav-link.active {
-    background: linear-gradient(135deg, var(--accent-green) 0%, var(--main-green) 100%);
-    color: white;
-    font-weight: 700;
-    box-shadow: 0 6px 20px rgba(126, 217, 87, 0.4);
-    transform: translateY(-1px);
-}
-
-.top-nav .nav-link.active:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(126, 217, 87, 0.5);
-}
-
-.top-nav .nav-link i {
-    font-size: 18px;
-    flex-shrink: 0;
-}
 
 /* メインコンテンツ */
 .main-content {
@@ -125,7 +28,6 @@ body.statistics-page {
     display: flex;
     flex-direction: column;
     width: 100%;
-    overflow: hidden;
 }
 
 .content-scroll-area {
@@ -870,24 +772,24 @@ body.statistics-page {
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
     .top-nav {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 15px 20px;
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 15px 0;
     }
 
     .top-nav-header {
         margin-right: 0;
-        margin-bottom: 15px;
+        margin-bottom: 0;
     }
 
     .top-nav-links {
-        flex-wrap: wrap;
-        width: 100%;
+        flex-wrap: nowrap;
+        width: auto;
     }
 
     .top-nav .nav-link {
-        flex: 1;
-        min-width: 120px;
+        flex: none;
+        min-width: auto;
         justify-content: center;
     }
 
@@ -901,8 +803,8 @@ body.statistics-page {
     }
 
     .metric-card {
-        flex-direction: column;
-        text-align: center;
+        flex-direction: row;
+        text-align: left;
         gap: 15px;
     }
 
@@ -943,12 +845,79 @@ body.statistics-page {
     }
 
     .sort-controls {
-        justify-content: space-between;
+        justify-content: flex-start;
     }
 
     .modal-content {
         margin: 20px;
         padding: 20px;
+    }
+
+    .data-table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .data-table thead,
+    .data-table tbody,
+    .data-table th,
+    .data-table td,
+    .data-table tr {
+        display: block;
+    }
+
+    .data-table thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    .data-table tr {
+        border: 1px solid #eee;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .data-table td {
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 50%;
+        text-align: right;
+    }
+
+    .data-table td:before {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: 600;
+        color: var(--sub-green);
+    }
+
+    .data-table td:nth-of-type(1):before { content: "顧客No"; }
+    .data-table td:nth-of-type(2):before { content: "顧客名"; }
+    .data-table td:nth-of-type(3):before { content: "総売上"; }
+    .data-table td:nth-of-type(4):before { content: "配達回数"; }
+    .data-table td:nth-of-type(5):before { content: "平均リードタイム"; }
+    .data-table td:nth-of-type(6):before { content: "アクション"; }
+
+    .data-table tr:hover td {
+        background-color: transparent;
+    }
+
+    .data-table tr:nth-child(even) td {
+        background-color: transparent;
+    }
+
+    .data-table tr:nth-child(even):hover td {
+        background-color: transparent;
     }
 }
 

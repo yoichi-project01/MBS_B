@@ -118,17 +118,11 @@ if ($storeName && $pageConfig['name'] !== 'menu') {
                 <span class="hamburger-line"></span>
             </button>
         </div>
-        <div class="menu-overlay" id="menuOverlay"></div>
-    </header>
-    <?php endif; ?>
-
-    <?php if ($pageConfig['isStatisticsPage']): ?>
-    <!-- Statistics Page Navigation -->
-    <div class="dashboard-container">
+        <?php if ($pageConfig['isStatisticsPage']): ?>
+        <!-- Statistics Page Navigation -->
         <aside class="top-nav">
             <div class="top-nav-header">
                 <i class="fas fa-book-open"></i>
-                <h3>受注管理</h3>
             </div>
             <nav class="top-nav-links">
                 <a href="#" class="nav-link active" data-tab="dashboard">
@@ -139,15 +133,18 @@ if ($storeName && $pageConfig['name'] !== 'menu') {
                     <i class="fas fa-users"></i>
                     <span>顧客一覧</span>
                 </a>
-                <a href="#" class="nav-link" data-tab="all-customers">
-                    <i class="fas fa-list"></i>
-                    <span>全顧客</span>
-                </a>
             </nav>
         </aside>
+        <?php endif; ?>
+        <div class="menu-overlay" id="menuOverlay"></div>
+    </header>
+    <?php endif; ?>
+
+    <?php if ($pageConfig['isStatisticsPage']): ?>
+    <div class="dashboard-container">
         <main class="main-content">
             <div class="content-scroll-area">
-                <?php endif; ?>
+    <?php endif; ?>
 
                 <script src="/MBS_B/assets/js/main.js" type="module"></script>
                 <script>

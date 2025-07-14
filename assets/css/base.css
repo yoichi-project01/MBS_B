@@ -27,9 +27,6 @@ body {
     color: var(--font-color);
     background: linear-gradient(135deg, #e3efe6 0%, #f0f8f0 50%, #f8faf9 100%);
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     overflow-x: hidden;
     position: relative;
     padding-top: 0;
@@ -37,10 +34,6 @@ body {
 
 body.with-header {
     padding-top: var(--header-height);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: calc(100vh - var(--header-height));
 }
 
 .container {

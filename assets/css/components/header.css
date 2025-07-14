@@ -285,13 +285,11 @@ body.with-header .back-button-top {
 .statistics-page .top-nav {
     display: flex;
     align-items: center;
-    background-color: white;
+    background-color: transparent;
     border-bottom: 1px solid rgba(47, 93, 63, 0.1);
     padding: 0 20px;
     flex-shrink: 0;
-    box-shadow: var(--shadow);
-    position: sticky;
-    top: 0;
+    box-shadow: none;
     z-index: 99;
 }
 
