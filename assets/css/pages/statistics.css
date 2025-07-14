@@ -1,5 +1,5 @@
 /* ==================================
-   Statistics Page Styles (改善版)
+   Customer List Page Styles
    ================================== */
 
 body.statistics-page {
@@ -11,7 +11,7 @@ body.statistics-page {
     height: 100%;
 }
 
-/* ダッシュボードコンテナ */
+/* ページコンテナ */
 .dashboard-container {
     display: flex;
     flex-direction: column;
@@ -20,7 +20,41 @@ body.statistics-page {
     background: linear-gradient(135deg, #f8faf9 0%, #e8f5e8 100%);
 }
 
+/* Customer List Header */
+.statistics-header {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 249, 0.95) 100%);
+    border-bottom: 1px solid rgba(47, 93, 63, 0.1);
+    padding: 20px 0;
+    box-shadow: 0 2px 8px rgba(47, 93, 63, 0.05);
+}
 
+.statistics-header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+.statistics-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--main-green);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.statistics-title i {
+    font-size: 24px;
+    color: var(--accent-green);
+}
+
+.statistics-subtitle {
+    font-size: 14px;
+    color: var(--sub-green);
+    margin: 0;
+    opacity: 0.8;
+}
 
 /* メインコンテンツ */
 .main-content {
@@ -38,281 +72,83 @@ body.statistics-page {
     overflow-x: hidden;
 }
 
-/* タブコンテンツ */
-.tab-content {
-    display: none;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.tab-content.active {
-    display: block;
+/* 顧客一覧コンテナ */
+.customer-list-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
     opacity: 1;
     transform: translateY(0);
+    animation: fadeInUp 0.6s ease-out;
 }
 
-/* ダッシュボードグリッド */
-.dashboard-grid {
+/* 統計サマリーカード */
+.customer-summary-container {
+    margin-bottom: 30px;
+}
+
+.summary-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 25px;
-    margin-bottom: 40px;
-}
-
-/* メトリックカード */
-.metric-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 249, 0.9) 100%);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow: 0 8px 32px rgba(47, 93, 63, 0.1);
-    border: 1px solid rgba(126, 217, 87, 0.2);
-    display: flex;
-    align-items: center;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-}
-
-.metric-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--accent-green), var(--main-green), var(--sub-green));
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.metric-card:hover::before {
-    opacity: 1;
-}
-
-.metric-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(47, 93, 63, 0.15);
-    border-color: var(--accent-green);
-}
-
-.card-icon {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    flex-shrink: 0;
-    position: relative;
-    overflow: hidden;
-}
-
-.card-icon::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: inherit;
-    opacity: 0.8;
-    border-radius: 50%;
-}
-
-.card-icon i {
-    position: relative;
-    z-index: 1;
-}
-
-.card-info {
-    flex: 1;
-}
-
-.card-info .card-title {
-    font-size: 15px;
-    color: var(--sub-green);
-    margin-bottom: 8px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-}
-
-.card-info .metric-value {
-    font-size: 32px;
-    font-weight: 800;
-    color: var(--main-green);
-    line-height: 1.1;
-    margin: 0;
-    background: linear-gradient(135deg, var(--main-green), var(--accent-green));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-/* トップ顧客セクション */
-.top-customers-section {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 249, 0.9) 100%);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 8px 32px rgba(47, 93, 63, 0.1);
-    border: 1px solid rgba(126, 217, 87, 0.2);
-    position: relative;
-    overflow: hidden;
-}
-
-.top-customers-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--accent-green), var(--main-green), var(--sub-green));
-}
-
-.top-customers-section h4 {
-    font-size: 24px;
-    font-weight: 800;
     margin-bottom: 20px;
-    color: var(--main-green);
-    display: flex;
-    align-items: center;
-    gap: 12px;
 }
 
-.top-customers-section h4::before {
-    content: '👑';
-    font-size: 28px;
-}
-
-.customers-count {
-    margin-bottom: 25px;
-    padding: 12px 20px;
-    background: linear-gradient(135deg, rgba(126, 217, 87, 0.1) 0%, rgba(47, 93, 63, 0.1) 100%);
-    border-radius: 12px;
-    border-left: 4px solid var(--accent-green);
-}
-
-.count-info {
-    font-weight: 600;
-    color: var(--main-green);
-    font-size: 16px;
-}
-
-.top-customers-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 20px;
-}
-
-/* トップ顧客カード */
-.top-customer-card {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    padding: 20px;
+.summary-card {
     background: linear-gradient(135deg, #ffffff 0%, #f8faf9 100%);
     border-radius: 16px;
-    border: 2px solid rgba(126, 217, 87, 0.1);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(47, 93, 63, 0.1);
+    border: 1px solid rgba(126, 217, 87, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all var(--transition);
 }
 
-.top-customer-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 6px;
-    height: 100%;
-    background: linear-gradient(180deg, var(--accent-green), var(--main-green));
-    transform: scaleY(0);
-    transition: transform 0.3s ease;
+.summary-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(47, 93, 63, 0.15);
 }
 
-.top-customer-card:hover::before {
-    transform: scaleY(1);
-}
-
-.top-customer-card:hover {
-    transform: translateY(-4px) translateX(8px);
-    box-shadow: 0 12px 30px rgba(47, 93, 63, 0.15);
-    border-color: var(--accent-green);
-}
-
-.customer-rank {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--main-green), var(--accent-green));
-    color: white;
+.summary-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 800;
-    font-size: 18px;
+    font-size: 24px;
+    background: linear-gradient(135deg, var(--accent-green) 0%, var(--sub-green) 100%);
+    color: white;
     flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(47, 93, 63, 0.3);
-    position: relative;
 }
 
-.customer-rank::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: linear-gradient(135deg, var(--accent-green), var(--main-green));
-    border-radius: 50%;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: -1;
-}
-
-.top-customer-card:hover .customer-rank::before {
-    opacity: 1;
-}
-
-.customer-info {
+.summary-content {
     flex: 1;
 }
 
-.customer-name {
-    font-weight: 700;
-    font-size: 18px;
-    color: var(--main-green);
-    margin-bottom: 12px;
-    line-height: 1.3;
-}
-
-.customer-stats {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.stat-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+.summary-content h3 {
+    margin: 0 0 8px 0;
     font-size: 14px;
-    color: var(--sub-green);
     font-weight: 600;
-    background: rgba(126, 217, 87, 0.1);
-    padding: 6px 12px;
-    border-radius: 8px;
+    color: var(--sub-green);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.stat-item i {
+.summary-value {
+    margin: 0 0 4px 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--main-green);
+    line-height: 1.2;
+}
+
+.summary-content small {
+    color: var(--sub-green);
     font-size: 12px;
-    color: var(--accent-green);
+    opacity: 0.8;
 }
 
 /* 顧客検索セクション */
@@ -320,14 +156,15 @@ body.statistics-page {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
     gap: 20px;
     flex-wrap: wrap;
-    padding: 20px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(248, 250, 249, 0.7) 100%);
+    padding: 25px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 249, 0.9) 100%);
     backdrop-filter: blur(10px);
-    border-radius: 16px;
+    border-radius: 20px;
     border: 1px solid rgba(126, 217, 87, 0.2);
+    box-shadow: 0 8px 32px rgba(47, 93, 63, 0.1);
 }
 
 .search-container {
@@ -338,7 +175,7 @@ body.statistics-page {
 
 .search-input {
     width: 100%;
-    padding: 14px 50px 14px 20px;
+    padding: 16px 50px 16px 20px;
     border: 2px solid rgba(126, 217, 87, 0.3);
     border-radius: 12px;
     font-size: 16px;
@@ -346,6 +183,7 @@ body.statistics-page {
     transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(5px);
+    color: var(--font-color);
 }
 
 .search-input:focus {
@@ -353,6 +191,11 @@ body.statistics-page {
     border-color: var(--accent-green);
     box-shadow: 0 0 0 4px rgba(126, 217, 87, 0.1);
     background: white;
+}
+
+.search-input::placeholder {
+    color: var(--sub-green);
+    opacity: 0.7;
 }
 
 .search-icon {
@@ -368,15 +211,16 @@ body.statistics-page {
 /* ビュー切り替え */
 .view-toggle {
     display: flex;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 12px;
-    padding: 4px;
+    padding: 6px;
     border: 2px solid rgba(126, 217, 87, 0.2);
     backdrop-filter: blur(10px);
+    box-shadow: 0 4px 16px rgba(47, 93, 63, 0.1);
 }
 
 .view-btn {
-    padding: 12px 20px;
+    padding: 14px 24px;
     border: none;
     background: transparent;
     color: var(--sub-green);
@@ -401,11 +245,80 @@ body.statistics-page {
     color: var(--main-green);
 }
 
-/* テーブル表示 */
-.table-view-container {
+/* 顧客一覧ヘッダー */
+.all-customers-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 25px;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 249, 0.9) 100%);
     backdrop-filter: blur(10px);
-    border-radius: 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(126, 217, 87, 0.2);
+    box-shadow: 0 8px 32px rgba(47, 93, 63, 0.1);
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.all-customers-header h3 {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--main-green);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.all-customers-header h3::before {
+    content: '👥';
+    font-size: 28px;
+}
+
+.controls-section {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.sort-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sort-controls label {
+    font-weight: 600;
+    color: var(--main-green);
+    font-size: 14px;
+}
+
+.sort-select {
+    padding: 12px 16px;
+    border: 2px solid rgba(126, 217, 87, 0.3);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--main-green);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.sort-select:focus {
+    outline: none;
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 3px rgba(126, 217, 87, 0.1);
+}
+
+/* テーブル表示 */
+.table-view-container,
+.all-customers-table-container {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 249, 0.9) 100%);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
     box-shadow: 0 8px 32px rgba(47, 93, 63, 0.1);
     overflow: hidden;
     border: 1px solid rgba(126, 217, 87, 0.2);
@@ -419,7 +332,7 @@ body.statistics-page {
 .data-table th {
     background: linear-gradient(135deg, var(--main-green) 0%, var(--sub-green) 100%);
     color: white;
-    padding: 18px 20px;
+    padding: 20px;
     text-align: left;
     font-weight: 700;
     font-size: 15px;
@@ -457,14 +370,14 @@ body.statistics-page {
 }
 
 .data-table td {
-    padding: 16px 20px;
+    padding: 18px 20px;
     border-bottom: 1px solid rgba(126, 217, 87, 0.1);
     font-size: 15px;
     transition: all 0.3s ease;
 }
 
 .data-table tr:hover td {
-    background: linear-gradient(135deg, rgba(126, 217, 87, 0.05) 0%, rgba(248, 250, 249, 0.5) 100%);
+    background: linear-gradient(135deg, rgba(126, 217, 87, 0.08) 0%, rgba(248, 250, 249, 0.6) 100%);
 }
 
 .data-table tr:nth-child(even) td {
@@ -472,7 +385,7 @@ body.statistics-page {
 }
 
 .data-table tr:nth-child(even):hover td {
-    background: linear-gradient(135deg, rgba(126, 217, 87, 0.08) 0%, rgba(248, 250, 249, 0.6) 100%);
+    background: linear-gradient(135deg, rgba(126, 217, 87, 0.1) 0%, rgba(248, 250, 249, 0.7) 100%);
 }
 
 /* カード表示 */
@@ -485,8 +398,8 @@ body.statistics-page {
 .customer-card {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 249, 0.9) 100%);
     backdrop-filter: blur(10px);
-    border-radius: 16px;
-    padding: 25px;
+    border-radius: 20px;
+    padding: 30px;
     box-shadow: 0 8px 32px rgba(47, 93, 63, 0.1);
     border: 1px solid rgba(126, 217, 87, 0.2);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -517,14 +430,14 @@ body.statistics-page {
 }
 
 .card-main-info {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .customer-card .customer-name {
     font-size: 20px;
     font-weight: 700;
     color: var(--main-green);
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     line-height: 1.3;
 }
 
@@ -532,7 +445,7 @@ body.statistics-page {
     font-size: 13px;
     color: var(--sub-green);
     background: rgba(126, 217, 87, 0.1);
-    padding: 4px 12px;
+    padding: 6px 12px;
     border-radius: 8px;
     display: inline-block;
     font-weight: 600;
@@ -542,12 +455,12 @@ body.statistics-page {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .stat {
     text-align: center;
-    padding: 15px 12px;
+    padding: 18px 15px;
     background: linear-gradient(135deg, rgba(126, 217, 87, 0.1) 0%, rgba(248, 250, 249, 0.5) 100%);
     border-radius: 12px;
     border: 1px solid rgba(126, 217, 87, 0.2);
@@ -555,7 +468,7 @@ body.statistics-page {
 }
 
 .stat:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     box-shadow: 0 8px 20px rgba(126, 217, 87, 0.1);
     border-color: var(--accent-green);
 }
@@ -564,7 +477,7 @@ body.statistics-page {
     font-size: 18px;
     font-weight: 800;
     color: var(--main-green);
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     line-height: 1.2;
 }
 
@@ -578,12 +491,12 @@ body.statistics-page {
 
 .card-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
 }
 
 .card-btn {
     flex: 1;
-    padding: 12px 20px;
+    padding: 14px 20px;
     border: none;
     border-radius: 10px;
     font-weight: 700;
@@ -605,7 +518,7 @@ body.statistics-page {
     background: linear-gradient(135deg, var(--main-green), var(--accent-green));
 }
 
-/* アクションボタン */
+/* テーブルアクションボタン */
 .table-action-btn {
     background: linear-gradient(135deg, var(--accent-green), var(--main-green));
     color: white;
@@ -626,73 +539,6 @@ body.statistics-page {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(126, 217, 87, 0.4);
     background: linear-gradient(135deg, var(--main-green), var(--accent-green));
-}
-
-/* 全顧客ページの追加スタイル */
-.all-customers-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-    padding: 20px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(248, 250, 249, 0.7) 100%);
-    backdrop-filter: blur(10px);
-    border-radius: 16px;
-    border: 1px solid rgba(126, 217, 87, 0.2);
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.all-customers-header h3 {
-    font-size: 24px;
-    font-weight: 800;
-    color: var(--main-green);
-    margin: 0;
-}
-
-.controls-section {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.sort-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.sort-controls label {
-    font-weight: 600;
-    color: var(--main-green);
-    font-size: 14px;
-}
-
-.sort-select {
-    padding: 10px 15px;
-    border: 2px solid rgba(126, 217, 87, 0.3);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.9);
-    color: var(--main-green);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.sort-select:focus {
-    outline: none;
-    border-color: var(--accent-green);
-    box-shadow: 0 0 0 3px rgba(126, 217, 87, 0.1);
-}
-
-.all-customers-table-container {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 249, 0.9) 100%);
-    backdrop-filter: blur(10px);
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(47, 93, 63, 0.1);
-    overflow: hidden;
-    border: 1px solid rgba(126, 217, 87, 0.2);
 }
 
 /* モーダルスタイル */
@@ -769,220 +615,6 @@ body.statistics-page {
     transform: scale(1.1);
 }
 
-/* レスポンシブデザイン */
-@media (max-width: 768px) {
-    .top-nav {
-        flex-direction: row;
-        justify-content: space-around;
-        padding: 15px 0;
-    }
-
-    .top-nav-header {
-        margin-right: 0;
-        margin-bottom: 0;
-    }
-
-    .top-nav-links {
-        flex-wrap: nowrap;
-        width: auto;
-    }
-
-    .top-nav .nav-link {
-        flex: none;
-        min-width: auto;
-        justify-content: center;
-    }
-
-    .content-scroll-area {
-        padding: 20px 15px;
-    }
-
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .metric-card {
-        flex-direction: row;
-        text-align: left;
-        gap: 15px;
-    }
-
-    .top-customers-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .customer-search-section {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .search-container {
-        max-width: none;
-    }
-
-    .view-toggle {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .card-view-container {
-        grid-template-columns: 1fr;
-    }
-
-    .customer-stats {
-        gap: 15px;
-    }
-
-    .all-customers-header {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .controls-section {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .sort-controls {
-        justify-content: flex-start;
-    }
-
-    .modal-content {
-        margin: 20px;
-        padding: 20px;
-    }
-
-    .data-table {
-        display: block;
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .data-table thead,
-    .data-table tbody,
-    .data-table th,
-    .data-table td,
-    .data-table tr {
-        display: block;
-    }
-
-    .data-table thead tr {
-        position: absolute;
-        top: -9999px;
-        left: -9999px;
-    }
-
-    .data-table tr {
-        border: 1px solid #eee;
-        margin-bottom: 10px;
-        border-radius: 8px;
-        overflow: hidden;
-    }
-
-    .data-table td {
-        border: none;
-        border-bottom: 1px solid #eee;
-        position: relative;
-        padding-left: 50%;
-        text-align: right;
-    }
-
-    .data-table td:before {
-        position: absolute;
-        top: 6px;
-        left: 6px;
-        width: 45%;
-        padding-right: 10px;
-        white-space: nowrap;
-        text-align: left;
-        font-weight: 600;
-        color: var(--sub-green);
-    }
-
-    .data-table td:nth-of-type(1):before { content: "顧客No"; }
-    .data-table td:nth-of-type(2):before { content: "顧客名"; }
-    .data-table td:nth-of-type(3):before { content: "総売上"; }
-    .data-table td:nth-of-type(4):before { content: "配達回数"; }
-    .data-table td:nth-of-type(5):before { content: "平均リードタイム"; }
-    .data-table td:nth-of-type(6):before { content: "アクション"; }
-
-    .data-table tr:hover td {
-        background-color: transparent;
-    }
-
-    .data-table tr:nth-child(even) td {
-        background-color: transparent;
-    }
-
-    .data-table tr:nth-child(even):hover td {
-        background-color: transparent;
-    }
-}
-
-/* アニメーション */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideInFromLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-50px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.05);
-    }
-}
-
-/* カードのスタガードアニメーション */
-.metric-card:nth-child(1) {
-    animation: fadeInUp 0.6s ease-out 0.1s both;
-}
-
-.metric-card:nth-child(2) {
-    animation: fadeInUp 0.6s ease-out 0.2s both;
-}
-
-.metric-card:nth-child(3) {
-    animation: fadeInUp 0.6s ease-out 0.3s both;
-}
-
-.metric-card:nth-child(4) {
-    animation: fadeInUp 0.6s ease-out 0.4s both;
-}
-
-.top-customer-card:nth-child(odd) {
-    animation: slideInFromLeft 0.6s ease-out both;
-}
-
-.top-customer-card:nth-child(even) {
-    animation: slideInFromLeft 0.6s ease-out 0.1s both;
-}
-
 /* 検索のハイライト */
 .search-highlight {
     background: linear-gradient(135deg, var(--accent-green), transparent);
@@ -990,6 +622,52 @@ body.statistics-page {
     border-radius: 4px;
     color: var(--main-green);
     font-weight: 700;
+}
+
+/* ローディングステート */
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    color: var(--sub-green);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.loading::before {
+    content: '';
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(126, 217, 87, 0.3);
+    border-top: 3px solid var(--accent-green);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 15px;
+}
+
+/* 空の状態 */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--sub-green);
+}
+
+.empty-state .empty-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-state .empty-message {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.empty-state .empty-description {
+    font-size: 14px;
+    opacity: 0.8;
 }
 
 /* スクロールバーのカスタマイズ */
@@ -1011,33 +689,183 @@ body.statistics-page {
     background: linear-gradient(135deg, var(--main-green), var(--accent-green));
 }
 
-/* ローディングステート */
-.loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px;
-    color: var(--sub-green);
-    font-size: 16px;
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+    .content-scroll-area {
+        padding: 20px 15px;
+    }
+
+    .customer-search-section {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 20px;
+    }
+
+    .search-container {
+        max-width: none;
+    }
+
+    .view-toggle {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .card-view-container {
+        grid-template-columns: 1fr;
+    }
+
+    .all-customers-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 20px;
+    }
+
+    .controls-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .sort-controls {
+        justify-content: flex-start;
+    }
+
+    .modal-content {
+        margin: 20px;
+        padding: 20px;
+    }
+
+    .data-table {
+        font-size: 14px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 12px 15px;
+    }
+
+    /* モバイル用テーブル表示 */
+    .data-table thead {
+        display: none;
+    }
+
+    .data-table,
+    .data-table tbody,
+    .data-table tr {
+        display: block;
+        width: 100%;
+    }
+
+    .data-table tr {
+        border: 1px solid rgba(126, 217, 87, 0.2);
+        margin-bottom: 15px;
+        border-radius: 12px;
+        overflow: hidden;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .data-table td {
+        border: none;
+        border-bottom: 1px solid rgba(126, 217, 87, 0.1);
+        position: relative;
+        padding: 10px 0;
+        text-align: left;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .data-table td:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .data-table td:before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--sub-green);
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .data-table td:nth-of-type(1):before { content: "顧客No"; }
+    .data-table td:nth-of-type(2):before { content: "顧客名"; }
+    .data-table td:nth-of-type(3):before { content: "総売上"; }
+    .data-table td:nth-of-type(4):before { content: "配達回数"; }
+    .data-table td:nth-of-type(5):before { content: "平均リードタイム"; }
+    .data-table td:nth-of-type(6):before { content: "アクション"; }
+
+    .card-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .card-actions {
+        flex-direction: column;
+    }
 }
 
-.loading::before {
-    content: '';
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(126, 217, 87, 0.3);
-    border-top: 3px solid var(--accent-green);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-right: 12px;
+/* アニメーション */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes spin {
     0% {
         transform: rotate(0deg);
     }
-
     100% {
         transform: rotate(360deg);
+    }
+}
+
+/* アクセシビリティ向上 */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* フォーカス管理 */
+.search-input:focus,
+.sort-select:focus,
+.view-btn:focus,
+.card-btn:focus,
+.table-action-btn:focus {
+    outline: 2px solid var(--accent-green);
+    outline-offset: 2px;
+}
+
+/* 高コントラストモード対応 */
+@media (prefers-contrast: high) {
+    .customer-card,
+    .table-view-container,
+    .customer-search-section {
+        border: 2px solid var(--main-green);
+    }
+
+    .data-table th {
+        border-bottom: 2px solid var(--accent-green);
+    }
+}
+
+/* 縮小モーション対応 */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }

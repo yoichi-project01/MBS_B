@@ -24,7 +24,8 @@ if ($order_id) {
         echo json_encode(['order_info' => $order_info, 'order_details' => $order_details]);
 
     } catch (PDOException $e) {
-        echo json_encode(['error' => $e->getMessage()]);
+        error_log('Database error in get_delivery_data.php: ' . $e->getMessage());
+        echo json_encode(['error' => 'Database error occurred']);
     }
 } else {
     echo json_encode(['error' => 'Order ID is missing']);

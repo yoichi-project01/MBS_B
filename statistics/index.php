@@ -75,14 +75,13 @@ $pageDescription = "{$storeName}の売上統計、顧客分析、配達実績な
     <?php endif; ?>
 
     <!-- Statistics content starts here -->
-    <!-- ダッシュボードタブ -->
-    <?php include 'dashboard_content.php'; ?>
-
-    <!-- 顧客一覧タブ -->
-    <?php include 'customer_list_content.php'; ?>
-
-    </div>
-    </main>
+    <div class="dashboard-container">
+        <div class="main-content">
+            <div class="content-scroll-area">
+                <!-- 顧客一覧のみの表示 -->
+                <?php include 'customer_list_content.php'; ?>
+            </div>
+        </div>
     </div>
 
     <!-- 詳細モーダル -->
@@ -171,21 +170,15 @@ $pageDescription = "{$storeName}の売上統計、顧客分析、配達実績な
 
     <!-- JavaScript Files -->
     <script src="/MBS_B/assets/js/main.js" type="module"></script>
+    <script src="/MBS_B/assets/js/pages/customer-statistics.js"></script>
 
     <!-- 個別の機能モジュール -->
     <script type="module">
     // 統計ページ固有の初期化
-    import('/MBS_B/assets/js/pages/statistics.js').then(module => {
+    document.addEventListener('DOMContentLoaded', function() {
         // 統計ページが正常に読み込まれた後の処理
         if (window.performance && window.performance.mark) {
             window.performance.mark('statistics-js-loaded');
-        }
-    }).catch(error => {
-        console.error('Failed to load statistics module:', error);
-
-        // フォールバック処理
-        if (typeof window.showErrorMessage === 'function') {
-            window.showErrorMessage('統計ページの初期化に失敗しました。ページを再読み込みしてください。');
         }
     });
     </script>

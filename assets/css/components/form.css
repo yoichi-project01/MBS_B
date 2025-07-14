@@ -145,3 +145,150 @@
     color: var(--sub-green);
     pointer-events: none;
 }
+
+/* Enhanced Form Controls */
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--main-green);
+    font-size: 14px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: var(--font-family);
+    transition: all var(--transition);
+    background: #ffffff;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 3px rgba(126, 217, 87, 0.1);
+    background: #fafbfc;
+}
+
+.form-input:invalid {
+    border-color: #dc3545;
+}
+
+.form-input:invalid:focus {
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.form-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.form-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: var(--font-family);
+    transition: all var(--transition);
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 3px rgba(126, 217, 87, 0.1);
+}
+
+.form-checkbox {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.form-checkbox input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.form-checkbox .checkmark {
+    height: 20px;
+    width: 20px;
+    background-color: #ffffff;
+    border: 2px solid #e1e5e9;
+    border-radius: 4px;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-checkbox input[type="checkbox"]:checked ~ .checkmark {
+    background-color: var(--accent-green);
+    border-color: var(--accent-green);
+}
+
+.form-checkbox input[type="checkbox"]:checked ~ .checkmark::after {
+    content: '✓';
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.form-checkbox:hover .checkmark {
+    border-color: var(--accent-green);
+}
+
+.form-error {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+}
+
+.form-help {
+    color: var(--sub-green);
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+}
+
+/* Mobile form improvements */
+@media (max-width: 768px) {
+    .file-upload-area {
+        padding: 30px 15px;
+    }
+    
+    .upload-icon {
+        font-size: 36px;
+    }
+    
+    .file-upload-content h3 {
+        font-size: 18px;
+    }
+    
+    .search-container {
+        max-width: 100%;
+    }
+    
+    .search-input {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    .form-input,
+    .form-select {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}

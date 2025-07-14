@@ -20,7 +20,8 @@ class SessionManager
             // セッションのセキュリティ設定
             ini_set('session.cookie_httponly', 1);
             ini_set('session.use_only_cookies', 1);
-            ini_set('session.cookie_secure', isset($_SERVER['HTTPS']));
+            ini_set('session.cookie_secure', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on');
+            ini_set('session.cookie_samesite', 'Strict');
         }
 
         if (session_status() === PHP_SESSION_NONE) {
@@ -126,6 +127,17 @@ class SessionManager
     {
         self::start();
         session_destroy();
+    }
+
+    /**
+     * セッションIDを再生成（セッションハイジャック対策）
+     */
+    public static function regenerateId()
+    {
+        self::start();
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_regenerate_id(true);
+        }
     }
 
     /**

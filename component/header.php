@@ -119,22 +119,16 @@ if ($storeName && $pageConfig['name'] !== 'menu') {
             </button>
         </div>
         <?php if ($pageConfig['isStatisticsPage']): ?>
-        <!-- Statistics Page Navigation -->
-        <aside class="top-nav">
-            <div class="top-nav-header">
-                <i class="fas fa-book-open"></i>
-            </div>
-            <nav class="top-nav-links">
-                <a href="#" class="nav-link active" data-tab="dashboard">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>ダッシュボード</span>
-                </a>
-                <a href="#" class="nav-link" data-tab="customers">
+        <!-- Statistics Page Header -->
+        <div class="statistics-header">
+            <div class="statistics-header-content">
+                <h1 class="statistics-title">
                     <i class="fas fa-users"></i>
-                    <span>顧客一覧</span>
-                </a>
-            </nav>
-        </aside>
+                    顧客一覧
+                </h1>
+                <p class="statistics-subtitle">店舗の顧客情報を表示・管理します</p>
+            </div>
+        </div>
         <?php endif; ?>
         <div class="menu-overlay" id="menuOverlay"></div>
     </header>

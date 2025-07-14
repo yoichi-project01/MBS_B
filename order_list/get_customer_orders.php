@@ -59,7 +59,7 @@ try {
 
 } catch (PDOException $e) {
     error_log("Database error in get_customer_orders.php: " . $e->getMessage());
-    echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+    echo json_encode(['error' => 'Database error occurred']);
 }
 
 function translate_status($status) {

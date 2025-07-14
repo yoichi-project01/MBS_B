@@ -71,3 +71,104 @@
     background: var(--main-green);
     transform: translateY(-2px);
 }
+
+/* Enhanced responsive table improvements */
+@media (max-width: 768px) {
+    .enhanced-table-container {
+        border-radius: 8px;
+        margin: 10px -10px;
+        overflow-x: auto;
+    }
+    
+    .data-table {
+        min-width: 600px;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 12px 8px;
+        font-size: 13px;
+    }
+    
+    .data-table th {
+        white-space: nowrap;
+    }
+    
+    .table-action-btn {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .enhanced-table-container {
+        border-radius: 0;
+        margin: 10px -15px;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 10px 6px;
+        font-size: 12px;
+    }
+    
+    .table-action-btn {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+}
+
+/* Touch-friendly checkboxes */
+.checkbox-col {
+    width: 50px;
+    text-align: center;
+}
+
+.checkbox-col input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .checkbox-col {
+        width: 60px;
+    }
+    
+    .checkbox-col input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        transform: scale(1.4);
+    }
+}
+
+/* Status styling improvements */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.status-completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-partial {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-cancelled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-pending {
+    background: #cce5ff;
+    color: #004085;
+}
