@@ -118,18 +118,6 @@ if ($storeName && $pageConfig['name'] !== 'menu') {
                 <span class="hamburger-line"></span>
             </button>
         </div>
-        <?php if ($pageConfig['isStatisticsPage']): ?>
-        <!-- Statistics Page Header -->
-        <div class="statistics-header">
-            <div class="statistics-header-content">
-                <h1 class="statistics-title">
-                    <i class="fas fa-users"></i>
-                    顧客一覧
-                </h1>
-                <p class="statistics-subtitle">店舗の顧客情報を表示・管理します</p>
-            </div>
-        </div>
-        <?php endif; ?>
         <div class="menu-overlay" id="menuOverlay"></div>
     </header>
     <?php endif; ?>
@@ -138,7 +126,7 @@ if ($storeName && $pageConfig['name'] !== 'menu') {
     <div class="dashboard-container">
         <main class="main-content">
             <div class="content-scroll-area">
-    <?php endif; ?>
+                <?php endif; ?>
 
                 <script src="/MBS_B/assets/js/main.js" type="module"></script>
                 <script>

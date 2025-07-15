@@ -80,43 +80,58 @@ $status_info = translate_status_detail($order['status']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>注文詳細 No.<?= htmlspecialchars($order['order_no']) ?></title>
-    <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>注文詳細 No.<?= htmlspecialchars($order['order_no']) ?> - <?php echo htmlspecialchars($storeName); ?></title>
+    <meta name="description" content="注文番号 <?= htmlspecialchars($order['order_no']) ?> の詳細情報を表示します。顧客情報、注文商品、合計金額などを確認できます。">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="/MBS_B/assets/css/base.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/components/header.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/components/button.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/components/modal.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/components/form.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/components/table.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/pages/order.css">
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
-<body class="with-header">
-    <div class="container order-detail-container">
-        <div class="detail-header">
-            <h1 class="page-title">注文詳細</h1>
-            <a href="index.php?store=<?= htmlspecialchars($storeName) ?>" class="back-button"><i class="fas fa-arrow-left"></i> 一覧へ戻る</a>
-        </div>
+<body class="with-header order-detail-page">
+    <div class="dashboard-container">
+        <div class="main-content">
+            <div class="content-scroll-area">
+                <div class="order-detail-container">
+                    <div class="detail-header">
+                        <h1 class="page-title">注文詳細</h1>
+                        <a href="index.php?store=<?= htmlspecialchars($storeName) ?>" class="back-button"><i class="fas fa-arrow-left"></i> 一覧へ戻る</a>
+                    </div>
 
-        <div class="order-meta">
-            <div class="meta-item">
-                <span class="meta-label">注文番号:</span>
-                <span class="meta-value"><?= htmlspecialchars($order['order_no']) ?></span>
-            </div>
-            <div class="meta-item">
-                <span class="meta-label">注文日:</span>
-                <span class="meta-value"><?= htmlspecialchars($order['registration_date']) ?></span>
-            </div>
-            <div class="meta-item">
-                <span class="meta-label">ステータス:</span>
-                <span class="meta-value status-badge <?= $status_info['class'] ?>"><?= $status_info['label'] ?></span>
-            </div>
-        </div>
+                    <div class="order-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">注文番号:</span>
+                            <span class="meta-value"><?= htmlspecialchars($order['order_no']) ?></span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">注文日:</span>
+                            <span class="meta-value"><?= htmlspecialchars($order['registration_date']) ?></span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">ステータス:</span>
+                            <span class="meta-value status-badge <?= $status_info['class'] ?>"><?= $status_info['label'] ?></span>
+                        </div>
+                    </div>
 
-        <div class="customer-info-box">
-            <h2 class="section-title">顧客情報</h2>
-            <p><strong>顧客名:</strong> <?= htmlspecialchars($order['customer_name']) ?></p>
-            <p><strong>担当者:</strong> <?= htmlspecialchars($order['manager_name'] ?? '--') ?></p>
-            <p><strong>住所:</strong> <?= htmlspecialchars($order['address']) ?></p>
-            <p><strong>電話番号:</strong> <?= htmlspecialchars($order['telephone_number']) ?></p>
-        </div>
+                    <div class="customer-info-box">
+                        <h2 class="section-title">顧客情報</h2>
+                        <p><strong>顧客名:</strong> <?= htmlspecialchars($order['customer_name']) ?></p>
+                        <p><strong>担当者:</strong> <?= htmlspecialchars($order['manager_name'] ?? '--') ?></p>
+                        <p><strong>住所:</strong> <?= htmlspecialchars($order['address']) ?></p>
+                        <p><strong>電話番号:</strong> <?= htmlspecialchars($order['telephone_number']) ?></p>
+                    </div>
 
-        <div class="order-items-box">
-            <h2 class="section-title">注文商品</h2>
-            <table class="data-table">
+                    <div class="order-items-box">
+                        <h2 class="section-title">注文商品</h2>
+                        <table class="data-table">
                 <thead>
                     <tr>
                         <th>書籍名</th>
@@ -146,12 +161,40 @@ $status_info = translate_status_detail($order['status']);
                         <td colspan="2" class="total-amount">¥<?= number_format($total_amount) ?></td>
                     </tr>
                 </tfoot>
-            </table>
-        </div>
+                        </table>
+                    </div>
 
-        <div class="detail-actions">
-            <button onclick="window.print();" class="action-button print-btn"><i class="fas fa-print"></i> 印刷する</button>
+                    <div class="detail-actions">
+                        <button onclick="window.print();" class="action-button print-btn"><i class="fas fa-print"></i> 印刷する</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+    
+    <!-- JavaScript Files -->
+    <script src="/MBS_B/assets/js/main.js" type="module"></script>
+    
+    <script>
+    // 注文詳細ページ固有の初期化
+    document.addEventListener('DOMContentLoaded', function() {
+        // パフォーマンス測定
+        if (window.performance && window.performance.mark) {
+            window.performance.mark('order-detail-page-loaded');
+        }
+        
+        // 印刷ボタンのアニメーション
+        const printBtn = document.querySelector('.print-btn');
+        if (printBtn) {
+            printBtn.addEventListener('click', function() {
+                // 印刷プレビュー表示前のアニメーション
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        }
+    });
+    </script>
 </body>
 </html>

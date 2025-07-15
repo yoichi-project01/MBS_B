@@ -100,27 +100,55 @@ function translate_status($status) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>注文書一覧</title>
-    <link rel="stylesheet" href="../style.css">
+    <title>注文書一覧 - <?php echo htmlspecialchars($storeName); ?></title>
+    <meta name="description" content="<?php echo htmlspecialchars($storeName); ?>の注文書一覧を表示します。注文の検索、並び替え、詳細確認が可能です。">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="/MBS_B/assets/css/base.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/components/header.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/components/button.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/components/modal.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/components/form.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/components/table.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/pages/order.css">
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body class="with-header order-list-page">
-    <div class="container">
-        <h2 class="main-page-title">
-            <span class="icon">📋</span> 注文書一覧
-        </h2>
+    <div class="dashboard-container">
+        <div class="main-content">
+            <div class="content-scroll-area">
+                <div class="order-list-container">
 
-        <!-- 検索・フィルタリング -->
-        <div class="search-container">
-            <form action="" method="GET">
-                <input type="hidden" name="store" value="<?= htmlspecialchars($storeName) ?>">
-                <input type="text" name="search_customer" placeholder="顧客名で検索..." value="<?= htmlspecialchars($search_customer) ?>">
-                <button type="submit">検索</button>
-            </form>
-        </div>
+                    <!-- 検索・フィルタリング -->
+                    <div class="order-search-section">
+                        <div class="search-container">
+                            <form action="" method="GET">
+                                <input type="hidden" name="store" value="<?= htmlspecialchars($storeName) ?>">
+                                <input type="text" name="search_customer" class="search-input" placeholder="顧客名で検索..." value="<?= htmlspecialchars($search_customer) ?>">
+                                <button type="submit" class="search-btn">
+                                    <i class="fas fa-search"></i> 検索
+                                </button>
+                            </form>
+                        </div>
+                        <div class="order-header-info">
+                            <h2 class="order-title">
+                                <i class="fas fa-file-alt"></i> 注文書一覧
+                            </h2>
+                            <p class="order-subtitle"><?php echo htmlspecialchars($storeName); ?> - 全 <?php echo $total_orders; ?> 件の注文</p>
+                        </div>
+                        <div class="order-actions">
+                            <a href="create.php?store=<?= htmlspecialchars($storeName) ?>" class="btn-create-order">
+                                <i class="fas fa-plus"></i> 新規注文書作成
+                            </a>
+                        </div>
+                    </div>
 
-        <!-- 注文一覧テーブル -->
-        <div class="table-container">
-            <table class="data-table">
+                    <!-- 注文一覧テーブル -->
+                    <div class="table-view-container">
+                        <table class="data-table">
                 <thead>
                     <tr>
                         <th><a href="?store=<?= $storeName ?>&sort=order_no&order=<?= $sort_column == 'order_no' && $sort_order == 'ASC' ? 'DESC' : 'ASC' ?>">注文番号</a></th>
@@ -152,11 +180,11 @@ function translate_status($status) {
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </tbody>
-            </table>
-        </div>
+                        </table>
+                    </div>
 
-        <!-- ページネーション -->
-        <div class="pagination">
+                    <!-- ページネーション -->
+                    <div class="pagination">
             <?php if ($page > 1): ?>
                 <a href="?store=<?= $storeName ?>&page=<?= $page - 1 ?>&search_customer=<?= $search_customer ?>&sort=<?= $sort_column ?>&order=<?= $sort_order ?>">前へ</a>
             <?php endif; ?>
@@ -164,6 +192,9 @@ function translate_status($status) {
             <?php if ($page < $total_pages): ?>
                 <a href="?store=<?= $storeName ?>&page=<?= $page + 1 ?>&search_customer=<?= $search_customer ?>&sort=<?= $sort_column ?>&order=<?= $sort_order ?>">次へ</a>
             <?php endif; ?>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -180,7 +211,61 @@ function translate_status($status) {
         </div>
     </div>
 
-    <script src="../script.js"></script>
-</body>
+    <!-- JavaScript Files -->
+    <script src="/MBS_B/assets/js/main.js" type="module"></script>
+    <script src="/MBS_B/assets/js/components/modal.js"></script>
+    
+    <script>
+    // 注文ページ固有の初期化
+    document.addEventListener('DOMContentLoaded', function() {
+        // 顧客名クリックイベント
+        document.querySelectorAll('.customer-name-clickable').forEach(element => {
+            element.addEventListener('click', function() {
+                const customerName = this.dataset.customerName;
+                loadCustomerOrders(customerName);
+            });
+        });
+        
+        // パフォーマンス測定
+        if (window.performance && window.performance.mark) {
+            window.performance.mark('order-page-loaded');
+        }
+    });
+    
+    // 顧客注文詳細をロードする関数
+    function loadCustomerOrders(customerName) {
+        const modal = document.getElementById('customerOrdersModal');
+        const title = document.getElementById('customerOrdersTitle');
+        const content = document.getElementById('customerOrdersContent');
+        
+        title.textContent = customerName + ' の注文履歴';
+        content.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><span>読み込み中...</span></div>';
+        
+        modal.style.display = 'block';
+        
+        // Ajax呼び出し（実装に応じて調整）
+        fetch(`get_customer_orders.php?customer_name=${encodeURIComponent(customerName)}&store=<?= htmlspecialchars($storeName) ?>`)
+            .then(response => response.text())
+            .then(data => {
+                content.innerHTML = data;
+            })
+            .catch(error => {
+                content.innerHTML = '<p class="error">データの読み込みに失敗しました。</p>';
+                console.error('Error:', error);
+            });
+    }
+    
+    // モーダルを閉じる関数
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+    
+    // モーダル外クリックで閉じる
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('modal')) {
+            e.target.style.display = 'none';
+        }
+    });
+    </script>
 </body>
 </html>
