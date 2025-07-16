@@ -12,55 +12,15 @@ if (empty($storeName)) {
     exit;
 }
 
-include(__DIR__ . '/../component/header.php');
-
 // デバッグモードの設定
 $debugMode = ($_ENV['ENVIRONMENT'] ?? 'development') !== 'production';
-
-
-
-
 
 // セキュリティ関連の設定
 $csrfToken = CSRFProtection::getToken();
 
-// メタデータの設定
-$pageTitle = "統計情報 - {$storeName}";
-$pageDescription = "{$storeName}の売上統計、顧客分析、配達実績などの詳細な統計情報を表示します。";
+include(__DIR__ . '/../component/header.php');
 ?>
 
-<!DOCTYPE html>
-<html lang="ja">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($pageTitle); ?></title>
-    <meta name="description" content="<?php echo htmlspecialchars($pageDescription); ?>">
-
-    <!-- CSP Meta Tag -->
-    <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data:; font-src 'self' https://cdnjs.cloudflare.com;">
-
-    <!-- CSS Files -->
-    <link rel="stylesheet" href="/MBS_B/assets/css/base.css">
-    <link rel="stylesheet" href="/MBS_B/assets/css/components/header.css">
-    <link rel="stylesheet" href="/MBS_B/assets/css/components/button.css">
-    <link rel="stylesheet" href="/MBS_B/assets/css/components/modal.css">
-    <link rel="stylesheet" href="/MBS_B/assets/css/components/form.css">
-    <link rel="stylesheet" href="/MBS_B/assets/css/components/table.css">
-    <link rel="stylesheet" href="/MBS_B/assets/css/pages/statistics.css">
-
-    <!-- External Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
-    <!-- Preload key resources -->
-    <link rel="preload" href="/MBS_B/assets/js/main.js" as="script">
-    <link rel="preload" href="/MBS_B/assets/js/pages/statistics.js" as="script">
-</head>
-
-<body class="with-header statistics-page">
     <!-- エラーメッセージの表示 -->
     <?php if (!empty($errorMessage)): ?>
     <div class="error-banner" role="alert" aria-live="assertive">

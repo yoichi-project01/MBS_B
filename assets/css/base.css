@@ -1,18 +1,101 @@
 
 :root {
+    /* === Color Palette === */
     --main-green: #2f5d3f;
     --sub-green: #4b7a5c;
     --accent-green: #7ed957;
     --light-green: #e8f5e8;
     --bg-light: #f8faf9;
     --font-color: #2f5d3f;
-    --font-family: 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', sans-serif;
-    --radius: 16px;
-    --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    --shadow: 0 8px 40px rgba(47, 93, 63, 0.12);
-    --shadow-hover: 0 16px 64px rgba(47, 93, 63, 0.20);
+    
+    /* === Status Colors === */
+    --status-pending: #f57c00;
+    --status-pending-bg: rgba(255, 193, 7, 0.1);
+    --status-processing: #1976d2;
+    --status-processing-bg: rgba(33, 150, 243, 0.1);
+    --status-completed: #388e3c;
+    --status-completed-bg: rgba(76, 175, 80, 0.1);
+    --status-cancelled: #d32f2f;
+    --status-cancelled-bg: rgba(244, 67, 54, 0.1);
+    
+    /* === Alert Colors === */
+    --alert-success: #2e7d32;
+    --alert-success-bg: rgba(76, 175, 80, 0.1);
+    --alert-error: #c62828;
+    --alert-error-bg: rgba(244, 67, 54, 0.1);
+    --alert-warning: #f57c00;
+    --alert-warning-bg: rgba(255, 193, 7, 0.1);
+    --alert-info: #1976d2;
+    --alert-info-bg: rgba(33, 150, 243, 0.1);
+    
+    /* === Typography === */
+    --font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', sans-serif;
+    --font-size-xs: 12px;
+    --font-size-sm: 14px;
+    --font-size-base: 16px;
+    --font-size-lg: 18px;
+    --font-size-xl: 20px;
+    --font-size-2xl: 24px;
+    --font-size-3xl: 28px;
+    --font-size-4xl: 32px;
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    --line-height-tight: 1.2;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.6;
+    
+    /* === Spacing === */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 12px;
+    --space-lg: 16px;
+    --space-xl: 20px;
+    --space-2xl: 24px;
+    --space-3xl: 32px;
+    --space-4xl: 40px;
+    --space-5xl: 48px;
+    --space-6xl: 64px;
+    
+    /* === Border Radius === */
+    --radius-sm: 8px;
+    --radius: 12px;
+    --radius-md: 16px;
+    --radius-lg: 20px;
+    --radius-xl: 24px;
+    --radius-full: 9999px;
+    
+    /* === Shadows === */
+    --shadow-sm: 0 2px 8px rgba(47, 93, 63, 0.08);
+    --shadow: 0 8px 32px rgba(47, 93, 63, 0.12);
+    --shadow-md: 0 12px 40px rgba(47, 93, 63, 0.15);
+    --shadow-lg: 0 16px 64px rgba(47, 93, 63, 0.20);
+    --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.3);
+    
+    /* === Transitions === */
+    --transition-fast: 0.15s ease;
+    --transition: 0.3s ease;
+    --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* === Layout === */
     --header-height: 68px;
     --tab-height: 56px;
+    --max-width-xs: 480px;
+    --max-width-sm: 640px;
+    --max-width-md: 768px;
+    --max-width-lg: 1024px;
+    --max-width-xl: 1200px;
+    --max-width-2xl: 1400px;
+    
+    /* === Z-Index === */
+    --z-index-dropdown: 100;
+    --z-index-modal: 1000;
+    --z-index-overlay: 999;
+    --z-index-header: 1001;
+    
     color-scheme: light;
 }
 
@@ -81,15 +164,122 @@ body.with-header .container {
     }
 }
 
-/* Utility Classes */
-.text-right {
-    text-align: right;
-}
+/* === Typography Utilities === */
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-base { font-size: var(--font-size-base); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+.text-2xl { font-size: var(--font-size-2xl); }
+.text-3xl { font-size: var(--font-size-3xl); }
+.text-4xl { font-size: var(--font-size-4xl); }
 
-.text-center {
-    text-align: center;
-}
+.font-light { font-weight: var(--font-weight-light); }
+.font-normal { font-weight: var(--font-weight-normal); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+.font-extrabold { font-weight: var(--font-weight-extrabold); }
 
+.leading-tight { line-height: var(--line-height-tight); }
+.leading-normal { line-height: var(--line-height-normal); }
+.leading-relaxed { line-height: var(--line-height-relaxed); }
+
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+/* === Color Utilities === */
+.text-main { color: var(--main-green); }
+.text-sub { color: var(--sub-green); }
+.text-accent { color: var(--accent-green); }
+.text-success { color: var(--alert-success); }
+.text-error { color: var(--alert-error); }
+.text-warning { color: var(--alert-warning); }
+.text-info { color: var(--alert-info); }
+
+.bg-main { background-color: var(--main-green); }
+.bg-sub { background-color: var(--sub-green); }
+.bg-accent { background-color: var(--accent-green); }
+.bg-light { background-color: var(--bg-light); }
+.bg-light-green { background-color: var(--light-green); }
+
+/* === Spacing Utilities === */
+.p-xs { padding: var(--space-xs); }
+.p-sm { padding: var(--space-sm); }
+.p-md { padding: var(--space-md); }
+.p-lg { padding: var(--space-lg); }
+.p-xl { padding: var(--space-xl); }
+.p-2xl { padding: var(--space-2xl); }
+.p-3xl { padding: var(--space-3xl); }
+.p-4xl { padding: var(--space-4xl); }
+
+.m-xs { margin: var(--space-xs); }
+.m-sm { margin: var(--space-sm); }
+.m-md { margin: var(--space-md); }
+.m-lg { margin: var(--space-lg); }
+.m-xl { margin: var(--space-xl); }
+.m-2xl { margin: var(--space-2xl); }
+.m-3xl { margin: var(--space-3xl); }
+.m-4xl { margin: var(--space-4xl); }
+
+.mb-xs { margin-bottom: var(--space-xs); }
+.mb-sm { margin-bottom: var(--space-sm); }
+.mb-md { margin-bottom: var(--space-md); }
+.mb-lg { margin-bottom: var(--space-lg); }
+.mb-xl { margin-bottom: var(--space-xl); }
+.mb-2xl { margin-bottom: var(--space-2xl); }
+.mb-3xl { margin-bottom: var(--space-3xl); }
+.mb-4xl { margin-bottom: var(--space-4xl); }
+
+.mt-xs { margin-top: var(--space-xs); }
+.mt-sm { margin-top: var(--space-sm); }
+.mt-md { margin-top: var(--space-md); }
+.mt-lg { margin-top: var(--space-lg); }
+.mt-xl { margin-top: var(--space-xl); }
+.mt-2xl { margin-top: var(--space-2xl); }
+.mt-3xl { margin-top: var(--space-3xl); }
+.mt-4xl { margin-top: var(--space-4xl); }
+
+/* === Border Radius Utilities === */
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded { border-radius: var(--radius); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+.rounded-full { border-radius: var(--radius-full); }
+
+/* === Shadow Utilities === */
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow { box-shadow: var(--shadow); }
+.shadow-md { box-shadow: var(--shadow-md); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+.shadow-xl { box-shadow: var(--shadow-xl); }
+
+/* === Display Utilities === */
+.flex { display: flex; }
+.grid { display: grid; }
+.block { display: block; }
+.inline-block { display: inline-block; }
+.hidden { display: none; }
+
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-end { justify-content: flex-end; }
+
+.gap-xs { gap: var(--space-xs); }
+.gap-sm { gap: var(--space-sm); }
+.gap-md { gap: var(--space-md); }
+.gap-lg { gap: var(--space-lg); }
+.gap-xl { gap: var(--space-xl); }
+.gap-2xl { gap: var(--space-2xl); }
+
+/* === Accessibility === */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -100,6 +290,108 @@ body.with-header .container {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+}
+
+/* === Status Badges === */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid;
+}
+
+.status-pending {
+    color: var(--status-pending);
+    background-color: var(--status-pending-bg);
+    border-color: var(--status-pending);
+}
+
+.status-processing {
+    color: var(--status-processing);
+    background-color: var(--status-processing-bg);
+    border-color: var(--status-processing);
+}
+
+.status-completed {
+    color: var(--status-completed);
+    background-color: var(--status-completed-bg);
+    border-color: var(--status-completed);
+}
+
+.status-cancelled {
+    color: var(--status-cancelled);
+    background-color: var(--status-cancelled-bg);
+    border-color: var(--status-cancelled);
+}
+
+/* === Alert Components === */
+.alert {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-lg) var(--space-xl);
+    border-radius: var(--radius);
+    font-weight: var(--font-weight-semibold);
+    border: 1px solid;
+    margin-bottom: var(--space-xl);
+}
+
+.alert-success {
+    color: var(--alert-success);
+    background-color: var(--alert-success-bg);
+    border-color: var(--alert-success);
+}
+
+.alert-error {
+    color: var(--alert-error);
+    background-color: var(--alert-error-bg);
+    border-color: var(--alert-error);
+}
+
+.alert-warning {
+    color: var(--alert-warning);
+    background-color: var(--alert-warning-bg);
+    border-color: var(--alert-warning);
+}
+
+.alert-info {
+    color: var(--alert-info);
+    background-color: var(--alert-info-bg);
+    border-color: var(--alert-info);
+}
+
+/* === Card Component === */
+.card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 249, 0.9) 100%);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(126, 217, 87, 0.2);
+    box-shadow: var(--shadow);
+    transition: all var(--transition);
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.card-header {
+    padding: var(--space-2xl) var(--space-2xl) var(--space-lg);
+    border-bottom: 1px solid rgba(126, 217, 87, 0.2);
+}
+
+.card-body {
+    padding: var(--space-2xl);
+}
+
+.card-footer {
+    padding: var(--space-lg) var(--space-2xl) var(--space-2xl);
+    border-top: 1px solid rgba(126, 217, 87, 0.2);
 }
 
 /* Enhanced Media Queries */
