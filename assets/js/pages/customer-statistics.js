@@ -104,7 +104,7 @@ class CustomerStatistics {
                 formData.append('csrf_token', this.csrfToken);
             }
 
-            const response = await fetch('/MBS_B/statistics/get_customer_statistics.php', {
+            const response = await fetch('/MBS_B/statistics/get_customer_statistics_debug.php', {
                 method: 'POST',
                 body: formData
             });
@@ -333,7 +333,7 @@ class CustomerStatistics {
 
             if (data.success) {
                 this.renderCustomerDetailModal(data.data);
-                this.elements.detailModal.style.display = 'block';
+                this.elements.detailModal.classList.add('show');
                 this.elements.detailModal.setAttribute('aria-hidden', 'false');
             } else {
                 throw new Error(data.message || '顧客詳細の取得に失敗しました');
@@ -500,7 +500,7 @@ class CustomerStatistics {
      * モーダルを閉じる
      */
     closeModal() {
-        this.elements.detailModal.style.display = 'none';
+        this.elements.detailModal.classList.remove('show');
         this.elements.detailModal.setAttribute('aria-hidden', 'true');
     }
 
