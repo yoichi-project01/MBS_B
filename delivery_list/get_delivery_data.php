@@ -1,7 +1,15 @@
 <?php
 require_once '../component/db.php';
+require_once '../component/autoloader.php';
 
 header('Content-Type: application/json');
+
+// 認証チェック
+if (!SessionManager::isLoggedIn()) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Unauthorized']);
+    exit;
+}
 
 $order_id = $_GET['order_id'] ?? null;
 

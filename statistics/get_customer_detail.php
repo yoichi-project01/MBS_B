@@ -20,6 +20,13 @@ try {
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 
+    // 認証チェック
+    if (!SessionManager::isLoggedIn()) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Unauthorized']);
+        exit;
+    }
+
 // CSRFトークンの検証を一時的に無効化（デバッグ用）
 /*
 if (!CSRFProtection::validateToken()) {

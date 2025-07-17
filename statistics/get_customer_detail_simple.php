@@ -6,6 +6,13 @@ try {
     require_once(__DIR__ . '/../component/autoloader.php');
     require_once(__DIR__ . '/../component/db.php');
 
+    // 認証チェック
+    if (!SessionManager::isLoggedIn()) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Unauthorized']);
+        exit;
+    }
+
     $customerNo = $_POST['customer_no'] ?? $_GET['customer_no'] ?? '';
     $storeName = $_POST['store'] ?? $_GET['store'] ?? '';
 

@@ -1,6 +1,15 @@
 <?php
 // デバッグ用のシンプルなAPI
+require_once(__DIR__ . '/../component/autoloader.php');
+
 header('Content-Type: application/json');
+
+// 認証チェック
+if (!SessionManager::isLoggedIn()) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Unauthorized']);
+    exit;
+}
 
 // エラー表示を有効にしてデバッグ
 error_reporting(E_ALL);

@@ -20,19 +20,26 @@ try {
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 
-    // CSRFトークンの検証を一時的に無効化（デバッグ用）
-    /*
+    // CSRFトークンの検証
     if (!CSRFProtection::validateToken()) {
         http_response_code(403);
         echo json_encode(['error' => 'Invalid CSRF token']);
         exit;
     }
-    */
 
     $storeName = $_POST['store'] ?? $_GET['store'] ?? '';
     $searchTerm = $_POST['search'] ?? $_GET['search'] ?? '';
     $sortColumn = $_POST['sort'] ?? $_GET['sort'] ?? 'customer_name';
     $sortOrder = $_POST['order'] ?? $_GET['order'] ?? 'ASC';
+    
+    // ソートパラメータのバリデーション
+    $allowedSortColumns = ['customer_name', 'total_orders', 'total_sales', 'avg_order_amount', 'recent_sales'];
+    if (!in_array($sortColumn, $allowedSortColumns)) {
+        $sortColumn = 'customer_name';
+    }
+    if (!in_array(strtoupper($sortOrder), ['ASC', 'DESC'])) {
+        $sortOrder = 'ASC';
+    }
     $page = max(1, (int)($_POST['page'] ?? $_GET['page'] ?? 1));
     $limit = min(50, max(10, (int)($_POST['limit'] ?? $_GET['limit'] ?? 20)));
 

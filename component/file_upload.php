@@ -374,8 +374,8 @@ class FileUploadHandler
             throw new Exception('一時ファイルの作成に失敗しました。');
         }
 
-        // 権限設定（読み書き可能、実行不可）
-        chmod($tempFile, 0644);
+        // 権限設定（所有者のみ読み書き可能、他者・グループは一切アクセス不可）
+        chmod($tempFile, 0600);
 
         return $tempFile;
     }
