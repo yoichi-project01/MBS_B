@@ -46,7 +46,7 @@ body.delivery-page {
 }
 
 /* Unified search section */
-.delivery-search-section {
+.order-search-section {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
@@ -61,9 +61,26 @@ body.delivery-page {
 }
 
 .search-container {
+    position: relative;
+    flex: 1;
+    max-width: 400px;
+}
+
+.search-container form {
     display: flex;
+    gap: 12px;
     align-items: center;
-    gap: 10px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 16px 20px;
+    border: 2px solid rgba(126, 217, 87, 0.3);
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: var(--font-family);
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
 }
 
 .search-btn {
@@ -87,59 +104,57 @@ body.delivery-page {
     box-shadow: 0 4px 12px rgba(126, 217, 87, 0.3);
 }
 
-.delivery-header-info {
+.order-header-info {
     text-align: center;
 }
 
-.delivery-title {
-    font-size: 24px;
+.order-title {
+    font-size: 28px;
     font-weight: 700;
     color: var(--main-green);
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 12px;
 }
 
-.delivery-title i {
-    font-size: 20px;
+.order-title i {
+    font-size: 24px;
     color: var(--accent-green);
 }
 
-.delivery-subtitle {
+.order-subtitle {
     font-size: 14px;
     color: var(--sub-green);
     margin: 0;
     opacity: 0.8;
 }
 
-.delivery-actions {
+.order-actions {
     display: flex;
     justify-content: flex-end;
-    align-items: center;
 }
 
-.btn-create-delivery {
-    padding: 12px 24px;
-    background: linear-gradient(135deg, var(--accent-green) 0%, var(--main-green) 100%);
+.btn-create-order {
+    background: linear-gradient(135deg, var(--accent-green), var(--main-green));
     color: white;
-    text-decoration: none;
+    padding: 12px 20px;
     border-radius: 12px;
-    font-size: 14px;
+    border: none;
     font-weight: 600;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     gap: 8px;
-    border: none;
     cursor: pointer;
+    box-shadow: 0 4px 12px rgba(126, 217, 87, 0.3);
 }
 
-.btn-create-delivery:hover {
+.btn-create-order:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(126, 217, 87, 0.4);
-    background: linear-gradient(135deg, var(--main-green) 0%, var(--accent-green) 100%);
+    box-shadow: 0 8px 20px rgba(126, 217, 87, 0.4);
+    background: linear-gradient(135deg, var(--main-green), var(--accent-green));
 }
 
 /* Table container unified style */

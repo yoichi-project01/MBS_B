@@ -42,45 +42,87 @@
     z-index: 10;
 }
 
-.store-title {
-    font-weight: 800;
-    font-size: 20px;
-    color: #fff;
+/* Header Title */
+.header-title {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    max-width: calc(100% - 60px);
+    gap: 2px;
+}
+
+.title-main {
     display: flex;
     align-items: center;
-    gap: 10px;
-    letter-spacing: 0.5px;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    transition: all var(--transition);
-    white-space: nowrap;
-    margin-bottom: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex-shrink: 0;
+    gap: 8px;
     min-width: 0;
 }
 
-.page-icon {
-    font-size: 24px;
+.title-icon {
+    font-size: 22px;
+    flex-shrink: 0;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
     transition: transform 0.3s ease;
-    flex-shrink: 0;
 }
 
-.page-text {
-    transition: transform 0.3s ease;
-    min-width: 0;
+.title-text {
+    font-weight: 700;
+    font-size: 18px;
+    color: #fff;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 1.2;
 }
 
-.store-title:hover .page-icon {
-    transform: scale(1.1);
+.title-sub {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 30px;
+    min-width: 0;
 }
 
-.store-title:hover .page-text {
-    transform: translateX(2px);
-    text-shadow: 0 4px 12px rgba(126, 217, 87, 0.3);
+.store-indicator {
+    font-size: 8px;
+    color: var(--accent-green);
+    flex-shrink: 0;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
+}
+
+.store-text {
+    font-weight: 500;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.85);
+    letter-spacing: 0.3px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1;
+}
+
+/* Hover effects */
+.header-title:hover .title-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.header-title:hover .title-text {
+    text-shadow: 0 3px 12px rgba(126, 217, 87, 0.4);
+}
+
+.header-title:hover .store-indicator {
+    color: #fff;
+    transform: scale(1.2);
+}
+
+.header-title:hover .store-text {
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 2px 6px rgba(126, 217, 87, 0.3);
 }
 
 /* Navigation - Desktop */
@@ -272,14 +314,15 @@ body.with-header .back-button-top {
 
 /* Statistics Page Special Layout */
 .statistics-page .site-header {
-    position: relative;
-    z-index: 100;
+    position: fixed;
+    z-index: 1000;
 }
 
 .statistics-page .dashboard-container {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    margin-top: var(--header-height);
 }
 
 .statistics-page .top-nav {
@@ -369,13 +412,36 @@ body.with-header .back-button-top {
         padding: 0 16px;
     }
 
-    .store-title {
-        font-size: 18px;
-        gap: 8px;
+    /* Mobile Header Title */
+    .header-title {
+        max-width: calc(100% - 50px);
+        gap: 1px;
     }
 
-    .page-icon {
-        font-size: 20px;
+    .title-main {
+        gap: 6px;
+    }
+
+    .title-icon {
+        font-size: 18px;
+    }
+
+    .title-text {
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .title-sub {
+        margin-left: 24px;
+        gap: 4px;
+    }
+
+    .store-indicator {
+        font-size: 7px;
+    }
+
+    .store-text {
+        font-size: 11px;
     }
 
     .nav {
@@ -461,6 +527,40 @@ body.with-header .back-button-top {
     }
 }
 
+/* Extra small screens */
+@media (max-width: 480px) {
+    .header-title {
+        max-width: calc(100% - 45px);
+        gap: 0;
+    }
+
+    .title-main {
+        gap: 4px;
+    }
+
+    .title-icon {
+        font-size: 16px;
+    }
+
+    .title-text {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .title-sub {
+        margin-left: 20px;
+        gap: 3px;
+    }
+
+    .store-indicator {
+        font-size: 6px;
+    }
+
+    .store-text {
+        font-size: 10px;
+    }
+}
+
 /* Special adjustments for different page types */
 .menu-page .back-button-top {
     position: absolute;
@@ -476,5 +576,5 @@ body.statistics-page.with-header {
 }
 
 body.statistics-page.with-header .dashboard-container {
-    margin-top: var(--header-height);
+    margin-top: 0;
 }

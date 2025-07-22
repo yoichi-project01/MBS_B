@@ -84,9 +84,17 @@ if ($storeName && $pageConfig['name'] !== 'menu') {
     <?php if ($pageConfig['showNav']): ?>
     <header class="site-header">
         <div class="header-inner">
-            <div class="store-title">
-                <span class="page-icon"><?= $pageConfig['icon'] ?></span>
-                <span class="page-text"><?= htmlspecialchars($displayTitle) ?></span>
+            <div class="header-title">
+                <div class="title-main">
+                    <span class="title-icon"><?= $pageConfig['icon'] ?></span>
+                    <span class="title-text"><?= htmlspecialchars($pageConfig['title']) ?></span>
+                </div>
+                <?php if ($storeName): ?>
+                <div class="title-sub">
+                    <span class="store-indicator">●</span>
+                    <span class="store-text"><?= htmlspecialchars($storeName) ?></span>
+                </div>
+                <?php endif; ?>
             </div>
 
             <nav class="nav" id="nav">

@@ -1,6 +1,9 @@
 <?php
 require_once(__DIR__ . '/../component/autoloader.php');
 require_once(__DIR__ . '/../component/db.php');
+require_once(__DIR__ . '/../component/search_section.php');
+require_once(__DIR__ . '/../component/data_table.php');
+require_once(__DIR__ . '/../component/pagination.php');
 include(__DIR__ . '/../component/header.php');
 
 SessionManager::start();
@@ -122,77 +125,48 @@ function translate_status($status) {
             <div class="content-scroll-area">
                 <div class="order-list-container">
 
-                    <!-- 検索・フィルタリング -->
-                    <div class="order-search-section">
-                        <div class="search-container">
-                            <form action="" method="GET">
-                                <input type="hidden" name="store" value="<?= htmlspecialchars($storeName) ?>">
-                                <input type="text" name="search_customer" class="search-input" placeholder="顧客名で検索..." value="<?= htmlspecialchars($search_customer) ?>">
-                                <button type="submit" class="search-btn">
-                                    <i class="fas fa-search"></i> 検索
-                                </button>
-                            </form>
-                        </div>
-                        <div class="order-header-info">
-                            <h2 class="order-title">
-                                <i class="fas fa-file-alt"></i> 注文書一覧
-                            </h2>
-                            <p class="order-subtitle"><?php echo htmlspecialchars($storeName); ?> - 全 <?php echo $total_orders; ?> 件の注文</p>
-                        </div>
-                        <div class="order-actions">
-                            <a href="create.php?store=<?= htmlspecialchars($storeName) ?>" class="btn-create-order">
-                                <i class="fas fa-plus"></i> 新規注文書作成
-                            </a>
-                        </div>
-                    </div>
+                    <?php
+                    // 検索セクションの設定
+                    renderSearchSection([
+                        'storeName' => $storeName,
+                        'pageType' => 'order',
+                        'icon' => 'fas fa-file-alt',
+                        'title' => '注文書一覧',
+                        'totalCount' => $total_orders,
+                        'itemName' => '注文',
+                        'searchValue' => $search_customer,
+                        'createUrl' => "create.php?store=" . urlencode($storeName),
+                        'createButtonText' => '新規注文書作成'
+                    ]);
+                    ?>
 
-                    <!-- 注文一覧テーブル -->
-                    <div class="table-view-container">
-                        <table class="data-table">
-                <thead>
-                    <tr>
-                        <th><a href="?store=<?= $storeName ?>&sort=order_no&order=<?= $sort_column == 'order_no' && $sort_order == 'ASC' ? 'DESC' : 'ASC' ?>">注文番号</a></th>
-                        <th><a href="?store=<?= $storeName ?>&sort=customer_name&order=<?= $sort_column == 'customer_name' && $sort_order == 'ASC' ? 'DESC' : 'ASC' ?>">顧客名</a></th>
-                        <th><a href="?store=<?= $storeName ?>&sort=registration_date&order=<?= $sort_column == 'registration_date' && $sort_order == 'ASC' ? 'DESC' : 'ASC' ?>">注文日</a></th>
-                        <th><a href="?store=<?= $storeName ?>&sort=total_amount&order=<?= $sort_column == 'total_amount' && $sort_order == 'ASC' ? 'DESC' : 'ASC' ?>">合計金額</a></th>
-                        <th><a href="?store=<?= $storeName ?>&sort=status&order=<?= $sort_column == 'status' && $sort_order == 'ASC' ? 'DESC' : 'ASC' ?>">ステータス</a></th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (empty($orders)): ?>
-                        <tr>
-                            <td colspan="6" class="text-center">該当する注文はありません。</td>
-                        </tr>
-                    <?php else: ?>
-                        <?php foreach ($orders as $order): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($order['order_no']) ?></td>
-                                <td><span class="customer-name-clickable" data-customer-name="<?= htmlspecialchars($order['customer_name']) ?>"><?= htmlspecialchars($order['customer_name']) ?></span></td>
-                                <td><?= htmlspecialchars($order['registration_date']) ?></td>
-                                <td>¥<?= number_format($order['total_amount']) ?></td>
-                                <td><span class="status-<?= htmlspecialchars($order['status']) ?>"><?= translate_status($order['status']) ?></span></td>
-                                <td>
-                                    <a href="detail.php?order_no=<?= htmlspecialchars($order['order_no']) ?>&store=<?= htmlspecialchars($storeName) ?>" class="btn-detail">詳細</a>
-                                    <a href="../delivery_list/index.php?order_id=<?= htmlspecialchars($order['order_no']) ?>" class="btn-delivery" target="_blank">納品書</a>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-                        </table>
-                    </div>
+                    <?php
+                    // テーブルの設定
+                    renderDataTable([
+                        'storeName' => $storeName,
+                        'pageType' => 'order',
+                        'columns' => getOrderColumns(),
+                        'data' => $orders,
+                        'sortParams' => [
+                            'column' => $sort_column,
+                            'order' => $sort_order,
+                            'search' => $search_customer
+                        ],
+                        'emptyMessage' => '該当する注文はありません。'
+                    ]);
+                    ?>
 
-                    <!-- ページネーション -->
-                    <div class="pagination">
-            <?php if ($page > 1): ?>
-                <a href="?store=<?= $storeName ?>&page=<?= $page - 1 ?>&search_customer=<?= $search_customer ?>&sort=<?= $sort_column ?>&order=<?= $sort_order ?>">前へ</a>
-            <?php endif; ?>
-            <span>ページ <?= $page ?> / <?= $total_pages ?></span>
-            <?php if ($page < $total_pages): ?>
-                <a href="?store=<?= $storeName ?>&page=<?= $page + 1 ?>&search_customer=<?= $search_customer ?>&sort=<?= $sort_column ?>&order=<?= $sort_order ?>">次へ</a>
-            <?php endif; ?>
-                    </div>
+                    <?php
+                    // ページネーションの設定
+                    renderPagination([
+                        'storeName' => $storeName,
+                        'currentPage' => $page,
+                        'totalPages' => $total_pages,
+                        'searchValue' => $search_customer,
+                        'sortColumn' => $sort_column,
+                        'sortOrder' => $sort_order
+                    ]);
+                    ?>
                 </div>
             </div>
         </div>
