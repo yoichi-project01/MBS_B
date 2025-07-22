@@ -137,7 +137,7 @@ if ($storeName && $pageConfig['name'] !== 'menu') {
                 <?php endif; ?>
 
                 <script src="/MBS_B/assets/js/main.js" type="module"></script>
-                <script>
+                <script nonce="<?= SessionManager::get('csp_nonce') ?>">
                 // Set store name and page info for header manager
                 document.addEventListener('DOMContentLoaded', function() {
                     if (window.HeaderManager) {

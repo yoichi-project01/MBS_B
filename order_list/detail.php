@@ -13,6 +13,7 @@ if (empty($order_no)) {
 }
 
 try {
+    $pdo = db_connect();
     // 注文情報と顧客情報を取得
     $sql = "
         SELECT 
@@ -175,7 +176,7 @@ $status_info = translate_status_detail($order['status']);
     <!-- JavaScript Files -->
     <script src="/MBS_B/assets/js/main.js" type="module"></script>
     
-    <script>
+    <script nonce="<?= SessionManager::get('csp_nonce') ?>">
     // 注文詳細ページ固有の初期化
     document.addEventListener('DOMContentLoaded', function() {
         // パフォーマンス測定

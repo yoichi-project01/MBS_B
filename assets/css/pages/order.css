@@ -483,6 +483,177 @@ body.order-list-page {
     text-align: center;
 }
 
+/* 顧客名クリック機能のスタイル */
+.customer-name-clickable {
+    cursor: pointer;
+    color: var(--main-green);
+    font-weight: 600;
+    transition: all var(--transition);
+    border-bottom: 1px dotted var(--main-green);
+}
+
+.customer-name-clickable:hover {
+    color: var(--accent-green);
+    border-bottom-color: var(--accent-green);
+    transform: translateY(-1px);
+}
+
+/* 詳細表示用のモーダル */
+.order-details-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: var(--z-index-modal);
+    backdrop-filter: blur(5px);
+}
+
+.order-details-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.order-details-content {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 249, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3xl);
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-xl);
+    border: 2px solid rgba(126, 217, 87, 0.3);
+    position: relative;
+}
+
+.order-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-lg);
+    border-bottom: 2px solid rgba(126, 217, 87, 0.2);
+}
+
+.order-details-header h3 {
+    color: var(--main-green);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    margin: 0;
+}
+
+.close-details {
+    background: none;
+    border: none;
+    font-size: var(--font-size-2xl);
+    cursor: pointer;
+    color: var(--sub-green);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+}
+
+.close-details:hover {
+    background: rgba(126, 217, 87, 0.1);
+    color: var(--main-green);
+    transform: scale(1.1);
+}
+
+.order-details-body {
+    color: var(--font-color);
+}
+
+.loading-state, .error-state {
+    text-align: center;
+    padding: var(--space-3xl);
+    color: var(--sub-green);
+}
+
+.error-message {
+    font-size: var(--font-size-sm);
+    color: var(--alert-error);
+    margin: var(--space-md) 0;
+}
+
+.order-summary {
+    margin-top: var(--space-lg);
+}
+
+.order-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.info-item label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--sub-green);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-item span {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--main-green);
+    padding: var(--space-sm) var(--space-md);
+    background: rgba(126, 217, 87, 0.1);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(126, 217, 87, 0.2);
+}
+
+.order-basic-info {
+    margin-top: var(--space-xl);
+    padding: var(--space-lg);
+    background: rgba(248, 250, 249, 0.5);
+    border-radius: var(--radius);
+    border: 1px solid rgba(126, 217, 87, 0.2);
+}
+
+.order-basic-info h4 {
+    color: var(--main-green);
+    margin-bottom: var(--space-md);
+    font-size: var(--font-size-lg);
+}
+
+.order-basic-info p {
+    margin: var(--space-sm) 0;
+    color: var(--font-color);
+}
+
+.order-actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid rgba(126, 217, 87, 0.2);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
     .content-scroll-area {
@@ -566,20 +737,90 @@ body.order-list-page {
     }
 
     .data-table td:before {
-        content: attr(data-label);
+        content: attr(data-label) ": ";
         font-weight: 600;
         color: var(--sub-green);
         font-size: 13px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        margin-right: 10px;
+        display: inline-block;
+        min-width: 80px;
     }
 
-    .data-table td:nth-of-type(1):before { content: "注文番号"; }
-    .data-table td:nth-of-type(2):before { content: "顧客名"; }
-    .data-table td:nth-of-type(3):before { content: "注文日"; }
-    .data-table td:nth-of-type(4):before { content: "合計金額"; }
-    .data-table td:nth-of-type(5):before { content: "ステータス"; }
-    .data-table td:nth-of-type(6):before { content: "操作"; }
+    /* 注文書のモバイル表示：顧客名のみ表示 */
+    body.order-list-page .data-table.mobile-customer-only thead {
+        display: none !important;
+    }
+
+    body.order-list-page .data-table.mobile-customer-only,
+    body.order-list-page .data-table.mobile-customer-only tbody,
+    body.order-list-page .data-table.mobile-customer-only tr {
+        display: block !important;
+        width: 100% !important;
+    }
+
+    body.order-list-page .data-table.mobile-customer-only tr {
+        border: 1px solid rgba(126, 217, 87, 0.2) !important;
+        margin: 0 auto 10px auto !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        background: rgba(255, 255, 255, 0.9) !important;
+        box-shadow: var(--shadow-sm) !important;
+        text-align: center !important;
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    body.order-list-page .data-table.mobile-customer-only td {
+        display: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* 顧客名のみ表示 */
+    body.order-list-page .data-table.mobile-customer-only td:nth-of-type(2) {
+        display: flex !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        color: var(--main-green) !important;
+        text-align: center !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+
+    body.order-list-page .data-table.mobile-customer-only td:nth-of-type(2):before {
+        display: none !important;
+        content: none !important;
+    }
+
+    body.order-list-page .data-table.mobile-customer-only .customer-name-clickable {
+        display: block !important;
+        padding: 20px !important;
+        border-radius: 8px !important;
+        background: linear-gradient(135deg, rgba(126, 217, 87, 0.1) 0%, rgba(248, 250, 249, 0.5) 100%) !important;
+        border: 1px dotted var(--accent-green) !important;
+        transition: all var(--transition) !important;
+        text-align: center !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+        text-decoration: none !important;
+        position: relative !important;
+        left: 0 !important;
+        right: 0 !important;
+    }
+
+    body.order-list-page .data-table.mobile-customer-only .customer-name-clickable:hover {
+        background: linear-gradient(135deg, rgba(126, 217, 87, 0.2) 0%, rgba(248, 250, 249, 0.7) 100%) !important;
+        transform: scale(1.02) !important;
+    }
 
     .btn-detail, .btn-delivery {
         margin: 2px;

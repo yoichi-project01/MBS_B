@@ -278,7 +278,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- JavaScript Files -->
     <script src="/MBS_B/assets/js/main.js" type="module"></script>
     
-    <script>
+    <script nonce="<?= SessionManager::get('csp_nonce') ?>">
     let itemCounter = 1;
     
     // 注文作成ページ固有の初期化

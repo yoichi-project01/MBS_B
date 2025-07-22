@@ -1,7 +1,12 @@
 <?php
+require_once(__DIR__ . '/component/autoloader.php');
+SessionManager::start();
+
 $storeName = $_GET['store'] ?? $_COOKIE['selectedStore'] ?? '';
 if ($storeName) {
     setcookie('selectedStore', $storeName, time() + 3600, '/');
+    SessionManager::set('store_name', $storeName);
+    SessionManager::regenerateId();
 }
 ?>
 <!DOCTYPE html>

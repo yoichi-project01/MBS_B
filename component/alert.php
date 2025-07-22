@@ -10,12 +10,13 @@ class AlertComponent
      */
     public static function renderUploadAlert($result)
     {
-        if (!$result['status']) {
+        if (!isset($result['status']) || !$result['status']) {
             return '';
         }
 
-        $script = '<script>
-        document.addEventListener("DOMContentLoaded", function() {';
+        $nonce = SessionManager::get('csp_nonce');
+        $script = '<script nonce="' . $nonce . '">' .
+        'document.addEventListener("DOMContentLoaded", function() {';
 
         if ($result['status'] === 'success') {
             $script .= self::renderSuccessAlert($result);
@@ -110,12 +111,13 @@ class AlertComponent
 
         $options = array_merge($defaultOptions, $options);
 
-        $script = '<script>
-        document.addEventListener("DOMContentLoaded", function() {
-            Swal.fire({
-                icon: "' . $type . '",
-                title: "' . addslashes($title) . '",
-                text: "' . addslashes($message) . '",';
+        $nonce = SessionManager::get('csp_nonce');
+        $script = '<script nonce="' . $nonce . '">' .
+        'document.addEventListener("DOMContentLoaded", function() {' .
+            'Swal.fire({' .
+                'icon: "' . $type . '",' .
+                'title: "' . addslashes($title) . '",' .
+                'text: "' . addslashes($message) . '",';
 
         foreach ($options as $key => $value) {
             if (is_string($value)) {
@@ -147,11 +149,12 @@ class AlertComponent
 
         $options = array_merge($defaultOptions, $options);
 
-        $script = '<script>
-        document.addEventListener("DOMContentLoaded", function() {
-            Swal.fire({
-                title: "' . addslashes($title) . '",
-                text: "' . addslashes($text) . '",';
+        $nonce = SessionManager::get('csp_nonce');
+        $script = '<script nonce="' . $nonce . '">' .
+        'document.addEventListener("DOMContentLoaded", function() {' .
+            'Swal.fire({' .
+                'title: "' . addslashes($title) . '",' .
+                'text: "' . addslashes($text) . '",';
 
         foreach ($options as $key => $value) {
             if (is_string($value)) {

@@ -73,12 +73,13 @@ include(__DIR__ . '/../component/header.php');
 
 
     <!-- JavaScript Data -->
-    <script>
+    <script nonce="<?= SessionManager::get('csp_nonce') ?>">
     // グローバルデータの設定
     window.statisticsData = {
         storeName: <?php echo json_encode($storeName); ?>,
         csrfToken: <?php echo json_encode($csrfToken); ?>,
-        debugMode: <?php echo json_encode($debugMode); ?>
+        debugMode: <?php echo json_encode($debugMode); ?>,
+        cspNonce: <?php echo json_encode(SessionManager::get('csp_nonce')); ?>
     };
 
     // エラーハンドリング
@@ -111,7 +112,7 @@ include(__DIR__ . '/../component/header.php');
 
     <!-- 分析・トラッキング（本番環境のみ） -->
     <?php if (($_ENV['ENVIRONMENT'] ?? 'development') === 'production'): ?>
-    <script>
+    <script nonce="<?= SessionManager::get('csp_nonce') ?>">
     // Google Analytics や他の分析ツールをここに追加
     // ユーザーのプライバシーを尊重し、必要最小限のデータのみ収集
     </script>

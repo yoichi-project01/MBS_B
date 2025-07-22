@@ -146,6 +146,6 @@ class SessionManager
     public static function isLoggedIn()
     {
         self::start();
-        return isset($_SESSION['user_id']) || isset($_SESSION['store_name']);
+        return isset($_SESSION['user_id']);
     }
 }

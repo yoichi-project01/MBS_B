@@ -5,11 +5,13 @@
 
 import { HeaderManager } from './components/header.js';
 import { initializeModalTriggers } from './components/modal.js';
+import { initializeCustomerNameClick } from './components/customer-details.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize common components
     new HeaderManager();
     initializeModalTriggers();
+    initializeCustomerNameClick();
 
     // Page-specific logic loader
     const path = window.location.pathname;

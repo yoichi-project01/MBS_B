@@ -181,6 +181,7 @@ try {
         'error_rows' => $errorRows
     ]);
 } catch (Exception $e) {
+    $pdo = db_connect();
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }

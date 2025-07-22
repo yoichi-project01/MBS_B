@@ -11,9 +11,16 @@ function renderDataTable($config) {
     $data = $config['data']; // 表示データ
     $sortParams = $config['sortParams'] ?? [];
     $emptyMessage = $config['emptyMessage'] ?? '該当するデータはありません。';
+    $mobileMode = $config['mobileMode'] ?? 'full'; // 'full' or 'customer-only'
+    
+    // モバイル用の特別なCSSクラスを追加
+    $tableClass = 'data-table';
+    if ($pageType === 'order' && $mobileMode === 'customer-only') {
+        $tableClass .= ' mobile-customer-only';
+    }
     
     echo '<div class="table-view-container">
-        <table class="data-table">
+        <table class="' . $tableClass . '">
             <thead>
                 <tr>';
     
@@ -50,14 +57,19 @@ function renderDataTable($config) {
             echo '<tr>';
             foreach ($columns as $column) {
                 $key = $column['key'];
-                $value = isset($row[$key]) ? $row[$key] : '';
+                $value = isset($row[$key]) ? $row[$key] : null;
                 
                 // カスタムレンダラーがある場合
                 if (isset($column['renderer']) && is_callable($column['renderer'])) {
                     $value = call_user_func($column['renderer'], $value, $row, $storeName);
+                } else {
+                    // レンダラーがない場合のデフォルト処理
+                    $value = $value !== null ? htmlspecialchars($value) : '';
                 }
                 
-                echo '<td>' . $value . '</td>';
+                // モバイル用のdata-label属性を追加
+                $dataLabel = isset($column['label']) ? $column['label'] : '';
+                echo '<td data-label="' . htmlspecialchars($dataLabel) . '">' . $value . '</td>';
             }
             echo '</tr>';
         }
@@ -83,7 +95,9 @@ function getOrderColumns() {
             'label' => '顧客名',
             'sortable' => true,
             'renderer' => function($value, $row, $storeName) {
-                return '<span class="customer-name-clickable" data-customer-name="' . htmlspecialchars($value) . '">' . htmlspecialchars($value) . '</span>';
+                $customerName = htmlspecialchars($value);
+                $orderNo = htmlspecialchars($row['order_no']);
+                return '<span class="customer-name-clickable" data-customer="' . $customerName . '" data-order="' . $orderNo . '" data-store="' . htmlspecialchars($storeName) . '">' . $customerName . '</span>';
             }
         ],
         [
@@ -96,7 +110,8 @@ function getOrderColumns() {
             'label' => '合計金額',
             'sortable' => true,
             'renderer' => function($value, $row, $storeName) {
-                return '¥' . number_format($value);
+                $amount = is_numeric($value) ? floatval($value) : 0;
+                return '¥' . number_format($amount);
             }
         ],
         [
@@ -139,7 +154,7 @@ function getDeliveryColumns() {
             'label' => '顧客名',
             'sortable' => true,
             'renderer' => function($value, $row, $storeName) {
-                return '<span class="customer-name-clickable" data-customer-name="' . htmlspecialchars($value) . '">' . htmlspecialchars($value) . '</span>';
+                return htmlspecialchars($value);
             }
         ],
         [
@@ -190,13 +205,15 @@ function getDeliveryColumns() {
 /**
  * ステータス翻訳関数（注文書用）
  */
-function translate_status($status) {
-    switch ($status) {
-        case 'pending': return '保留中';
-        case 'processing': return '処理中';
-        case 'completed': return '完了';
-        case 'cancelled': return 'キャンセル';
-        default: return $status;
+if (!function_exists('translate_status')) {
+    function translate_status($status) {
+        switch ($status) {
+            case 'pending': return '保留中';
+            case 'processing': return '処理中';
+            case 'completed': return '完了';
+            case 'cancelled': return 'キャンセル';
+            default: return $status;
+        }
     }
 }
 ?>

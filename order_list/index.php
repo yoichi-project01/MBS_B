@@ -1,12 +1,18 @@
 <?php
-require_once(__DIR__ . '/../component/autoloader.php');
-require_once(__DIR__ . '/../component/db.php');
-require_once(__DIR__ . '/../component/search_section.php');
-require_once(__DIR__ . '/../component/data_table.php');
-require_once(__DIR__ . '/../component/pagination.php');
-include(__DIR__ . '/../component/header.php');
 
-SessionManager::start();
+
+try {
+    require_once(__DIR__ . '/../component/autoloader.php');
+    require_once(__DIR__ . '/../component/db.php');
+    require_once(__DIR__ . '/../component/search_section.php');
+    require_once(__DIR__ . '/../component/data_table.php');
+    require_once(__DIR__ . '/../component/pagination.php');
+    include(__DIR__ . '/../component/header.php');
+
+    SessionManager::start();
+} catch (Exception $e) {
+    die('初期化エラー: ' . $e->getMessage());
+}
 
 $storeName = $_GET['store'] ?? $_COOKIE['selectedStore'] ?? '';
 
@@ -33,6 +39,7 @@ if (!in_array(strtoupper($sort_order), ['ASC', 'DESC'])) {
 }
 
 try {
+    $pdo = db_connect();
     // 基本クエリ
     $sql = "
         SELECT 
@@ -83,19 +90,14 @@ try {
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
-    die("データベースエラー: " . $e->getMessage());
+    error_log("データベースエラー: " . $e->getMessage());
+    // エラーの場合は空配列を設定
+    $orders = [];
+    $total_orders = 0;
+    $total_pages = 1;
 }
 
-// ステータスの日本語変換
-function translate_status($status) {
-    switch ($status) {
-        case 'pending': return '保留';
-        case 'processing': return '処理中';
-        case 'completed': return '完了';
-        case 'cancelled': return 'キャンセル';
-        default: return $status;
-    }
-}
+// translate_status関数はdata_table.phpに移動しました
 ?>
 
 <!DOCTYPE html>
@@ -152,7 +154,8 @@ function translate_status($status) {
                             'order' => $sort_order,
                             'search' => $search_customer
                         ],
-                        'emptyMessage' => '該当する注文はありません。'
+                        'emptyMessage' => '該当する注文はありません。',
+                        'mobileMode' => 'customer-only'
                     ]);
                     ?>
 
@@ -189,16 +192,18 @@ function translate_status($status) {
     <script src="/MBS_B/assets/js/main.js" type="module"></script>
     <script src="/MBS_B/assets/js/components/modal.js"></script>
     
-    <script>
+    <script nonce="<?= SessionManager::get('csp_nonce') ?>">
     // 注文ページ固有の初期化
     document.addEventListener('DOMContentLoaded', function() {
-        // 顧客名クリックイベント
+        // 顧客名クリックイベントを無効化
+        /*
         document.querySelectorAll('.customer-name-clickable').forEach(element => {
             element.addEventListener('click', function() {
                 const customerName = this.dataset.customerName;
                 loadCustomerOrders(customerName);
             });
         });
+        */
         
         // パフォーマンス測定
         if (window.performance && window.performance.mark) {
@@ -206,40 +211,7 @@ function translate_status($status) {
         }
     });
     
-    // 顧客注文詳細をロードする関数
-    function loadCustomerOrders(customerName) {
-        const modal = document.getElementById('customerOrdersModal');
-        const title = document.getElementById('customerOrdersTitle');
-        const content = document.getElementById('customerOrdersContent');
-        
-        title.textContent = customerName + ' の注文履歴';
-        content.innerHTML = '<div class="loading-placeholder"><div class="loading-spinner"></div><span>読み込み中...</span></div>';
-        
-        modal.style.display = 'block';
-        
-        // Ajax呼び出し（実装に応じて調整）
-        fetch(`get_customer_orders.php?customer_name=${encodeURIComponent(customerName)}&store=<?= htmlspecialchars($storeName) ?>`)
-            .then(response => response.text())
-            .then(data => {
-                content.innerHTML = data;
-            })
-            .catch(error => {
-                content.innerHTML = '<p class="error">データの読み込みに失敗しました。</p>';
-                console.error('Error:', error);
-            });
-    }
     
-    // モーダルを閉じる関数
-    function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-    }
-    
-    // モーダル外クリックで閉じる
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('modal')) {
-            e.target.style.display = 'none';
-        }
-    });
     </script>
 </body>
 </html>

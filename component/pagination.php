@@ -44,11 +44,11 @@ function buildPaginationUrl($storeName, $page, $searchValue = "", $sortColumn = 
     $params["store"] = $storeName;
     $params["page"] = $page;
     
-    if (\!empty($searchValue)) {
+    if (!empty($searchValue)) {
         $params["search_customer"] = $searchValue;
     }
     
-    if (\!empty($sortColumn)) {
+    if (!empty($sortColumn)) {
         $params["sort"] = $sortColumn;
         $params["order"] = $sortOrder;
     }

@@ -10,18 +10,7 @@ class CSRFProtection
      */
     public static function getToken()
     {
-        // セッションが開始されていない場合のみ開始
-        if (session_status() === PHP_SESSION_NONE) {
-            // ヘッダーが送信されていないことを確認
-            if (!headers_sent()) {
-                session_start();
-            } else {
-                // エラーログに記録
-                error_log('CSRF: Cannot start session - headers already sent');
-                return null;
-            }
-        }
-
+        // SessionManagerがセッションを管理
         if (empty($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
@@ -34,15 +23,7 @@ class CSRFProtection
      */
     public static function validateToken($token)
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            if (!headers_sent()) {
-                session_start();
-            } else {
-                error_log('CSRF: Cannot start session for validation - headers already sent');
-                return false;
-            }
-        }
-
+        // SessionManagerがセッションを管理
         if (!isset($_SESSION['csrf_token']) || empty($token)) {
             return false;
         }

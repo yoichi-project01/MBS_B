@@ -83,8 +83,13 @@ function setSecurityHeaders()
         header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
     }
 
-    // コンテンツセキュリティポリシー（基本設定）
-    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data:; font-src 'self' https://cdnjs.cloudflare.com;");
+    // CSP nonceの生成
+    $nonce = bin2hex(random_bytes(16));
+    SessionManager::set('csp_nonce', $nonce);
+
+    // コンテンツセキュリティポリシー（nonce対応）
+    $csp = "default-src 'self'; script-src 'self' 'nonce-{$nonce}' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'nonce-{$nonce}' https://cdnjs.cloudflare.com; img-src 'self' data:; font-src 'self' https://cdnjs.cloudflare.com;";
+    header("Content-Security-Policy: " . $csp);
 }
 
 // 環境設定とセキュリティヘッダーの初期化
