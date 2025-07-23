@@ -575,6 +575,24 @@
     }
 }
 
+/* === Mobile Customer Only Mode === */
+@media (max-width: 768px) {
+    .data-table.mobile-customer-only th:not(:nth-child(2)),
+    .data-table.mobile-customer-only td:not(:nth-child(2)) {
+        display: none;
+    }
+    
+    .data-table.mobile-customer-only th:nth-child(2),
+    .data-table.mobile-customer-only td:nth-child(2) {
+        width: 100%;
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+    }
+}
+
 /* === Print Styles === */
 @media print {
     .table-container,

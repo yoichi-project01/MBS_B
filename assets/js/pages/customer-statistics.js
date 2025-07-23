@@ -104,7 +104,7 @@ class CustomerStatistics {
                 formData.append('csrf_token', this.csrfToken);
             }
 
-            const response = await fetch('/MBS_B/statistics/get_customer_statistics_debug.php', {
+            const response = await fetch('/MBS_B/statistics/get_customer_statistics.php', {
                 method: 'POST',
                 body: formData
             });

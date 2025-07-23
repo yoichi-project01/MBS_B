@@ -689,20 +689,57 @@ body.statistics-page {
     background: linear-gradient(135deg, var(--main-green), var(--accent-green));
 }
 
-/* レスポンシブデザイン */
+/* レスポンシブデザイン - スマホ最適化 */
 @media (max-width: 768px) {
     .content-scroll-area {
-        padding: 20px 15px;
+        padding: 10px 8px;
     }
 
+    /* サマリーカードをスマホ向けに最適化 */
+    .summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 15px;
+    }
+
+    .summary-card {
+        padding: 16px;
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
+
+    .summary-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+        margin: 0 auto;
+    }
+
+    .summary-value {
+        font-size: 20px;
+    }
+
+    .summary-content h3 {
+        font-size: 11px;
+        margin-bottom: 4px;
+    }
+
+    /* 検索セクションをスマホ向けに最適化 */
     .customer-search-section {
         flex-direction: column;
         align-items: stretch;
-        padding: 20px;
+        padding: 15px;
+        gap: 15px;
     }
 
     .search-container {
         max-width: none;
+    }
+
+    .search-input {
+        padding: 14px 45px 14px 16px;
+        font-size: 16px; /* ズーム防止 */
     }
 
     .view-toggle {
@@ -710,40 +747,117 @@ body.statistics-page {
         justify-content: center;
     }
 
-    .card-view-container {
-        grid-template-columns: 1fr;
+    .view-btn {
+        padding: 12px 16px;
+        font-size: 13px;
     }
 
+    /* カード表示をスマホ向けに最適化 */
+    .card-view-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .customer-card {
+        padding: 20px;
+        border-radius: 15px;
+    }
+
+    .customer-card .customer-name {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+
+    .card-main-info {
+        margin-bottom: 20px;
+    }
+
+    .card-stats {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .stat {
+        padding: 12px 8px;
+    }
+
+    .stat-value {
+        font-size: 16px;
+    }
+
+    .stat-label {
+        font-size: 10px;
+    }
+
+    .card-actions {
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .card-btn {
+        padding: 12px 16px;
+        font-size: 13px;
+    }
+
+    /* ヘッダーをスマホ向けに最適化 */
     .all-customers-header {
         flex-direction: column;
         align-items: stretch;
-        padding: 20px;
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .all-customers-header h3 {
+        font-size: 20px;
+        text-align: center;
     }
 
     .controls-section {
         flex-direction: column;
         align-items: stretch;
+        gap: 12px;
     }
 
     .sort-controls {
-        justify-content: flex-start;
+        justify-content: center;
+        flex-wrap: wrap;
     }
 
+    .sort-select {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    /* モーダルをスマホ向けに最適化 */
     .modal-content {
-        margin: 20px;
+        margin: 10px;
         padding: 20px;
+        width: calc(100% - 20px);
+        max-height: 95vh;
+        border-radius: 15px;
     }
 
+    .modal-header {
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+    }
+
+    .modal-header h2 {
+        font-size: 20px;
+    }
+
+    /* テーブル表示をスマホ向けに最適化 */
     .data-table {
         font-size: 14px;
     }
 
     .data-table th,
     .data-table td {
-        padding: 12px 15px;
+        padding: 10px 12px;
     }
 
-    /* モバイル用テーブル表示 */
+    /* モバイル用テーブル表示 - カード形式 */
     .data-table thead {
         display: none;
     }
@@ -757,35 +871,41 @@ body.statistics-page {
 
     .data-table tr {
         border: 1px solid rgba(126, 217, 87, 0.2);
-        margin-bottom: 15px;
+        margin-bottom: 12px;
         border-radius: 12px;
         overflow: hidden;
         padding: 15px;
-        background: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 12px rgba(47, 93, 63, 0.08);
     }
 
     .data-table td {
         border: none;
         border-bottom: 1px solid rgba(126, 217, 87, 0.1);
         position: relative;
-        padding: 10px 0;
+        padding: 12px 0;
         text-align: left;
         display: flex;
         justify-content: space-between;
+        align-items: center;
+        min-height: 40px;
     }
 
     .data-table td:last-child {
         border-bottom: none;
         padding-bottom: 0;
+        justify-content: center;
     }
 
     .data-table td:before {
         content: attr(data-label);
-        font-weight: 600;
-        color: var(--sub-green);
-        font-size: 13px;
+        font-weight: 700;
+        color: var(--main-green);
+        font-size: 12px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        min-width: 100px;
+        flex-shrink: 0;
     }
 
     .data-table td:nth-of-type(1):before { content: "顧客No"; }
@@ -793,14 +913,63 @@ body.statistics-page {
     .data-table td:nth-of-type(3):before { content: "総売上"; }
     .data-table td:nth-of-type(4):before { content: "配達回数"; }
     .data-table td:nth-of-type(5):before { content: "平均リードタイム"; }
-    .data-table td:nth-of-type(6):before { content: "アクション"; }
+    .data-table td:nth-of-type(6):before { content: ""; }
+
+    /* テーブルアクションボタンをスマホ向けに最適化 */
+    .table-action-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+        width: 100%;
+        max-width: 120px;
+    }
+}
+
+/* 極小画面 (360px以下) 対応 */
+@media (max-width: 360px) {
+    .content-scroll-area {
+        padding: 8px 6px;
+    }
+
+    .summary-cards {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .customer-search-section {
+        padding: 12px;
+    }
+
+    .customer-card {
+        padding: 15px;
+    }
 
     .card-stats {
         grid-template-columns: 1fr;
+        gap: 10px;
     }
 
     .card-actions {
         flex-direction: column;
+    }
+
+    .modal-content {
+        margin: 5px;
+        padding: 15px;
+    }
+
+    .data-table tr {
+        padding: 12px;
+    }
+
+    .data-table td {
+        padding: 8px 0;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .data-table td:before {
+        min-width: auto;
     }
 }
 

@@ -728,7 +728,6 @@ body.order-list-page {
         padding: 10px 0;
         text-align: left;
         display: flex;
-        justify-content: space-between;
     }
 
     .data-table td:last-child {
