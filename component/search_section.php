@@ -12,8 +12,8 @@ function renderSearchSection($config) {
     $totalCount = $config['totalCount'];
     $itemName = $config['itemName']; // '注文' or '納品書'
     $searchValue = $config['searchValue'] ?? '';
-    $createUrl = $config['createUrl'];
-    $createButtonText = $config['createButtonText'];
+    $createUrl = $config['createUrl'] ?? '';
+    $createButtonText = $config['createButtonText'] ?? '';
     
     echo '
     <!-- 検索・フィルタリング -->
@@ -33,11 +33,15 @@ function renderSearchSection($config) {
             </h2>
             <p class="order-subtitle">' . htmlspecialchars($storeName) . ' - 全 ' . intval($totalCount) . ' 件の' . htmlspecialchars($itemName) . '</p>
         </div>
-        <div class="order-actions">
-            <a href="' . htmlspecialchars($createUrl) . '" class="btn-create-order">
+        <div class="order-actions">';
+    
+    if (!empty($createUrl) && !empty($createButtonText)) {
+        echo '<a href="' . htmlspecialchars($createUrl) . '" class="btn-create-order">
                 <i class="fas fa-plus"></i> ' . htmlspecialchars($createButtonText) . '
-            </a>
-        </div>
+            </a>';
+    }
+    
+    echo '</div>
     </div>';
 }
 ?>

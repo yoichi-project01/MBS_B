@@ -296,6 +296,42 @@
     }
 }
 
+/* === Delivery Status Badge === */
+.delivery-status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    height: 32px;
+    padding: 6px 12px;
+    border-radius: var(--radius);
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    text-align: center;
+    line-height: 1;
+    border: 2px solid;
+    transition: all var(--transition);
+    white-space: nowrap;
+}
+
+.delivery-status-pending {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #92400e;
+    border-color: #f59e0b;
+}
+
+.delivery-status-completed {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    color: #065f46;
+    border-color: #10b981;
+}
+
+.delivery-status-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 /* === Print Styles === */
 @media print {
     .status-badge {
@@ -312,5 +348,12 @@
     .status-badge::before {
         content: "[" attr(class) "] ";
         font-weight: bold;
+    }
+    
+    .delivery-status-badge {
+        background: white !important;
+        color: black !important;
+        border: 1px solid black !important;
+        box-shadow: none !important;
     }
 }

@@ -44,17 +44,20 @@ $sampleCustomers = [
     <link rel="stylesheet" href="/MBS_B/assets/css/components/modal.css">
     <link rel="stylesheet" href="/MBS_B/assets/css/components/form.css">
     <link rel="stylesheet" href="/MBS_B/assets/css/components/table.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/components/action_button.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/components/status_badge.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/components/table_actions.css">
     <link rel="stylesheet" href="/MBS_B/assets/css/pages/order.css">
     
     <!-- External Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
-<body class="with-header order-list-page">
+<body class="with-header delivery-list-page">
     <div class="dashboard-container">
         <div class="main-content">
             <div class="content-scroll-area">
-                <div class="order-list-container">
+                <div class="delivery-list-container">
                     
                     <?php
                     // 検索セクションの設定
@@ -66,8 +69,6 @@ $sampleCustomers = [
                         'totalCount' => count($sampleDeliveries),
                         'itemName' => '納品書',
                         'searchValue' => '',
-                        'createUrl' => "create.php?store=" . urlencode($storeName),
-                        'createButtonText' => '新規納品書作成'
                     ]);
                     ?>
 
@@ -83,7 +84,8 @@ $sampleCustomers = [
                             'order' => 'DESC',
                             'search' => ''
                         ],
-                        'emptyMessage' => '該当する納品書はありません。'
+                        'emptyMessage' => '該当する納品書はありません。',
+                        'mobileMode' => 'customer-only'
                     ]);
                     ?>
 

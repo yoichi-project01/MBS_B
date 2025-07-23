@@ -131,7 +131,7 @@ function renderOrderTableActions($orderNo, $storeName, $includeDelivery = false)
 /**
  * 納品書用のテーブルアクションを描画（ショートカット関数）
  */
-function renderDeliveryTableActions($deliveryNo, $storeName, $includeOrder = true) {
+function renderDeliveryTableActions($deliveryNo, $storeName, $includeOrder = false) {
     $actions = [
         [
             'type' => 'detail',
@@ -140,16 +140,6 @@ function renderDeliveryTableActions($deliveryNo, $storeName, $includeOrder = tru
             'icon' => 'fas fa-eye'
         ]
     ];
-    
-    if ($includeOrder) {
-        $actions[] = [
-            'type' => 'primary',
-            'url' => '../order_list/index.php?delivery_id=' . urlencode($deliveryNo),
-            'label' => '注文書',
-            'icon' => 'fas fa-file-invoice',
-            'target' => '_blank'
-        ];
-    }
     
     return renderTableActions([
         'actions' => $actions

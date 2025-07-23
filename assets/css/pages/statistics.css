@@ -65,7 +65,7 @@ body.statistics-page {
 }
 
 .content-scroll-area {
-    padding: 30px;
+    padding: 50px 30px 30px 30px;
     width: 100%;
     flex: 1;
     overflow-y: auto;

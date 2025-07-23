@@ -30,11 +30,15 @@ function selectedStore(storeName) {
 }
 
 function initializeTopPage() {
+    console.log('Initializing top page...');
     const storeButtons = document.querySelectorAll('.menu-button[data-store]');
+    console.log('Found store buttons:', storeButtons.length);
+    
     storeButtons.forEach(function(button) {
         button.addEventListener('click', function(e) {
             e.preventDefault();
             const storeName = this.getAttribute('data-store');
+            console.log('Store button clicked:', storeName);
             selectedStore(storeName);
         });
     });

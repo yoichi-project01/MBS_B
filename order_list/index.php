@@ -77,8 +77,8 @@ try {
     $total_orders = $total_stmt->rowCount();
     $total_pages = ceil($total_orders / $limit);
 
-    // ソートとページネーションを追加
-    $sql .= " ORDER BY $sort_column $sort_order LIMIT :limit OFFSET :offset";
+    // ソートとページネーションを追加（検証済みパラメータを使用）
+    $sql .= " ORDER BY " . $sort_column . " " . $sort_order . " LIMIT :limit OFFSET :offset";
 
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);

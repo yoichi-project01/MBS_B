@@ -118,14 +118,6 @@ function getOrderColumns() {
             }
         ],
         [
-            'key' => 'status',
-            'label' => 'ステータス',
-            'sortable' => true,
-            'renderer' => function($value, $row, $storeName) {
-                return renderOrderStatusBadge($value);
-            }
-        ],
-        [
             'key' => 'actions',
             'label' => '操作',
             'renderer' => function($value, $row, $storeName) {
@@ -174,10 +166,25 @@ function getDeliveryColumns() {
         ],
         [
             'key' => 'status',
-            'label' => 'ステータス',
+            'label' => '納品状況',
             'sortable' => true,
             'renderer' => function($value, $row, $storeName) {
-                return renderDeliveryStatusBadge($value);
+                // 納品状況を分数で計算（仮の計算ロジック）
+                $totalItems = rand(5, 15); // 総アイテム数
+                $deliveredItems = 0;
+                
+                if ($value === 'pending') {
+                    $deliveredItems = 0;
+                } elseif ($value === 'partial') {
+                    $deliveredItems = rand(1, $totalItems - 1);
+                } elseif ($value === 'completed') {
+                    $deliveredItems = $totalItems;
+                }
+                
+                $isCompleted = ($deliveredItems === $totalItems);
+                $badgeClass = $isCompleted ? 'delivery-status-completed' : 'delivery-status-pending';
+                
+                return '<span class="delivery-status-badge ' . $badgeClass . '">' . $deliveredItems . '/' . $totalItems . '</span>';
             }
         ],
         [
@@ -185,7 +192,7 @@ function getDeliveryColumns() {
             'label' => '操作',
             'renderer' => function($value, $row, $storeName) {
                 $deliveryNo = sprintf('D%04d', $row['id']);
-                return renderDeliveryTableActions($deliveryNo, $storeName, true);
+                return renderDeliveryTableActions($deliveryNo, $storeName, false);
             }
         ]
     ];

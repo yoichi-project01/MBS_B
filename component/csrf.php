@@ -19,10 +19,15 @@ class CSRFProtection
     }
 
     /**
-     * CSRFトークンを検証
+     * CSRFトークンを検証（引数なしの場合はPOSTから取得）
      */
-    public static function validateToken($token)
+    public static function validateToken($token = null)
     {
+        // 引数がない場合はPOSTから取得
+        if ($token === null) {
+            $token = $_POST['csrf_token'] ?? $_GET['csrf_token'] ?? '';
+        }
+        
         // SessionManagerがセッションを管理
         if (!isset($_SESSION['csrf_token']) || empty($token)) {
             return false;

@@ -19,21 +19,19 @@ try {
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 
-    // 認証チェック（デバッグ用に一時的に無効化）
-    // if (!SessionManager::isLoggedIn()) {
-    //     http_response_code(401);
-    //     echo json_encode(['error' => 'Unauthorized']);
-    //     exit;
-    // }
+    // 認証チェック
+    if (!SessionManager::isLoggedIn()) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Unauthorized']);
+        exit;
+    }
 
-// CSRFトークンの検証を一時的に無効化（デバッグ用）
-/*
-if (!CSRFProtection::validateToken()) {
-    http_response_code(403);
-    echo json_encode(['error' => 'Invalid CSRF token']);
-    exit;
-}
-*/
+    // CSRFトークンの検証
+    if (!CSRFProtection::validateToken()) {
+        http_response_code(403);
+        echo json_encode(['error' => 'Invalid CSRF token']);
+        exit;
+    }
 
 $customerNo = $_POST['customer_no'] ?? $_GET['customer_no'] ?? '';
 $storeName = $_POST['store'] ?? $_GET['store'] ?? '';
@@ -222,23 +220,11 @@ try {
     
 } catch (PDOException $e) {
     error_log("Database error in get_customer_detail.php: " . $e->getMessage());
-    $response['message'] = 'データベースエラーが発生しました: ' . $e->getMessage();
-    $response['debug_info'] = [
-        'error_type' => 'PDOException',
-        'error_message' => $e->getMessage(),
-        'customer_no' => $customerNo,
-        'store_name' => $storeName
-    ];
+    $response['message'] = 'データベースエラーが発生しました。';
     http_response_code(500);
 } catch (Exception $e) {
     error_log("General error in get_customer_detail.php: " . $e->getMessage());
-    $response['message'] = $e->getMessage();
-    $response['debug_info'] = [
-        'error_type' => 'Exception',
-        'error_message' => $e->getMessage(),
-        'customer_no' => $customerNo,
-        'store_name' => $storeName
-    ];
+    $response['message'] = 'エラーが発生しました。';
     http_response_code(400);
 }
 

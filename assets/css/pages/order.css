@@ -2,7 +2,8 @@
    Order List Page Styles
    ================================== */
 
-body.order-list-page {
+body.order-list-page,
+body.delivery-list-page {
     font-family: 'Noto Sans JP', sans-serif;
     background: linear-gradient(135deg, #f8faf9 0%, #e8f5e8 100%);
     color: var(--font-color);
@@ -73,7 +74,8 @@ body.order-list-page {
 }
 
 /* 注文一覧コンテナ */
-.order-list-container {
+.order-list-container,
+.delivery-list-container {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
