@@ -115,6 +115,9 @@ try {
     <link rel="stylesheet" href="/MBS_B/assets/css/components/modal.css">
     <link rel="stylesheet" href="/MBS_B/assets/css/components/form.css">
     <link rel="stylesheet" href="/MBS_B/assets/css/components/table.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/components/action_button.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/components/status_badge.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/components/table_actions.css">
     <link rel="stylesheet" href="/MBS_B/assets/css/pages/order.css">
     
     <!-- External Libraries -->

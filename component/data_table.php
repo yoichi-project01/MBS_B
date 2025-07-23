@@ -4,6 +4,9 @@
  * 注文書・納品書共通のテーブル表示
  */
 
+require_once(__DIR__ . '/status_badge.php');
+require_once(__DIR__ . '/table_actions.php');
+
 function renderDataTable($config) {
     $storeName = $config['storeName'];
     $pageType = $config['pageType']; // 'order' or 'delivery'
@@ -119,18 +122,14 @@ function getOrderColumns() {
             'label' => 'ステータス',
             'sortable' => true,
             'renderer' => function($value, $row, $storeName) {
-                $statusText = translate_status($value);
-                return '<span class="status-' . htmlspecialchars($value) . '">' . htmlspecialchars($statusText) . '</span>';
+                return renderOrderStatusBadge($value);
             }
         ],
         [
             'key' => 'actions',
             'label' => '操作',
             'renderer' => function($value, $row, $storeName) {
-                $orderNo = htmlspecialchars($row['order_no']);
-                $storeParam = htmlspecialchars($storeName);
-                return '<a href="detail.php?order_no=' . $orderNo . '&store=' . $storeParam . '" class="btn-detail">詳細</a>
-                        <a href="../delivery_list/index.php?order_id=' . $orderNo . '" class="btn-delivery" target="_blank">納品書</a>';
+                return renderOrderTableActions($row['order_no'], $storeName, false);
             }
         ]
     ];
@@ -178,15 +177,7 @@ function getDeliveryColumns() {
             'label' => 'ステータス',
             'sortable' => true,
             'renderer' => function($value, $row, $storeName) {
-                $statusText = '';
-                if ($value === 'completed') {
-                    $statusText = '納品済み';
-                } else if ($value === 'partial') {
-                    $statusText = '一部納品';
-                } else {
-                    $statusText = '未納品';
-                }
-                return '<span class="status-badge status-' . htmlspecialchars($value) . '">' . htmlspecialchars($statusText) . '</span>';
+                return renderDeliveryStatusBadge($value);
             }
         ],
         [
@@ -194,9 +185,7 @@ function getDeliveryColumns() {
             'label' => '操作',
             'renderer' => function($value, $row, $storeName) {
                 $deliveryNo = sprintf('D%04d', $row['id']);
-                $storeParam = htmlspecialchars($storeName);
-                return '<a href="detail.php?delivery_no=' . $deliveryNo . '&store=' . $storeParam . '" class="btn-detail">詳細</a>
-                        <a href="../order_list/index.php?delivery_id=' . $deliveryNo . '" class="btn-delivery" target="_blank">注文書</a>';
+                return renderDeliveryTableActions($deliveryNo, $storeName, true);
             }
         ]
     ];

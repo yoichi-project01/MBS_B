@@ -1,0 +1,316 @@
+/* ==================================
+   Action Button Component
+   ================================== */
+
+/* === Base Action Button === */
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: var(--shadow-sm);
+    white-space: nowrap;
+    line-height: 1.2;
+    user-select: none;
+}
+
+.action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+    text-decoration: none;
+}
+
+.action-btn:active {
+    transform: translateY(0);
+}
+
+.action-btn:focus {
+    outline: 2px solid var(--main-green);
+    outline-offset: 2px;
+}
+
+/* === Button Types === */
+
+/* Detail Button */
+.action-btn-detail {
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+    color: white;
+    border: 1px solid #1976d2;
+}
+
+.action-btn-detail:hover {
+    background: linear-gradient(135deg, #1976d2, #1565c0);
+    color: white;
+}
+
+/* Delivery Button */
+.action-btn-delivery {
+    background: linear-gradient(135deg, var(--accent-green), var(--main-green));
+    color: white;
+    border: 1px solid var(--main-green);
+}
+
+.action-btn-delivery:hover {
+    background: linear-gradient(135deg, var(--main-green), var(--sub-green));
+    color: white;
+}
+
+/* Create Button */
+.action-btn-create {
+    background: linear-gradient(135deg, #4caf50, #388e3c);
+    color: white;
+    border: 1px solid #388e3c;
+}
+
+.action-btn-create:hover {
+    background: linear-gradient(135deg, #388e3c, #2e7d32);
+    color: white;
+}
+
+/* Edit Button */
+.action-btn-edit {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+    border: 1px solid #f57c00;
+}
+
+.action-btn-edit:hover {
+    background: linear-gradient(135deg, #f57c00, #ef6c00);
+    color: white;
+}
+
+/* Delete Button */
+.action-btn-delete {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    color: white;
+    border: 1px solid #d32f2f;
+}
+
+.action-btn-delete:hover {
+    background: linear-gradient(135deg, #d32f2f, #c62828);
+    color: white;
+}
+
+/* Primary Button */
+.action-btn-primary {
+    background: linear-gradient(135deg, var(--main-green), var(--sub-green));
+    color: white;
+    border: 1px solid var(--main-green);
+}
+
+.action-btn-primary:hover {
+    background: linear-gradient(135deg, var(--sub-green), #2e7d32);
+    color: white;
+}
+
+/* Secondary Button */
+.action-btn-secondary {
+    background: linear-gradient(135deg, #6c757d, #495057);
+    color: white;
+    border: 1px solid #495057;
+}
+
+.action-btn-secondary:hover {
+    background: linear-gradient(135deg, #495057, #343a40);
+    color: white;
+}
+
+/* Success Button */
+.action-btn-success {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    color: white;
+    border: 1px solid #1e7e34;
+}
+
+.action-btn-success:hover {
+    background: linear-gradient(135deg, #1e7e34, #155724);
+    color: white;
+}
+
+/* Warning Button */
+.action-btn-warning {
+    background: linear-gradient(135deg, #ffc107, #e0a800);
+    color: #212529;
+    border: 1px solid #e0a800;
+}
+
+.action-btn-warning:hover {
+    background: linear-gradient(135deg, #e0a800, #d39e00);
+    color: #212529;
+}
+
+/* Danger Button */
+.action-btn-danger {
+    background: linear-gradient(135deg, #dc3545, #bd2130);
+    color: white;
+    border: 1px solid #bd2130;
+}
+
+.action-btn-danger:hover {
+    background: linear-gradient(135deg, #bd2130, #a71e2a);
+    color: white;
+}
+
+/* === Button Sizes === */
+
+/* Extra Small */
+.action-btn-xs {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--font-size-xs);
+    gap: var(--space-xs);
+}
+
+/* Small (Default) */
+.action-btn-sm {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-sm);
+    gap: var(--space-xs);
+}
+
+/* Medium */
+.action-btn-md {
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--font-size-base);
+    gap: var(--space-sm);
+}
+
+/* Large */
+.action-btn-lg {
+    padding: var(--space-lg) var(--space-xl);
+    font-size: var(--font-size-lg);
+    gap: var(--space-sm);
+}
+
+/* === Button States === */
+
+/* Disabled State */
+.action-btn-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.action-btn-disabled:hover {
+    transform: none;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Loading State */
+.action-btn-loading {
+    position: relative;
+    color: transparent;
+}
+
+.action-btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* === Button Groups === */
+.action-btn-group {
+    display: inline-flex;
+    gap: var(--space-sm);
+    align-items: center;
+}
+
+.action-btn-group .action-btn {
+    margin: 0;
+}
+
+/* === Responsive Design === */
+@media (max-width: 768px) {
+    .action-btn {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: var(--font-size-xs);
+        gap: var(--space-xs);
+    }
+    
+    .action-btn-group {
+        flex-direction: column;
+        width: 100%;
+        gap: var(--space-xs);
+    }
+    
+    .action-btn-group .action-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .action-btn {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: var(--font-size-xs);
+        min-height: 36px;
+    }
+    
+    .action-btn i {
+        font-size: var(--font-size-xs);
+    }
+}
+
+/* === High Contrast Mode === */
+@media (prefers-contrast: high) {
+    .action-btn {
+        border-width: 2px;
+    }
+    
+    .action-btn:focus {
+        outline-width: 3px;
+    }
+}
+
+/* === Reduced Motion === */
+@media (prefers-reduced-motion: reduce) {
+    .action-btn {
+        transition: none;
+    }
+    
+    .action-btn:hover {
+        transform: none;
+    }
+    
+    .action-btn-loading::after {
+        animation: none;
+    }
+}
+
+/* === Print Styles === */
+@media print {
+    .action-btn {
+        background: white !important;
+        color: black !important;
+        border: 1px solid black !important;
+        box-shadow: none !important;
+        text-decoration: underline !important;
+    }
+    
+    .action-btn::after {
+        content: " (" attr(href) ")";
+        font-size: 10px;
+    }
+}

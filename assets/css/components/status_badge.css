@@ -1,0 +1,316 @@
+/* ==================================
+   Status Badge Component
+   ================================== */
+
+/* === Base Status Badge === */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-full);
+    font-family: var(--font-family);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid;
+    white-space: nowrap;
+    text-align: center;
+    line-height: 1.2;
+    transition: all var(--transition);
+}
+
+.status-badge i {
+    font-size: var(--font-size-xs);
+}
+
+/* === Status Colors === */
+
+/* Pending Status */
+.status-badge-pending {
+    color: #b45309;
+    background-color: #fef3c7;
+    border-color: #d97706;
+}
+
+/* Processing Status */
+.status-badge-processing {
+    color: #1e40af;
+    background-color: #dbeafe;
+    border-color: #3b82f6;
+}
+
+/* Completed Status */
+.status-badge-completed {
+    color: #065f46;
+    background-color: #d1fae5;
+    border-color: #10b981;
+}
+
+/* Cancelled Status */
+.status-badge-cancelled {
+    color: #991b1b;
+    background-color: #fee2e2;
+    border-color: #ef4444;
+}
+
+/* Draft Status */
+.status-badge-draft {
+    color: #374151;
+    background-color: #f3f4f6;
+    border-color: #6b7280;
+}
+
+/* Confirmed Status */
+.status-badge-confirmed {
+    color: #1e3a8a;
+    background-color: #dbeafe;
+    border-color: #2563eb;
+}
+
+/* Shipped Status */
+.status-badge-shipped {
+    color: #0c4a6e;
+    background-color: #e0f2fe;
+    border-color: #0ea5e9;
+}
+
+/* Delivered Status */
+.status-badge-delivered {
+    color: #14532d;
+    background-color: #dcfce7;
+    border-color: #22c55e;
+}
+
+/* Partial Status (Delivery) */
+.status-badge-partial {
+    color: #92400e;
+    background-color: #fef3c7;
+    border-color: #f59e0b;
+}
+
+/* Preparing Status */
+.status-badge-preparing {
+    color: #155e75;
+    background-color: #cffafe;
+    border-color: #06b6d4;
+}
+
+/* === Status Type Variations === */
+
+/* Order Type Badges */
+.status-badge-order.status-badge-pending {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+}
+
+.status-badge-order.status-badge-processing {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+}
+
+.status-badge-order.status-badge-completed {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+}
+
+.status-badge-order.status-badge-cancelled {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+}
+
+/* Delivery Type Badges */
+.status-badge-delivery.status-badge-pending {
+    background: linear-gradient(135deg, #fff7ed, #fed7aa);
+}
+
+.status-badge-delivery.status-badge-partial {
+    background: linear-gradient(135deg, #fef3c7, #fcd34d);
+}
+
+.status-badge-delivery.status-badge-completed {
+    background: linear-gradient(135deg, #ecfdf5, #bbf7d0);
+}
+
+/* === Badge Sizes === */
+
+/* Extra Small */
+.status-badge-xs {
+    padding: 2px var(--space-xs);
+    font-size: 10px;
+    gap: 2px;
+}
+
+.status-badge-xs i {
+    font-size: 10px;
+}
+
+/* Small (Default) */
+.status-badge-sm {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--font-size-xs);
+    gap: var(--space-xs);
+}
+
+.status-badge-sm i {
+    font-size: var(--font-size-xs);
+}
+
+/* Medium */
+.status-badge-md {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-sm);
+    gap: var(--space-xs);
+}
+
+.status-badge-md i {
+    font-size: var(--font-size-sm);
+}
+
+/* Large */
+.status-badge-lg {
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--font-size-base);
+    gap: var(--space-sm);
+}
+
+.status-badge-lg i {
+    font-size: var(--font-size-base);
+}
+
+/* === Hover Effects === */
+.status-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* === Animation for Processing Status === */
+.status-badge-processing i.fa-spin {
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* === Legacy Support === */
+/* 既存のstatus-クラスとの互換性維持 */
+.status-pending {
+    color: #b45309;
+    background-color: #fef3c7;
+    border-color: #d97706;
+}
+
+.status-processing {
+    color: #1e40af;
+    background-color: #dbeafe;
+    border-color: #3b82f6;
+}
+
+.status-completed {
+    color: #065f46;
+    background-color: #d1fae5;
+    border-color: #10b981;
+}
+
+.status-cancelled {
+    color: #991b1b;
+    background-color: #fee2e2;
+    border-color: #ef4444;
+}
+
+.status-partial {
+    color: #92400e;
+    background-color: #fef3c7;
+    border-color: #f59e0b;
+}
+
+/* === Responsive Design === */
+@media (max-width: 768px) {
+    .status-badge {
+        font-size: 10px;
+        padding: 2px var(--space-xs);
+        gap: 2px;
+    }
+    
+    .status-badge i {
+        font-size: 10px;
+    }
+    
+    .status-badge-md,
+    .status-badge-lg {
+        font-size: var(--font-size-xs);
+        padding: var(--space-xs) var(--space-sm);
+    }
+}
+
+@media (max-width: 480px) {
+    .status-badge {
+        font-size: 9px;
+        padding: 1px var(--space-xs);
+    }
+    
+    .status-badge i {
+        font-size: 9px;
+    }
+}
+
+/* === High Contrast Mode === */
+@media (prefers-contrast: high) {
+    .status-badge {
+        border-width: 2px;
+        font-weight: var(--font-weight-bold);
+    }
+    
+    .status-badge-pending {
+        background-color: #fbbf24;
+        color: #000;
+    }
+    
+    .status-badge-processing {
+        background-color: #3b82f6;
+        color: #fff;
+    }
+    
+    .status-badge-completed {
+        background-color: #10b981;
+        color: #fff;
+    }
+    
+    .status-badge-cancelled {
+        background-color: #ef4444;
+        color: #fff;
+    }
+}
+
+/* === Reduced Motion === */
+@media (prefers-reduced-motion: reduce) {
+    .status-badge {
+        transition: none;
+    }
+    
+    .status-badge:hover {
+        transform: none;
+    }
+    
+    .status-badge-processing i.fa-spin {
+        animation: none;
+    }
+}
+
+/* === Print Styles === */
+@media print {
+    .status-badge {
+        background: white !important;
+        color: black !important;
+        border: 1px solid black !important;
+        box-shadow: none !important;
+    }
+    
+    .status-badge i {
+        display: none !important;
+    }
+    
+    .status-badge::before {
+        content: "[" attr(class) "] ";
+        font-weight: bold;
+    }
+}
