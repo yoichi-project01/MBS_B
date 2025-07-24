@@ -18,7 +18,7 @@ function renderDataTable($config) {
     
     // モバイル用の特別なCSSクラスを追加
     $tableClass = 'data-table';
-    if ($pageType === 'order' && $mobileMode === 'customer-only') {
+    if (($pageType === 'order' || $pageType === 'delivery' || $pageType === 'statistics') && $mobileMode === 'customer-only') {
         $tableClass .= ' mobile-customer-only';
     }
     
@@ -95,12 +95,14 @@ function getOrderColumns() {
         ],
         [
             'key' => 'customer_name',
-            'label' => '顧客名',
+            'label' => '顧客名 実際の顧客名',
             'sortable' => true,
             'renderer' => function($value, $row, $storeName) {
-                $customerName = htmlspecialchars($value);
-                $orderNo = htmlspecialchars($row['order_no']);
-                return '<span class="customer-name-clickable" data-customer="' . $customerName . '" data-order="' . $orderNo . '" data-store="' . htmlspecialchars($storeName) . '">' . $customerName . '</span>';
+                $customerName = htmlspecialchars($value, ENT_QUOTES);
+                $orderNo = htmlspecialchars($row['order_no'], ENT_QUOTES);
+                $customerNo = htmlspecialchars($row['customer_no'] ?? '', ENT_QUOTES);
+                $storeNameEscaped = htmlspecialchars($storeName, ENT_QUOTES);
+                return '<span class="customer-name-clickable" data-customer="' . $customerName . '" data-order="' . $orderNo . '" data-customer-no="' . $customerNo . '" data-store="' . $storeNameEscaped . '">' . $customerName . '</span>';
             }
         ],
         [
@@ -142,7 +144,7 @@ function getDeliveryColumns() {
         ],
         [
             'key' => 'customer_name',
-            'label' => '顧客名',
+            'label' => '顧客名 実際の顧客名',
             'sortable' => true,
             'renderer' => function($value, $row, $storeName) {
                 return htmlspecialchars($value);
@@ -161,7 +163,8 @@ function getDeliveryColumns() {
             'label' => '合計金額',
             'sortable' => true,
             'renderer' => function($value, $row, $storeName) {
-                return '¥' . number_format(rand(10000, 50000));
+                $amount = is_numeric($value) ? floatval($value) : 0;
+                return '¥' . number_format($amount);
             }
         ],
         [
@@ -193,6 +196,65 @@ function getDeliveryColumns() {
             'renderer' => function($value, $row, $storeName) {
                 $deliveryNo = sprintf('D%04d', $row['id']);
                 return renderDeliveryTableActions($deliveryNo, $storeName, false);
+            }
+        ]
+    ];
+}
+
+/**
+ * 顧客統計用のカラム定義
+ */
+function getCustomerColumns() {
+    return [
+        [
+            'key' => 'customer_no',
+            'label' => '顧客No',
+            'sortable' => true
+        ],
+        [
+            'key' => 'customer_name',
+            'label' => '顧客名 実際の顧客名',
+            'sortable' => true,
+            'renderer' => function($value, $row, $storeName) {
+                $customerName = htmlspecialchars($value, ENT_QUOTES);
+                $customerNo = htmlspecialchars($row['customer_no'] ?? '', ENT_QUOTES);
+                $storeNameEscaped = htmlspecialchars($storeName, ENT_QUOTES);
+                return '<span class="customer-name-statistics" data-customer="' . $customerName . '" data-customer-no="' . $customerNo . '" data-store="' . $storeNameEscaped . '">' . $customerName . '</span>';
+            }
+        ],
+        [
+            'key' => 'total_sales',
+            'label' => '総売上',
+            'sortable' => true,
+            'renderer' => function($value, $row, $storeName) {
+                $amount = is_numeric($value) ? floatval($value) : 0;
+                return '¥' . number_format($amount);
+            }
+        ],
+        [
+            'key' => 'delivery_count',
+            'label' => '配達回数',
+            'sortable' => true,
+            'renderer' => function($value, $row, $storeName) {
+                return $value . '回';
+            }
+        ],
+        [
+            'key' => 'avg_lead_time',
+            'label' => '平均リードタイム',
+            'sortable' => true,
+            'renderer' => function($value, $row, $storeName) {
+                return $value . '日';
+            }
+        ],
+        [
+            'key' => 'actions',
+            'label' => 'アクション',
+            'renderer' => function($value, $row, $storeName) {
+                return '<button class="btn btn-sm btn-primary view-detail-btn" 
+                        data-customer-no="' . $row['customer_no'] . '">
+                        <i class="fas fa-eye"></i> 詳細
+                        </button>';
             }
         ]
     ];

@@ -11,9 +11,12 @@ function renderPagination($config) {
     $searchValue = $config["searchValue"] ?? "";
     $sortColumn = $config["sortColumn"] ?? "";
     $sortOrder = $config["sortOrder"] ?? "ASC";
+    $totalItems = $config["totalItems"] ?? 0;
+    $itemsPerPage = $config["itemsPerPage"] ?? 10;
     
-    if ($totalPages <= 1) {
-        return; // ページが1つしかない場合は表示しない
+    // 5件以上かつ複数ページがある場合のみ表示
+    if ($totalItems < 5 || $totalPages <= 1) {
+        return;
     }
     
     echo "<div class=\"pagination\">";
@@ -25,7 +28,7 @@ function renderPagination($config) {
     }
     
     // ページ情報
-    echo "<span>ページ " . intval($currentPage) . " / " . intval($totalPages) . "</span>";
+    echo "<span>ページ " . htmlspecialchars(intval($currentPage)) . " / " . htmlspecialchars(intval($totalPages)) . "</span>";
     
     // 次へリンク
     if ($currentPage < $totalPages) {

@@ -44,6 +44,7 @@ try {
     $sql = "
         SELECT 
             o.order_no, 
+            c.customer_no,
             c.customer_name, 
             o.registration_date, 
             o.status,
@@ -70,11 +71,17 @@ try {
         $sql .= " WHERE " . implode(" AND ", $where_clauses);
     }
 
-    // 総件数を取得
-    $count_sql = str_replace("SELECT ... FROM", "SELECT COUNT(*) FROM", $sql);
-    $total_stmt = $pdo->prepare($sql);
+    // 総件数を取得（専用クエリを作成）
+    $count_sql = "SELECT COUNT(*) as total FROM orders o 
+                  LEFT JOIN customers c ON o.customer_no = c.customer_no";
+    if (!empty($where_clauses)) {
+        $count_sql .= " WHERE " . implode(" AND ", $where_clauses);
+    }
+    
+    $total_stmt = $pdo->prepare($count_sql);
     $total_stmt->execute($params);
-    $total_orders = $total_stmt->rowCount();
+    $total_result = $total_stmt->fetch(PDO::FETCH_ASSOC);
+    $total_orders = $total_result['total'];
     $total_pages = ceil($total_orders / $limit);
 
     // ソートとページネーションを追加（検証済みパラメータを使用）
@@ -170,7 +177,9 @@ try {
                         'totalPages' => $total_pages,
                         'searchValue' => $search_customer,
                         'sortColumn' => $sort_column,
-                        'sortOrder' => $sort_order
+                        'sortOrder' => $sort_order,
+                        'totalItems' => $total_orders,
+                        'itemsPerPage' => $limit
                     ]);
                     ?>
                 </div>
@@ -198,15 +207,88 @@ try {
     <script nonce="<?= SessionManager::get('csp_nonce') ?>">
     // 注文ページ固有の初期化
     document.addEventListener('DOMContentLoaded', function() {
-        // 顧客名クリックイベントを無効化
-        /*
-        document.querySelectorAll('.customer-name-clickable').forEach(element => {
-            element.addEventListener('click', function() {
-                const customerName = this.dataset.customerName;
-                loadCustomerOrders(customerName);
+        let currentIsMobile = null;
+        
+        // スマホ時のみ顧客名クリックイベントを有効化
+        function setupCustomerClickEvents() {
+            const isMobile = window.innerWidth <= 768;
+            
+            // 状態が変わった時のみ処理
+            if (currentIsMobile === isMobile) {
+                return;
+            }
+            currentIsMobile = isMobile;
+            
+            // 全ての既存イベントを削除してから再設定
+            const customerElements = document.querySelectorAll('.customer-name-clickable');
+            
+            customerElements.forEach(element => {
+                // 既存の要素をクローンして置き換え（全イベントリスナーを削除）
+                const newElement = element.cloneNode(true);
+                element.parentNode.replaceChild(newElement, element);
+                
+                if (isMobile) {
+                    // スマホ時：クリック可能にする
+                    newElement.style.cursor = 'pointer';
+                    newElement.style.color = 'var(--main-green)';
+                    newElement.style.fontWeight = '600';
+                    newElement.style.borderBottom = '1px dotted var(--main-green)';
+                    newElement.style.transition = 'all 0.3s ease';
+                    
+                    // クリックイベント
+                    newElement.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const orderNo = this.dataset.order;
+                        const storeName = this.dataset.store;
+                        
+                        if (orderNo && storeName) {
+                            // 注文書詳細ページに遷移
+                            window.location.href = `/MBS_B/order_list/detail.php?order_no=${encodeURIComponent(orderNo)}&store=${encodeURIComponent(storeName)}`;
+                        } else {
+                            console.error('Order number or store name not found');
+                        }
+                    });
+                    
+                    // ホバーエフェクト
+                    newElement.addEventListener('mouseover', function() {
+                        this.style.color = 'var(--accent-green)';
+                        this.style.borderBottomColor = 'var(--accent-green)';
+                        this.style.transform = 'translateY(-1px)';
+                    });
+                    
+                    newElement.addEventListener('mouseout', function() {
+                        this.style.color = 'var(--main-green)';
+                        this.style.borderBottomColor = 'var(--main-green)';
+                        this.style.transform = 'translateY(0)';
+                    });
+                } else {
+                    // デスクトップ時：通常の表示
+                    newElement.style.cursor = 'default';
+                    newElement.style.color = 'var(--font-color)';
+                    newElement.style.fontWeight = 'normal';
+                    newElement.style.borderBottom = 'none';
+                    newElement.style.transform = 'translateY(0)';
+                    newElement.style.transition = 'none';
+                    
+                    // クリックを無効化
+                    newElement.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                    });
+                }
             });
+        }
+        
+        // 初回実行
+        setupCustomerClickEvents();
+        
+        // リサイズ時に再実行（デバウンス付き）
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(setupCustomerClickEvents, 100);
         });
-        */
         
         // パフォーマンス測定
         if (window.performance && window.performance.mark) {

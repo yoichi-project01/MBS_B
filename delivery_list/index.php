@@ -86,8 +86,7 @@ $sampleCustomers = [
                             'order' => 'DESC',
                             'search' => ''
                         ],
-                        'emptyMessage' => '該当する納品書はありません。',
-                        'mobileMode' => 'customer-only'
+                        'emptyMessage' => '該当する納品書はありません。'
                     ]);
                     ?>
 
@@ -101,7 +100,9 @@ $sampleCustomers = [
                         'totalPages' => $total_pages,
                         'searchValue' => '',
                         'sortColumn' => 'delivery_date',
-                        'sortOrder' => 'DESC'
+                        'sortOrder' => 'DESC',
+                        'totalItems' => count($sampleDeliveries),
+                        'itemsPerPage' => 10
                     ]);
                     ?>
                 </div>

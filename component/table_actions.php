@@ -107,7 +107,7 @@ function renderOrderTableActions($orderNo, $storeName, $includeDelivery = false)
     $actions = [
         [
             'type' => 'detail',
-            'url' => 'detail.php?order_no=' . urlencode($orderNo) . '&store=' . urlencode($storeName),
+            'url' => '/MBS_B/order_list/detail.php?order_no=' . urlencode($orderNo) . '&store=' . urlencode($storeName),
             'label' => '詳細',
             'icon' => 'fas fa-eye'
         ]
@@ -116,7 +116,7 @@ function renderOrderTableActions($orderNo, $storeName, $includeDelivery = false)
     if ($includeDelivery) {
         $actions[] = [
             'type' => 'delivery',
-            'url' => '../delivery_list/index.php?order_id=' . urlencode($orderNo),
+            'url' => '/MBS_B/delivery_list/index.php?order_id=' . urlencode($orderNo),
             'label' => '納品書',
             'icon' => 'fas fa-file-alt',
             'target' => '_blank'
@@ -135,7 +135,7 @@ function renderDeliveryTableActions($deliveryNo, $storeName, $includeOrder = fal
     $actions = [
         [
             'type' => 'detail',
-            'url' => 'detail.php?delivery_no=' . urlencode($deliveryNo) . '&store=' . urlencode($storeName),
+            'url' => '/MBS_B/delivery_list/detail.php?delivery_no=' . urlencode($deliveryNo) . '&store=' . urlencode($storeName),
             'label' => '詳細',
             'icon' => 'fas fa-eye'
         ]

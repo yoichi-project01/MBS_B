@@ -252,7 +252,8 @@ class CustomerStatistics {
      * ページネーションの描画
      */
     renderPagination(pagination) {
-        if (pagination.total_pages <= 1) {
+        // 5件未満またはページが1つの場合は非表示
+        if (pagination.total_records < 5 || pagination.total_pages <= 1) {
             this.elements.pagination.innerHTML = '';
             return;
         }

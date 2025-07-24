@@ -298,17 +298,17 @@ body.delivery-list-page {
     border: 1px solid rgba(211, 47, 47, 0.3);
 }
 
-/* 顧客名クリック可能 */
+/* 顧客名クリック可能 - デスクトップでは通常表示 */
 .customer-name-clickable {
-    color: var(--accent-green);
-    cursor: pointer;
-    font-weight: 600;
-    text-decoration: underline;
+    color: var(--font-color);
+    cursor: default;
+    font-weight: normal;
+    text-decoration: none;
     transition: color 0.3s ease;
 }
 
 .customer-name-clickable:hover {
-    color: var(--main-green);
+    color: var(--font-color);
 }
 
 /* アクションボタン */
@@ -485,20 +485,6 @@ body.delivery-list-page {
     text-align: center;
 }
 
-/* 顧客名クリック機能のスタイル */
-.customer-name-clickable {
-    cursor: pointer;
-    color: var(--main-green);
-    font-weight: 600;
-    transition: all var(--transition);
-    border-bottom: 1px dotted var(--main-green);
-}
-
-.customer-name-clickable:hover {
-    color: var(--accent-green);
-    border-bottom-color: var(--accent-green);
-    transform: translateY(-1px);
-}
 
 /* 詳細表示用のモーダル */
 .order-details-modal {
@@ -821,6 +807,94 @@ body.delivery-list-page {
     body.order-list-page .data-table.mobile-customer-only .customer-name-clickable:hover {
         background: linear-gradient(135deg, rgba(126, 217, 87, 0.2) 0%, rgba(248, 250, 249, 0.7) 100%) !important;
         transform: scale(1.02) !important;
+    }
+
+
+    /* 統計情報ページのモバイル表示：基本レイアウト */
+    body.statistics-page .data-table.mobile-customer-only thead {
+        display: none !important;
+    }
+
+    body.statistics-page .data-table.mobile-customer-only,
+    body.statistics-page .data-table.mobile-customer-only tbody,
+    body.statistics-page .data-table.mobile-customer-only tr {
+        display: block !important;
+        width: 100% !important;
+    }
+
+    body.statistics-page .data-table.mobile-customer-only tr {
+        border: 1px solid rgba(126, 217, 87, 0.2) !important;
+        margin: 0 auto 10px auto !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    body.statistics-page .data-table.mobile-customer-only td {
+        display: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* 統計情報ページの顧客名のみ表示 (2列目) */
+    body.statistics-page .data-table.mobile-customer-only td:nth-of-type(2) {
+        display: flex !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        color: var(--main-green) !important;
+        text-align: center !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+
+    body.statistics-page .data-table.mobile-customer-only td:nth-of-type(2):before {
+        display: none !important;
+        content: none !important;
+    }
+
+    /* 統計情報ページの顧客名表示 - 注文書と完全に同じスタイル */
+    body.statistics-page .data-table.mobile-customer-only td:nth-of-type(2) .customer-name-statistics {
+        display: block !important;
+        padding: 20px !important;
+        border-radius: 8px !important;
+        background: linear-gradient(135deg, rgba(126, 217, 87, 0.1) 0%, rgba(248, 250, 249, 0.5) 100%) !important;
+        border: 1px dotted var(--accent-green) !important;
+        color: var(--main-green) !important;
+        font-weight: 600 !important;
+        font-size: 16px !important;
+        text-align: center !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+        transform: translateZ(0) !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        word-wrap: break-word !important;
+        word-break: break-all !important;
+        white-space: normal !important;
+        line-height: 1.4 !important;
+        position: relative !important;
+        left: 0 !important;
+        right: 0 !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+        text-decoration: none !important;
+    }
+
+    body.statistics-page .data-table.mobile-customer-only td:nth-of-type(2) .customer-name-statistics:hover {
+        background: linear-gradient(135deg, rgba(126, 217, 87, 0.2) 0%, rgba(248, 250, 249, 0.7) 100%) !important;
+        transform: scale(1.02) !important;
+    }
+
+    /* 統計情報ページのアクションボタン (6列目) - 注文書と統一 */
+    body.statistics-page .data-table.mobile-customer-only td:nth-of-type(6) {
+        display: none !important;
     }
 
     .btn-detail, .btn-delivery {
