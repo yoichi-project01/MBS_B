@@ -69,6 +69,8 @@ $sampleCustomers = [
                         'totalCount' => count($sampleDeliveries),
                         'itemName' => '納品書',
                         'searchValue' => '',
+                        'createUrl' => "create.php?store=" . urlencode($storeName),
+                        'createButtonText' => '新規納品書作成'
                     ]);
                     ?>
 
