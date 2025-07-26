@@ -142,18 +142,18 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
-<body class="with-header order-list-page statistics-page">
+<body class="with-header order-list-page">
     <div class="dashboard-container">
         <div class="main-content">
             <div class="content-scroll-area">
-                <div class="order-list-container">
+                <div class="order-list-container statistics-container">
 
                     <?php
                     // 検索セクションの設定
                     renderSearchSection([
                         'storeName' => $storeName,
-                        'pageType' => 'statistics',
-                        'icon' => 'fas fa-chart-line',
+                        'pageType' => 'order',
+                        'icon' => 'fas fa-file-alt',
                         'title' => '統計情報一覧',
                         'totalCount' => $total_customers,
                         'itemName' => '統計情報',
@@ -167,7 +167,7 @@ try {
                     // テーブルの設定
                     renderDataTable([
                         'storeName' => $storeName,
-                        'pageType' => 'statistics',
+                        'pageType' => 'order',
                         'columns' => getCustomerColumns(),
                         'data' => $customers,
                         'sortParams' => [
