@@ -148,4 +148,68 @@ class SessionManager
         self::start();
         return isset($_SESSION['user_id']);
     }
+
+    /**
+     * 拡張セッション検証（セキュリティ強化版）
+     */
+    public static function isValidSession()
+    {
+        self::start();
+        
+        // ユーザーIDの存在確認
+        if (!isset($_SESSION['user_id'])) {
+            return false;
+        }
+        
+        // セッションタイムアウトチェック（30分）
+        if (isset($_SESSION['last_activity']) && 
+            (time() - $_SESSION['last_activity'] > 1800)) {
+            self::destroy();
+            return false;
+        }
+        
+        // IPアドレスの確認（セッションハイジャック対策）
+        if (isset($_SESSION['user_ip']) && 
+            $_SESSION['user_ip'] !== $_SERVER['REMOTE_ADDR']) {
+            self::destroy();
+            return false;
+        }
+        
+        // User-Agentの確認
+        if (isset($_SESSION['user_agent']) && 
+            $_SESSION['user_agent'] !== $_SERVER['HTTP_USER_AGENT']) {
+            self::destroy();
+            return false;
+        }
+        
+        $_SESSION['last_activity'] = time();
+        return true;
+    }
+
+    /**
+     * ユーザーログイン時のセッション初期化
+     */
+    public static function initializeUserSession($userId)
+    {
+        self::start();
+        self::regenerateId();
+        
+        $_SESSION['user_id'] = $userId;
+        $_SESSION['user_ip'] = $_SERVER['REMOTE_ADDR'];
+        $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+        $_SESSION['last_activity'] = time();
+        $_SESSION['login_time'] = time();
+    }
+
+    /**
+     * セッションの有効期限チェック
+     */
+    public static function checkSessionTimeout()
+    {
+        if (!self::isValidSession()) {
+            self::setFlash('error', 'セッションが無効です。再度ログインしてください。');
+            return false;
+        }
+        return true;
+    }
 }

@@ -139,12 +139,12 @@ function getDeliveryColumns() {
             'label' => '納品書番号',
             'sortable' => true,
             'renderer' => function($value, $row, $storeName) {
-                return sprintf('D%04d', $row['id']);
+                return sprintf('D%04d', $row['delivery_no']);
             }
         ],
         [
             'key' => 'customer_name',
-            'label' => '顧客名 実際の顧客名',
+            'label' => '顧客名',
             'sortable' => true,
             'renderer' => function($value, $row, $storeName) {
                 return htmlspecialchars($value);
@@ -155,7 +155,7 @@ function getDeliveryColumns() {
             'label' => '納品日',
             'sortable' => true,
             'renderer' => function($value, $row, $storeName) {
-                return date('Y-m-d');
+                return date('Y-m-d', strtotime($value));
             }
         ],
         [
@@ -172,29 +172,24 @@ function getDeliveryColumns() {
             'label' => '納品状況',
             'sortable' => true,
             'renderer' => function($value, $row, $storeName) {
-                // 納品状況を分数で計算（仮の計算ロジック）
-                $totalItems = rand(5, 15); // 総アイテム数
-                $deliveredItems = 0;
+                // 実際のデータベースから取得した情報を使用
+                $totalItems = $row['total_items'] ?? 1;
+                $totalVolume = $row['total_volume'] ?? 0;
                 
-                if ($value === 'pending') {
-                    $deliveredItems = 0;
-                } elseif ($value === 'partial') {
-                    $deliveredItems = rand(1, $totalItems - 1);
-                } elseif ($value === 'completed') {
-                    $deliveredItems = $totalItems;
-                }
+                // 納品済みなので完了状態として表示
+                $deliveredItems = $totalItems;
+                $isCompleted = true;
+                $badgeClass = 'delivery-status-completed';
                 
-                $isCompleted = ($deliveredItems === $totalItems);
-                $badgeClass = $isCompleted ? 'delivery-status-completed' : 'delivery-status-pending';
-                
-                return '<span class="delivery-status-badge ' . $badgeClass . '">' . $deliveredItems . '/' . $totalItems . '</span>';
+                return '<span class="delivery-status-badge ' . $badgeClass . '">' . 
+                       $deliveredItems . '/' . $totalItems . ' (数量: ' . number_format($totalVolume) . ')</span>';
             }
         ],
         [
             'key' => 'actions',
             'label' => '操作',
             'renderer' => function($value, $row, $storeName) {
-                $deliveryNo = sprintf('D%04d', $row['id']);
+                $deliveryNo = sprintf('D%04d', $row['delivery_no']);
                 return renderDeliveryTableActions($deliveryNo, $storeName, false);
             }
         ]

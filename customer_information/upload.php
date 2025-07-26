@@ -186,9 +186,14 @@ try {
         $pdo->rollBack();
     }
 
+    $environment = $_ENV['ENVIRONMENT'] ?? $_SERVER['ENVIRONMENT'] ?? 'development';
     $errorMessage = 'データ処理中にエラーが発生しました。';
-    if (($_ENV['ENVIRONMENT'] ?? 'development') !== 'production') {
-        $errorMessage .= ' (' . $e->getMessage() . ')';
+    
+    if ($environment !== 'production') {
+        $errorMessage .= ' (デバッグ情報: ' . htmlspecialchars($e->getMessage()) . ')';
+        error_log('Upload Error Details: ' . $e->getTraceAsString());
+    } else {
+        error_log('Upload Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
     }
 
     SessionManager::setUploadResult('error', ['error_message' => $errorMessage]);

@@ -51,22 +51,23 @@ function db_connect()
         $pdo->exec("SET time_zone = '+09:00'");
         $pdo->exec("SET SESSION sql_safe_updates = 1");
 
-        if (($_ENV['ENVIRONMENT'] ?? 'development') === 'development') {
+        $environment = $_ENV['ENVIRONMENT'] ?? $_SERVER['ENVIRONMENT'] ?? 'development';
+        if ($environment === 'development') {
             error_log('Database connection established successfully to: ' . $host . ':' . $port . '/' . $db);
         }
         
         return $pdo;
 
     } catch (PDOException $e) {
-        $environment = $_ENV['ENVIRONMENT'] ?? 'development';
+        $environment = $_ENV['ENVIRONMENT'] ?? $_SERVER['ENVIRONMENT'] ?? 'development';
         $errorMessage = 'Database connection failed';
 
         if ($environment === 'production') {
-            error_log($errorMessage . ': [Error Code: ' . $e->getCode() . ']');
+            error_log($errorMessage . ': [Error Code: ' . $e->getCode() . '] Host: ' . $host . ':' . $port);
             http_response_code(503);
             echo '<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><title>システムメンテナンス中</title></head><body><h1>システムメンテナンス中</h1><p>しばらくしてから再度お試しください。</p></body></html>';
         } else {
-            error_log($errorMessage . ': ' . $e->getMessage());
+            error_log($errorMessage . ': ' . $e->getMessage() . ' Host: ' . $host . ':' . $port);
             echo '<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><title>データベース接続エラー</title></head><body><h1>データベース接続エラー</h1><pre>' . htmlspecialchars($e->getMessage()) . '</pre></body></html>';
         }
         exit;

@@ -4,10 +4,10 @@ require_once '../component/autoloader.php';
 
 header('Content-Type: application/json');
 
-// 認証チェック
-if (!SessionManager::isLoggedIn()) {
+// 認証・セッション検証
+if (!SessionManager::checkSessionTimeout()) {
     http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
+    echo json_encode(['error' => 'セッションが無効です。再度ログインしてください。']);
     exit;
 }
 

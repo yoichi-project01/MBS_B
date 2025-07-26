@@ -19,6 +19,11 @@ if (empty($storeName)) {
 // CSRFトークンの生成
 $csrfToken = CSRFProtection::getToken();
 
+// CSPノンスの生成
+if (!SessionManager::get('csp_nonce')) {
+    SessionManager::set('csp_nonce', bin2hex(random_bytes(16)));
+}
+
 try {
     $pdo = db_connect();
     
@@ -134,6 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>新規納品書作成 - <?php echo htmlspecialchars($storeName); ?></title>
     <meta name="description" content="<?php echo htmlspecialchars($storeName); ?>で新しい納品書を作成します。顧客選択、商品追加、納品詳細の入力が可能です。">
+    <meta name="csrf-token" content="<?= htmlspecialchars($csrfToken) ?>">
     
     <!-- CSS Files -->
     <link rel="stylesheet" href="/MBS_B/assets/css/base.css">
@@ -262,7 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- JavaScript Files -->
     <script src="/MBS_B/assets/js/main.js" type="module"></script>
     
-    <script nonce="<?= SessionManager::get('csp_nonce') ?>">
+    <script nonce="<?= htmlspecialchars(SessionManager::get('csp_nonce', '')) ?>">
     let itemCounter = 0;
     let customerProducts = [];
     
@@ -318,7 +324,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             const formData = new FormData();
             formData.append('customer_no', customerNo);
-            formData.append('csrf_token', '<?= $csrfToken ?>');
+            formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
             
             const response = await fetch('get_customer_products.php', {
                 method: 'POST',
