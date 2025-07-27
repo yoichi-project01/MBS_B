@@ -43,6 +43,7 @@ try {
     $errorRows = [];
     $processedCustomerNos = [];
     $validator = new Validator();
+    $pdo = db_connect();
 
     $pdo->beginTransaction();
 

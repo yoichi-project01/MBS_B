@@ -71,11 +71,11 @@ if ($storeName && $pageConfig['name'] !== 'menu') {
     <link rel="stylesheet" href="/MBS_B/assets/css/components/modal.css">
     <link rel="stylesheet" href="/MBS_B/assets/css/components/form.css">
     <link rel="stylesheet" href="/MBS_B/assets/css/components/table.css">
+    <link rel="stylesheet" href="/MBS_B/assets/css/components/alert.css">
     <?php if (file_exists(__DIR__ . "/../assets/css/pages/{$pageConfig['name']}.css")): ?>
     <link rel="stylesheet" href="/MBS_B/assets/css/pages/<?= $pageConfig['name'] ?>.css">
     <?php endif; ?>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 
 <body

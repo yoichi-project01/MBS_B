@@ -46,13 +46,13 @@ class AlertComponent
             if (count($errorRows) > 5) {
                 $errorRowsDisplay .= " 他" . (count($errorRows) - 5) . "行";
             }
-            $message .= "<br><span style='color: #ff6b6b;'>⚠️ エラー行: " . $errorRowsDisplay . "行目</span>";
+            $message .= "<br><span class='swal-result-item-error'>⚠️ エラー行: " . $errorRowsDisplay . "行目</span>";
         }
 
         $errorSection = '';
         if (!empty($errorRows)) {
-            $errorSection = '<div style="border-top: 1px solid #dee2e6; margin-top: 8px; padding-top: 8px;">
-                                <span style="color: #dc3545;">❌ エラー:</span> <strong>' . count($errorRows) . '件</strong>
+            $errorSection = '<div class="swal-result-divider swal-result-box error">
+                                <span class="swal-result-item-error">❌ エラー:</span> <strong>' . count($errorRows) . '件</strong>
                             </div>';
         }
 
@@ -60,15 +60,15 @@ class AlertComponent
             icon: "success",
             title: "登録が成功しました",
             html: `
-                <div style="text-align: left; margin: 20px 0;">
-                    <p style="margin-bottom: 15px;">' . addslashes($message) . '</p>
-                    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #28a745;">
+                <div class="swal-text-left">
+                    <p class="swal-result-header">' . addslashes($message) . '</p>
+                    <div class="swal-result-box">
                         <strong>📊 処理結果</strong><br>
-                        <div style="margin-top: 10px; line-height: 1.8;">
-                            <div><span style="color: #28a745;">✅ 新規追加:</span> <strong>' . $insertCount . '件</strong></div>
-                            <div><span style="color: #17a2b8;">🔄 更新:</span> <strong>' . $updateCount . '件</strong></div>
-                            <div style="border-top: 1px solid #dee2e6; margin-top: 8px; padding-top: 8px;">
-                                <span style="color: #6c757d;">📈 合計処理:</span> <strong>' . $totalRows . '件</strong>
+                        <div class="swal-result-item">
+                            <div><span class="swal-result-item-success">✅ 新規追加:</span> <strong>' . $insertCount . '件</strong></div>
+                            <div><span class="swal-result-item-info">🔄 更新:</span> <strong>' . $updateCount . '件</strong></div>
+                            <div class="swal-result-divider">
+                                <span class="swal-result-item-muted">📈 合計処理:</span> <strong>' . $totalRows . '件</strong>
                             </div>
                             ' . $errorSection . '
                         </div>

@@ -6,6 +6,8 @@
 import { showErrorMessage } from '../components/notification.js';
 
 function initializeCustomerUpload() {
+    console.log('initializeCustomerUpload called.');
+
     const fileUploadArea = document.getElementById('fileUploadArea');
     const csvFile = document.getElementById('csvFile');
     const fileInfo = document.getElementById('fileInfo');
@@ -14,10 +16,12 @@ function initializeCustomerUpload() {
     const uploadButton = document.getElementById('uploadButton');
 
     if (!fileUploadArea || !csvFile) {
+        console.error('fileUploadArea or csvFile not found.');
         return;
     }
 
     fileUploadArea.addEventListener('click', function(e) {
+        console.log('fileUploadArea clicked.');
         if (e.target !== csvFile) {
             csvFile.click();
         }

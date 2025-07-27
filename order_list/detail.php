@@ -95,7 +95,7 @@ $status_info = translate_status_detail($order['status']);
     
     <!-- External Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    
 </head>
 <body class="with-header order-detail-page">
     <div class="dashboard-container">

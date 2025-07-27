@@ -17,16 +17,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname;
     console.log('Current path:', path);
 
-    if (path.endsWith('/') || path.endsWith('index.html') || path.endsWith('index.php') || path.includes('MBS_B/index.php') || path === '/MBS_B/') {
+    if (path.endsWith('/index.php') && !path.includes('customer_information/') && !path.includes('menu.php') && !path.includes('statistics/') && !path.includes('delivery_list/')) {
         console.log('Loading top.js...');
         import('./pages/top.js');
     } else if (path.includes('menu.php')) {
         import('./pages/menu.js');
-    } else if (path.includes('customer_information')) {
+    } else if (path.includes('customer_information/index.php')) {
+        console.log('Loading customer.js...');
         import('./pages/customer.js');
-    } else if (path.includes('statistics')) {
+    } else if (path.includes('statistics/index.php')) {
+        console.log('Loading statistics.js...');
         import('./pages/statistics.js');
-    } else if (path.includes('delivery_list')) {
+    } else if (path.includes('delivery_list/index.php')) {
+        console.log('Loading delivery.js...');
         import('./pages/delivery.js');
     }
 });

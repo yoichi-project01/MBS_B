@@ -88,7 +88,7 @@ function setSecurityHeaders()
     SessionManager::set('csp_nonce', $nonce);
 
     // コンテンツセキュリティポリシー（nonce対応）
-    $csp = "default-src 'self'; script-src 'self' 'nonce-{$nonce}' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'nonce-{$nonce}' https://cdnjs.cloudflare.com; img-src 'self' data:; font-src 'self' https://cdnjs.cloudflare.com; object-src 'none'; base-uri 'self';";
+    $csp = "default-src 'self'; script-src 'self' 'nonce-{$nonce}' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://kit.fontawesome.com; style-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://cdnjs.cloudflare.com; object-src 'none'; base-uri 'self';";
     header("Content-Security-Policy: " . $csp);
 }
 
