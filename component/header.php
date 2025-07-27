@@ -38,7 +38,7 @@ if (strpos($requestUri, '/menu.php') !== false) {
     $pageConfig['title'] = '顧客情報';
     $pageConfig['icon'] = '👥';
 } elseif (strpos($requestUri, '/statistics/') !== false) {
-    $pageConfig['name'] = 'statistics';
+    $pageConfig['name'] = 'order';
     $pageConfig['title'] = '統計情報';
     $pageConfig['icon'] = '📊';
     $pageConfig['isStatisticsPage'] = true;
@@ -72,7 +72,7 @@ if ($storeName && $pageConfig['name'] !== 'menu') {
     <link rel="stylesheet" href="/MBS_B/assets/css/components/form.css">
     <link rel="stylesheet" href="/MBS_B/assets/css/components/table.css">
     <link rel="stylesheet" href="/MBS_B/assets/css/components/alert.css">
-    <?php if (file_exists(__DIR__ . "/../assets/css/pages/{$pageConfig['name']}.css")): ?>
+    <?php if (file_exists(__DIR__ . "/../assets/css/pages/{$pageConfig['name']}.css") && $pageConfig['name'] !== 'statistics'): ?>
     <link rel="stylesheet" href="/MBS_B/assets/css/pages/<?= $pageConfig['name'] ?>.css">
     <?php endif; ?>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

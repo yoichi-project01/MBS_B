@@ -29,7 +29,7 @@
             </button>
         </div>
     </main>
-    <script src="/MBS_B/assets/js/main.js" type="module"></script>
+        <script src="/MBS_B/assets/js/pages/top.js" type="module"></script>
 </body>
 
 </html>

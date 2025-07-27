@@ -146,19 +146,19 @@ try {
     <div class="dashboard-container">
         <div class="main-content">
             <div class="content-scroll-area">
-                <div class="order-list-container statistics-container">
+                <div class="order-list-container">
 
                     <?php
                     // 検索セクションの設定
                     renderSearchSection([
                         'storeName' => $storeName,
                         'pageType' => 'order',
-                        'icon' => 'fas fa-file-alt',
+                        'icon' => 'fas fa-chart-bar',
                         'title' => '統計情報一覧',
                         'totalCount' => $total_customers,
-                        'itemName' => '統計情報',
+                        'itemName' => '顧客',
                         'searchValue' => $search_customer,
-                        'createUrl' => null, // 統計ページには作成ボタンなし
+                        'createUrl' => null,
                         'createButtonText' => null
                     ]);
                     ?>
@@ -268,14 +268,14 @@ try {
                     // ホバーエフェクト
                     newElement.addEventListener('mouseover', function() {
                         this.style.color = 'var(--accent-green)';
-                        this.style.borderBottomColor = 'var(--accent-green)';
-                        this.style.transform = 'translateY(-1px)';
+                        newElement.style.borderBottomColor = 'var(--accent-green)';
+                        newElement.style.transform = 'translateY(-1px)';
                     });
                     
                     newElement.addEventListener('mouseout', function() {
                         this.style.color = 'var(--main-green)';
-                        this.style.borderBottomColor = 'var(--main-green)';
-                        this.style.transform = 'translateY(0)';
+                        newElement.style.borderBottomColor = 'var(--main-green)';
+                        newElement.style.transform = 'translateY(0)';
                     });
                 } else {
                     // デスクトップ時：通常の表示
