@@ -147,7 +147,11 @@ function getDeliveryColumns() {
             'label' => '顧客名',
             'sortable' => true,
             'renderer' => function($value, $row, $storeName) {
-                return htmlspecialchars($value);
+                $customerName = htmlspecialchars($value, ENT_QUOTES);
+                $customerNo = htmlspecialchars($row['customer_no'] ?? '', ENT_QUOTES);
+                $storeNameEscaped = htmlspecialchars($storeName, ENT_QUOTES);
+                // 顧客詳細ページへのリンクを直接埋め込む
+                return '<a class="delivery-customer-name-clickable" href="/MBS_B/statistics/customer_detail.php?customer_no=' . $customerNo . '&store=' . $storeNameEscaped . '">' . $customerName . '</a>';
             }
         ],
         [
@@ -190,7 +194,8 @@ function getDeliveryColumns() {
             'label' => '操作',
             'renderer' => function($value, $row, $storeName) {
                 $deliveryNo = sprintf('D%04d', $row['delivery_no']);
-                return renderDeliveryTableActions($deliveryNo, $storeName, false);
+                $customerNo = htmlspecialchars($row['customer_no'] ?? '', ENT_QUOTES);
+                return renderDeliveryTableActions($deliveryNo, $storeName, $customerNo, false);
             }
         ]
     ];

@@ -131,13 +131,18 @@ function renderOrderTableActions($orderNo, $storeName, $includeDelivery = false)
 /**
  * 納品書用のテーブルアクションを描画（ショートカット関数）
  */
-function renderDeliveryTableActions($deliveryNo, $storeName, $includeOrder = false) {
+function renderDeliveryTableActions($deliveryNo, $storeName, $customerNo, $includeOrder = false) {
     $actions = [
         [
             'type' => 'detail',
-            'url' => '/MBS_B/delivery_list/detail.php?delivery_no=' . urlencode($deliveryNo) . '&store=' . urlencode($storeName),
-            'label' => '詳細',
-            'icon' => 'fas fa-eye'
+            'url' => '/MBS_B/statistics/customer_detail.php?customer_no=' . urlencode($customerNo) . '&store=' . urlencode($storeName),
+            'label' => '顧客詳細',
+            'icon' => 'fas fa-user',
+            'class' => 'view-customer-detail-btn', // 新しいクラスを追加
+            'data' => [
+                'customer-no' => $customerNo,
+                'store' => $storeName
+            ]
         ]
     ];
     

@@ -184,7 +184,8 @@ try {
                             'order' => $sort_order ?? 'DESC',
                             'search' => $search_customer ?? ''
                         ],
-                        'emptyMessage' => '該当する納品書はありません。'
+                        'emptyMessage' => '該当する納品書はありません。',
+                        'mobileMode' => 'customer-only'
                     ]);
                     ?>
 
@@ -208,6 +209,25 @@ try {
     
     <!-- JavaScript Files -->
     <script src="/MBS_B/assets/js/main.js" type="module"></script>
+    <script nonce="<?= SessionManager::get('csp_nonce') ?>">
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Delivery list page DOMContentLoaded');
+            document.querySelectorAll('.view-customer-detail-btn').forEach(button => {
+                console.log('Found detail button:', button);
+                button.addEventListener('click', function(e) {
+                    e.preventDefault(); // Prevent default link behavior
+                    const customerNo = this.dataset.customerNo;
+                    const storeName = this.dataset.store;
+                    console.log('Detail button clicked. customerNo:', customerNo, 'storeName:', storeName);
+                    if (customerNo && storeName) {
+                        window.location.href = `/MBS_B/statistics/customer_detail.php?customer_no=${encodeURIComponent(customerNo)}&store=${encodeURIComponent(storeName)}`;
+                    } else {
+                        console.error('Customer number or store name not found on detail button.');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

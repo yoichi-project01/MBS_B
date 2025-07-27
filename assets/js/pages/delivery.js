@@ -70,6 +70,10 @@ class DeliverySystem {
         const deliveryTableBody = document.getElementById('deliveryTableBody');
         if (deliveryTableBody) {
             deliveryTableBody.addEventListener('click', (e) => {
+                // 詳細ボタンがクリックされた場合は処理しない
+                if (e.target.closest('.view-customer-detail-btn')) {
+                    return;
+                }
                 const row = e.target.closest('tr');
                 if (row && !e.target.closest('input[type="checkbox"]')) {
                     const customerName = row.dataset.customerName;

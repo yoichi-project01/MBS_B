@@ -8,7 +8,8 @@
 export function initializeCustomerNameClick() {
     // 顧客名クリックイベントの設定
     document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('customer-name-clickable')) {
+        // 注文書ページの顧客名クリックのみを処理
+        if (e.target.classList.contains('customer-name-clickable') && window.location.pathname.includes('order_list')) {
             e.preventDefault();
             const customerName = e.target.getAttribute('data-customer');
             const orderNo = e.target.getAttribute('data-order');
