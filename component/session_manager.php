@@ -20,7 +20,7 @@ class SessionManager
             // セッションのセキュリティ設定
             ini_set('session.cookie_httponly', 1);
             ini_set('session.use_only_cookies', 1);
-            ini_set('session.cookie_secure', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on');
+            ini_set('session.cookie_secure', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443);
             ini_set('session.cookie_samesite', 'Strict');
         }
 

@@ -2,11 +2,29 @@
 require_once(__DIR__ . '/component/autoloader.php');
 SessionManager::start();
 
+$allowedStores = ['緑橋本店', '今里店', '深江橋店'];
 $storeName = $_GET['store'] ?? $_COOKIE['selectedStore'] ?? '';
-if ($storeName) {
-    setcookie('selectedStore', $storeName, time() + 3600, '/');
+
+if ($storeName && in_array($storeName, $allowedStores, true)) {
+    // クッキーのセキュリティ設定
+    $cookieOptions = [
+        'expires' => time() + 3600,
+        'path' => '/',
+        'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off', // HTTPSの場合のみsecure
+        'httponly' => true, // JavaScriptからのアクセスを禁止
+        'samesite' => 'Lax' // CSRF対策
+    ];
+    setcookie('selectedStore', $storeName, $cookieOptions);
     SessionManager::set('store_name', $storeName);
     SessionManager::regenerateId();
+} else {
+    // 不正な店舗名の場合はデフォルト値またはエラー処理
+    $storeName = SessionManager::get('store_name', ''); // セッションから取得
+    if (empty($storeName)) {
+        // セッションにもない場合は、トップページにリダイレクトするか、エラーメッセージを表示
+        header('Location: /MBS_B/index.php');
+        exit;
+    }
 }
 ?>
 <!DOCTYPE html>

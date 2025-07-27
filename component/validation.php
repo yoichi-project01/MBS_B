@@ -226,7 +226,9 @@ class Validator
         $isValid = true;
 
         // データが配列で9つ以上の要素があることを確認
-        if (!is_array($data) || count($data) < 9) {
+        // 期待されるヘッダー数に基づいて列数をチェック
+        $expectedColumnCount = count($this->getExpectedCustomerHeaders()); // 新しいヘルパー関数を呼び出す
+        if (!is_array($data) || count($data) < $expectedColumnCount) {
             $this->addError($prefix . "データ形式", "CSVの列数が不足しています。");
             return false;
         }
@@ -347,13 +349,13 @@ class Validator
         }, $headers);
 
         // 最低限必要な列数をチェック
-        if (count($normalizedHeaders) < 9) {
+        if (count($normalizedHeaders) < count($this->getExpectedCustomerHeaders())) {
             $this->addError('header', 'CSVファイルの列数が不足しています。最低9列必要です。');
             return false;
         }
 
         // ヘッダー名の妥当性チェック（部分一致で許可）
-        for ($i = 0; $i < 9; $i++) {
+        for ($i = 0; $i < count($this->getExpectedCustomerHeaders()); $i++) {
             if (empty($normalizedHeaders[$i])) {
                 $this->addError('header', "列" . ($i + 1) . "のヘッダーが空です。");
                 return false;
@@ -486,5 +488,23 @@ class Validator
             }
         }
         return implode($separator, $errorMessages);
+    }
+
+    /**
+     * 顧客データCSVの期待されるヘッダーリストを取得
+     */
+    private function getExpectedCustomerHeaders()
+    {
+        return [
+            '顧客ID',
+            '店舗名',
+            '顧客名',
+            '担当者名',
+            '住所',
+            '電話番号',
+            '配送条件',
+            '備考',
+            '顧客登録日'
+        ];
     }
 }

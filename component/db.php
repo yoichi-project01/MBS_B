@@ -37,7 +37,6 @@ function db_connect()
         PDO::ATTR_TIMEOUT            => 30,
         PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES {$charset} COLLATE utf8mb4_unicode_ci",
         PDO::MYSQL_ATTR_FOUND_ROWS   => true,
-        PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
     ];
 
     if (isset($_ENV['DB_SSL']) && $_ENV['DB_SSL'] === 'true') {

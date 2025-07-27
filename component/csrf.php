@@ -25,7 +25,7 @@ class CSRFProtection
     {
         // 引数がない場合はPOSTから取得
         if ($token === null) {
-            $token = $_POST['csrf_token'] ?? $_GET['csrf_token'] ?? '';
+            $token = $_POST['csrf_token'] ?? '';
         }
         
         // SessionManagerがセッションを管理

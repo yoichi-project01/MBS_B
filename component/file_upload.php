@@ -195,7 +195,7 @@ class FileUploadHandler
         $header = fread($handle, 16);
         fclose($handle);
 
-        // CSVファイルとして妥当かチェック
+        // テキストファイルとして妥当かチェック（UTF-8 BOMの確認を含む）
         // UTF-8 BOMの確認
         if (substr($header, 0, 3) === "\xEF\xBB\xBF") {
             $header = substr($header, 3);
